@@ -6,12 +6,12 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>831</width>
-    <height>584</height>
+    <width>866</width>
+    <height>625</height>
    </rect>
   </property>
   <property name="windowTitle">
-   <string>ArenaUI</string>
+   <string>Assisi|bf Arena UI</string>
   </property>
   <widget class="QWidget" name="centralWidget">
    <layout class="QHBoxLayout" name="horizontalLayout" stretch="3,2">
@@ -26,49 +26,184 @@
       <property name="currentIndex">
        <number>0</number>
       </property>
-      <widget class="QWidget" name="tab">
+      <widget class="QWidget" name="tab_casus">
+       <property name="enabled">
+        <bool>true</bool>
+       </property>
        <attribute name="title">
-        <string>Tab 1</string>
+        <string>Casus</string>
        </attribute>
        <layout class="QVBoxLayout" name="verticalLayout_2">
         <item>
          <layout class="QVBoxLayout" name="verticalLayout">
           <item>
-           <widget class="QLabel" name="label">
-            <property name="text">
-             <string>TextLabel</string>
+           <widget class="QTreeWidget" name="tree_casu">
+            <property name="allColumnsShowFocus">
+             <bool>true</bool>
             </property>
+            <attribute name="headerDefaultSectionSize">
+             <number>180</number>
+            </attribute>
+            <column>
+             <property name="text">
+              <string>Device</string>
+             </property>
+            </column>
+            <column>
+             <property name="text">
+              <string>Value</string>
+             </property>
+            </column>
+            <item>
+             <property name="text">
+              <string>casu001</string>
+             </property>
+             <property name="text">
+              <string/>
+             </property>
+             <item>
+              <property name="text">
+               <string>IR</string>
+              </property>
+              <item>
+               <property name="text">
+                <string>ir_N</string>
+               </property>
+               <property name="text">
+                <string>17</string>
+               </property>
+              </item>
+              <item>
+               <property name="text">
+                <string>ir_NE</string>
+               </property>
+              </item>
+              <item>
+               <property name="text">
+                <string>ir_SE</string>
+               </property>
+               <property name="text">
+                <string>0.9</string>
+               </property>
+              </item>
+              <item>
+               <property name="text">
+                <string>ir_S</string>
+               </property>
+              </item>
+              <item>
+               <property name="text">
+                <string>ir_SW</string>
+               </property>
+              </item>
+              <item>
+               <property name="text">
+                <string>ir_NW</string>
+               </property>
+              </item>
+             </item>
+             <item>
+              <property name="text">
+               <string>Diagnostic LED</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>Temperature</string>
+              </property>
+              <item>
+               <property name="text">
+                <string>temp_N</string>
+               </property>
+              </item>
+              <item>
+               <property name="text">
+                <string>temp_E</string>
+               </property>
+              </item>
+              <item>
+               <property name="text">
+                <string>temp_S</string>
+               </property>
+              </item>
+              <item>
+               <property name="text">
+                <string>temp_W</string>
+               </property>
+              </item>
+             </item>
+             <item>
+              <property name="text">
+               <string>Vibration</string>
+              </property>
+              <item>
+               <property name="text">
+                <string>acc_N</string>
+               </property>
+              </item>
+              <item>
+               <property name="text">
+                <string>acc_E</string>
+               </property>
+              </item>
+              <item>
+               <property name="text">
+                <string>acc_S</string>
+               </property>
+              </item>
+              <item>
+               <property name="text">
+                <string>acc_W</string>
+               </property>
+              </item>
+             </item>
+             <item>
+              <property name="text">
+               <string>Light</string>
+              </property>
+             </item>
+            </item>
            </widget>
-          </item>
-          <item>
-           <widget class="QLineEdit" name="lineEdit"/>
           </item>
          </layout>
         </item>
        </layout>
       </widget>
+      <widget class="QWidget" name="tab_global">
+       <attribute name="title">
+        <string>Global</string>
+       </attribute>
+      </widget>
+      <widget class="QWidget" name="tab_logging">
+       <attribute name="title">
+        <string>Logging</string>
+       </attribute>
+      </widget>
       <widget class="QWidget" name="tab_2">
        <attribute name="title">
-        <string>Tab 2</string>
+        <string>Deployment</string>
+       </attribute>
+      </widget>
+      <widget class="QWidget" name="tab_camera">
+       <attribute name="title">
+        <string>Camera</string>
+       </attribute>
+      </widget>
+      <widget class="QWidget" name="tab_sim">
+       <attribute name="title">
+        <string>Simulation</string>
        </attribute>
       </widget>
      </widget>
     </item>
    </layout>
-   <zorder>tabWidget</zorder>
-   <zorder>textEdit</zorder>
-   <zorder>textEdit</zorder>
-   <zorder>label</zorder>
-   <zorder>lineEdit</zorder>
-   <zorder>graphicsView</zorder>
-   <zorder>tabWidget</zorder>
   </widget>
   <widget class="QMenuBar" name="menuBar">
    <property name="geometry">
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>831</width>
+     <width>866</width>
      <height>25</height>
     </rect>
    </property>

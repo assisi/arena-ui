@@ -18,6 +18,10 @@ public:
     ~ArenaUI();
 
 private:
+
+    // Connect the publisher and subscriber
+    void connect_();
+
     Ui::ArenaUI *ui;
 
     QString sub_addr_;
@@ -25,6 +29,10 @@ private:
     nzmqt::ZMQContext* context_;
     nzmqt::ZMQSocket* pub_sock_;
     nzmqt::ZMQSocket* sub_sock_;
+    bool connected_;
+
+protected slots:
+    void messageReceived(const QList<QByteArray>& message);
 };
 
 #endif // ARENAUI_H
