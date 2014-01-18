@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>866</width>
-    <height>625</height>
+    <width>1093</width>
+    <height>710</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -16,7 +16,11 @@
   <widget class="QWidget" name="centralWidget">
    <layout class="QHBoxLayout" name="horizontalLayout" stretch="3,2">
     <item>
-     <widget class="QGraphicsView" name="graphicsView"/>
+     <widget class="QGraphicsView" name="graphicsView">
+      <property name="styleSheet">
+       <string notr="true">border-image: url(:/images/arena_sw.png);</string>
+      </property>
+     </widget>
     </item>
     <item>
      <widget class="QTabWidget" name="tabWidget">
@@ -70,12 +74,15 @@
                 <string>ir_N</string>
                </property>
                <property name="text">
-                <string>17</string>
+                <string>0.53</string>
                </property>
               </item>
               <item>
                <property name="text">
                 <string>ir_NE</string>
+               </property>
+               <property name="text">
+                <string>2</string>
                </property>
               </item>
               <item>
@@ -83,28 +90,40 @@
                 <string>ir_SE</string>
                </property>
                <property name="text">
-                <string>0.9</string>
+                <string>2</string>
                </property>
               </item>
               <item>
                <property name="text">
                 <string>ir_S</string>
                </property>
+               <property name="text">
+                <string>2</string>
+               </property>
               </item>
               <item>
                <property name="text">
                 <string>ir_SW</string>
+               </property>
+               <property name="text">
+                <string>2</string>
                </property>
               </item>
               <item>
                <property name="text">
                 <string>ir_NW</string>
                </property>
+               <property name="text">
+                <string>2</string>
+               </property>
               </item>
              </item>
              <item>
               <property name="text">
                <string>Diagnostic LED</string>
+              </property>
+              <property name="text">
+               <string/>
               </property>
              </item>
              <item>
@@ -203,7 +222,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>866</width>
+     <width>1093</width>
      <height>25</height>
     </rect>
    </property>

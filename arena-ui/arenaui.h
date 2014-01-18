@@ -2,6 +2,7 @@
 #define ARENAUI_H
 
 #include <QMainWindow>
+#include <QGraphicsScene>
 
 #include <nzmqt.hpp>
 
@@ -23,6 +24,8 @@ private:
     void connect_();
 
     Ui::ArenaUI *ui;
+    QGraphicsScene *arena_scene;
+    QGraphicsEllipseItem *ellipse;
 
     QString sub_addr_;
     QString pub_addr_;
@@ -33,6 +36,18 @@ private:
 
 protected slots:
     void messageReceived(const QList<QByteArray>& message);
+};
+
+
+class MouseClickHandler : public QObject
+{
+    Q_OBJECT
+
+public:
+    MouseClickHandler(QObject* parent = 0);
+
+protected:
+    bool eventFilter(QObject* obj, QEvent* event);
 };
 
 #endif // ARENAUI_H

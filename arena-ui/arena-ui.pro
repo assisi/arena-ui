@@ -27,3 +27,6 @@ FORMS    += arenaui.ui
 LIBS += -lzmq\
         -lnzmqt\
         -lprotobuf
+
+RESOURCES += \
+    images.qrc

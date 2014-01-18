@@ -1,6 +1,7 @@
 #include <boost/lexical_cast.hpp>
 
 #include <QThread>
+#include <QGraphicsSceneMouseEvent>
 
 #include "arenaui.h"
 #include "ui_arenaui.h"
@@ -24,6 +25,15 @@ ArenaUI::ArenaUI(QWidget *parent) :
     sub_sock_(0)
 {
     ui->setupUi(this);
+    arena_scene = new QGraphicsScene(this);
+    ui->graphicsView->setScene(arena_scene);
+
+    MouseClickHandler* click_handler = new MouseClickHandler(this);
+    ui->graphicsView->installEventFilter(click_handler);
+
+    QPen outlinePen(Qt::red);
+    outlinePen.setWidth(2);
+    ellipse = arena_scene->addEllipse(0, 0, 20, 20, outlinePen);
 
     context_ = createDefaultContext(this);
     context_->start();
@@ -72,11 +82,6 @@ void ArenaUI::messageReceived(const QList<QByteArray>& message)
     {
         RangeArray ranges;
         ranges.ParseFromString(data);
-        /*
-        ui->tree_casu->topLevelItem(1)->setData(2,
-                                                Qt::DisplayRole,
-                                                QVariant(lexical_cast<string>(ranges.range(0)).c_str()));
-                                                */
         QTreeWidgetItem* ir = ui->tree_casu->topLevelItem(0)->child(0);
         for (int i = 0; i < ranges.range_size(); i++)
         {
@@ -85,6 +90,31 @@ void ArenaUI::messageReceived(const QList<QByteArray>& message)
         }
     }
 
+}
+
+// -------------------------------------------------------------------------------
+
+MouseClickHandler::MouseClickHandler(QObject *parent) : QObject(parent)
+{
+
+}
+
+// -------------------------------------------------------------------------------
+
+
+bool MouseClickHandler::eventFilter(QObject* obj, QEvent* event)
+{
+    if (event->type() == QEvent::GraphicsSceneMousePress)
+    {
+        QGraphicsSceneMouseEvent* mouse_click = static_cast<QGraphicsSceneMouseEvent *>(event);
+        qDebug("Mouse clicked!!!");
+        return true;
+    }
+    else
+    {
+        // standard event processing
+        return QObject::eventFilter(obj, event);
+    }
 }
 
 // -------------------------------------------------------------------------------
