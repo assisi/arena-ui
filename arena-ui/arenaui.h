@@ -25,7 +25,6 @@ private:
 
     Ui::ArenaUI *ui;
     QGraphicsScene *arena_scene;
-    QGraphicsEllipseItem *ellipse;
 
     QString sub_addr_;
     QString pub_addr_;
@@ -38,16 +37,24 @@ protected slots:
     void messageReceived(const QList<QByteArray>& message);
 };
 
+// ------------------------------------------------------------------------
 
 class MouseClickHandler : public QObject
 {
     Q_OBJECT
 
 public:
-    MouseClickHandler(QObject* parent = 0);
+    MouseClickHandler(QGraphicsScene* scene, QObject* parent = 0);
 
 protected:
     bool eventFilter(QObject* obj, QEvent* event);
+
+private:
+    QGraphicsScene* scene_;
+    QPen pen_;
+    QGraphicsEllipseItem* mark_;
 };
+
+// ------------------------------------------------------------------------
 
 #endif // ARENAUI_H

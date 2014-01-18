@@ -2,6 +2,7 @@
 
 #include <QThread>
 #include <QGraphicsSceneMouseEvent>
+#include <QGraphicsEllipseItem>
 
 #include "arenaui.h"
 #include "ui_arenaui.h"
@@ -28,12 +29,8 @@ ArenaUI::ArenaUI(QWidget *parent) :
     arena_scene = new QGraphicsScene(this);
     ui->graphicsView->setScene(arena_scene);
 
-    MouseClickHandler* click_handler = new MouseClickHandler(this);
-    ui->graphicsView->installEventFilter(click_handler);
-
-    QPen outlinePen(Qt::red);
-    outlinePen.setWidth(2);
-    ellipse = arena_scene->addEllipse(0, 0, 20, 20, outlinePen);
+    MouseClickHandler* click_handler = new MouseClickHandler(arena_scene, this);
+    arena_scene->installEventFilter(click_handler);
 
     context_ = createDefaultContext(this);
     context_->start();
@@ -94,9 +91,13 @@ void ArenaUI::messageReceived(const QList<QByteArray>& message)
 
 // -------------------------------------------------------------------------------
 
-MouseClickHandler::MouseClickHandler(QObject *parent) : QObject(parent)
+MouseClickHandler::MouseClickHandler(QGraphicsScene* scene, QObject *parent) :
+    QObject(parent),
+    scene_(scene),
+    pen_(Qt::red),
+    mark_(0)
 {
-
+    pen_.setWidth(2);
 }
 
 // -------------------------------------------------------------------------------
@@ -107,7 +108,17 @@ bool MouseClickHandler::eventFilter(QObject* obj, QEvent* event)
     if (event->type() == QEvent::GraphicsSceneMousePress)
     {
         QGraphicsSceneMouseEvent* mouse_click = static_cast<QGraphicsSceneMouseEvent *>(event);
-        qDebug("Mouse clicked!!!");
+        if (mark_ == 0)
+        {
+            //QPointF point = mouse_click->buttonDownPos(Qt::LeftButton);
+            QPointF point = mouse_click->scenePos();
+            mark_ = scene_->addEllipse(point.x(), point.y(), 20, 20, pen_);
+        }
+        else
+        {
+            //mark_->setPos(mouse_click->buttonDownPos(Qt::LeftButton));
+            mark_->setPos(mouse_click->scenePos());
+        }
         return true;
     }
     else
