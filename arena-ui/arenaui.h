@@ -3,8 +3,14 @@
 
 #include <QMainWindow>
 #include <QGraphicsScene>
+#include <vector>
 
-#include <nzmqt.hpp>
+#include <yaml-cpp/yaml.h>
+#include <nzmqt/nzmqt.hpp>
+
+#include "casusceneitem.h"
+#include "connectdialog.h"
+
 
 namespace Ui {
 class ArenaUI;
@@ -19,22 +25,17 @@ public:
     ~ArenaUI();
 
 private:
-
-    // Connect the publisher and subscriber
-    void connect_();
-
     Ui::ArenaUI *ui;
     QGraphicsScene *arena_scene;
+    QString arena_file;
 
-    QString sub_addr_;
-    QString pub_addr_;
-    nzmqt::ZMQContext* context_;
-    nzmqt::ZMQSocket* pub_sock_;
-    nzmqt::ZMQSocket* sub_sock_;
-    bool connected_;
+    YAML::Node arena_config;
 
-protected slots:
-    void messageReceived(const QList<QByteArray>& message);
+private slots:
+    void on_actionOpen_Arena_triggered();
+    void on_actionGroup_triggered();
+    void on_actionUngroup_triggered();
+    void on_actionConnect_triggered();
 };
 
 // ------------------------------------------------------------------------
@@ -51,8 +52,7 @@ protected:
 
 private:
     QGraphicsScene* scene_;
-    QPen pen_;
-    QGraphicsEllipseItem* mark_;
+    bool drag_true;
 };
 
 // ------------------------------------------------------------------------

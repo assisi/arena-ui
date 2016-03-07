@@ -11,22 +11,29 @@ greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 TARGET = arena-ui
 TEMPLATE = app
 
-
 INCLUDEPATH += ../msg/cpp
 
 SOURCES += main.cpp\
         arenaui.cpp\
+        nzmqt/nzmqt.cpp\
         ../msg/cpp/base_msgs.pb.cc\
         ../msg/cpp/dev_msgs.pb.cc\
-        ../msg/cpp/sim_msgs.pb.cc
+        ../msg/cpp/sim_msgs.pb.cc \
+    casutreeitem.cpp \
+    casusceneitem.cpp \
+    connectdialog.cpp
 
-HEADERS  += arenaui.h
+HEADERS  += arenaui.h\
+        nzmqt/nzmqt.hpp \
+    casutreeitem.h \
+    casusceneitem.h \
+    connectdialog.h
 
 FORMS    += arenaui.ui
 
 LIBS += -lzmq\
-        -lnzmqt\
-        -lprotobuf
+        -lprotobuf\
+        -lyaml-cpp
 
 RESOURCES += \
     images.qrc

@@ -2,7 +2,8 @@
 
 #include <QThread>
 #include <QGraphicsSceneMouseEvent>
-#include <QGraphicsEllipseItem>
+#include <QFileDialog>
+#include <QMessageBox>
 
 #include "arenaui.h"
 #include "ui_arenaui.h"
@@ -14,33 +15,24 @@ using namespace std;
 using namespace AssisiMsg;
 using namespace boost;
 
+
 // -------------------------------------------------------------------------------
 
 ArenaUI::ArenaUI(QWidget *parent) :
     QMainWindow(parent),
-    ui(new Ui::ArenaUI),
-    sub_addr_("tcp://127.0.0.1:5555"),
-    pub_addr_("tcp://127.0.0.1:5556"),
-    context_(0),
-    pub_sock_(0),
-    sub_sock_(0)
+    ui(new Ui::ArenaUI)
 {
     ui->setupUi(this);
+
     arena_scene = new QGraphicsScene(this);
-    ui->graphicsView->setScene(arena_scene);
+    arena_scene->setSceneRect(0,0,800,800);
+
+    ui->arenaSpace->setScene(arena_scene);
+    ui->arenaSpace->setDragMode(QGraphicsView::RubberBandDrag);
 
     MouseClickHandler* click_handler = new MouseClickHandler(arena_scene, this);
     arena_scene->installEventFilter(click_handler);
 
-    context_ = createDefaultContext(this);
-    context_->start();
-    sub_sock_ = context_->createSocket(ZMQSocket::TYP_SUB, this);
-    pub_sock_ = context_->createSocket(ZMQSocket::TYP_PUB, this);
-
-    connect(sub_sock_, SIGNAL(messageReceived(const QList<QByteArray>&)),
-            SLOT(messageReceived(const QList<QByteArray>&)));
-
-    this->connect_();
 }
 
 // -------------------------------------------------------------------------------
@@ -48,77 +40,40 @@ ArenaUI::ArenaUI(QWidget *parent) :
 ArenaUI::~ArenaUI()
 {
     delete ui;
-    delete context_;
-    delete pub_sock_;
-    delete sub_sock_;
-}
-
-// -------------------------------------------------------------------------------
-
-void ArenaUI::connect_()
-{
-    pub_sock_->connectTo(pub_addr_);
-    // Subscribe to everything!
-    sub_sock_->subscribeTo("casu");
-    sub_sock_->connectTo(sub_addr_);
-}
-
-// -------------------------------------------------------------------------------
-
-/* protected slots */
-void ArenaUI::messageReceived(const QList<QByteArray>& message)
-{
-    connected_ = true;
-
-    string name(message.at(0).constData(), message.at(0).length());
-    string device(message.at(1).constData(), message.at(1).length());
-    string command(message.at(2).constData(), message.at(2).length());
-    string data(message.at(3).constData(), message.at(3).length());
-
-    if (device == "ir")
-    {
-        RangeArray ranges;
-        ranges.ParseFromString(data);
-        QTreeWidgetItem* ir = ui->tree_casu->topLevelItem(0)->child(0);
-        for (int i = 0; i < ranges.range_size(); i++)
-        {
-            ir->child(i)->setData(1, Qt::DisplayRole,
-                                  QVariant(lexical_cast<string>(ranges.range(i)).c_str()));
-        }
-    }
-
 }
 
 // -------------------------------------------------------------------------------
 
 MouseClickHandler::MouseClickHandler(QGraphicsScene* scene, QObject *parent) :
     QObject(parent),
-    scene_(scene),
-    pen_(Qt::red),
-    mark_(0)
-{
-    pen_.setWidth(2);
-}
-
+    scene_(scene){}
 // -------------------------------------------------------------------------------
-
-
 bool MouseClickHandler::eventFilter(QObject* obj, QEvent* event)
 {
-    if (event->type() == QEvent::GraphicsSceneMousePress)
+    if (event->type() == QEvent::GraphicsSceneMouseMove){
+        drag_true = true;
+    }
+    if (event->type() == QEvent::GraphicsSceneMouseRelease)
     {
         QGraphicsSceneMouseEvent* mouse_click = static_cast<QGraphicsSceneMouseEvent *>(event);
-        if (mark_ == 0)
-        {
-            //QPointF point = mouse_click->buttonDownPos(Qt::LeftButton);
-            QPointF point = mouse_click->scenePos();
-            mark_ = scene_->addEllipse(point.x(), point.y(), 20, 20, pen_);
-        }
-        else
-        {
-            //mark_->setPos(mouse_click->buttonDownPos(Qt::LeftButton));
-            mark_->setPos(mouse_click->scenePos());
-        }
+
+        QGraphicsItem * itemAtMouse= scene_->itemAt(mouse_click->scenePos().x(),mouse_click->scenePos().y(), QTransform());
+
+        if (itemAtMouse && !drag_true)
+            if(QApplication::keyboardModifiers() == Qt::CTRL){
+                if(itemAtMouse->isSelected())itemAtMouse->setSelected(0);
+                else itemAtMouse->setSelected(1);
+            }
+            else{
+                scene_->clearSelection();
+                itemAtMouse->setSelected(1);
+            }
+        else if(QApplication::keyboardModifiers() != Qt::CTRL && !drag_true)
+            scene_->clearSelection();
+
+
+        drag_true = false;
+
         return true;
     }
     else
@@ -129,3 +84,82 @@ bool MouseClickHandler::eventFilter(QObject* obj, QEvent* event)
 }
 
 // -------------------------------------------------------------------------------
+
+
+void ArenaUI::on_actionOpen_Arena_triggered()
+{
+    arena_file = QFileDialog::getOpenFileName(this,tr("Open Arena configuration file"),"../arena_files",tr("*.arena"));
+    if(!arena_file.toStdString().empty()){
+        arena_scene->clear();
+        arena_config = YAML::LoadFile(arena_file.toStdString());
+
+        for(YAML::const_iterator it=arena_config["beearena"].begin(); it!=arena_config["beearena"].end(); it++){
+            QString name = QString::fromStdString(it->first.as<std::string>());
+            int xpos = arena_config["beearena"][name.toStdString()]["pose"]["x"].as<int>();
+            int ypos = arena_config["beearena"][name.toStdString()]["pose"]["y"].as<int>();
+
+            CasuTreeItem* temp_tree = new CasuTreeItem(ui->casuTree, name);
+
+            ui->casuTree->addTopLevelItem(temp_tree);
+
+            CasuSceneItem* temp_item = new CasuSceneItem(this, xpos*10+400, ypos*10+400, temp_tree);
+
+            arena_scene->addItem(temp_item);
+
+            temp_tree->setAddr(QString::fromStdString(arena_config["beearena"][name.toStdString()]["sub_addr"].as<std::string>()),
+                               QString::fromStdString(arena_config["beearena"][name.toStdString()]["pub_addr"].as<std::string>()),
+                               QString::fromStdString(arena_config["beearena"][name.toStdString()]["msg_addr"].as<std::string>()));
+        }
+
+    }
+}
+
+void ArenaUI::on_actionGroup_triggered()
+{
+    QList<QGraphicsItem *> temp_itemList= arena_scene->selectedItems();
+    arena_scene->clearSelection();
+    QGraphicsItemGroup *temp_group = arena_scene->createItemGroup(temp_itemList);
+    temp_group->setFlag(QGraphicsItem::ItemIsSelectable, true);
+    temp_group->setFlag(QGraphicsItem::ItemIsFocusable, false);
+    temp_group->setSelected(1);
+    temp_group->setZValue(-1);
+}
+
+
+void ArenaUI::on_actionUngroup_triggered()
+{
+    QList<QGraphicsItem *> temp_itemList= arena_scene->selectedItems();
+    for(int k=0;k<temp_itemList.size();k++)
+        if(temp_itemList[k]->childItems().size()){
+            QList<QGraphicsItem *> temp_childList = temp_itemList[k]->childItems();
+            if(!temp_itemList[k]->childItems().size())temp_itemList[k]->setZValue(1);
+            arena_scene->destroyItemGroup((QGraphicsItemGroup*)temp_itemList[k]);
+            for(int i=0;i<temp_childList.size();i++){;
+                temp_childList[i]->setSelected(0);
+                temp_childList[i]->setSelected(1);
+            }
+        }
+}
+
+void ArenaUI::on_actionConnect_triggered()
+{
+    //Check if only one is selected
+    {
+    bool error = false;
+    if (arena_scene->selectedItems().size() != 1) error = true;
+    if(arena_scene->selectedItems().size() == 1)
+        if(arena_scene->selectedItems()[0]->childItems().size()) error = true;
+    if(error){
+        QMessageBox msgBox;
+        msgBox.setWindowTitle("ERROR");
+        msgBox.setText("Please select one CASU.");
+        msgBox.setStandardButtons(QMessageBox::Ok);
+        msgBox.exec();
+        return;
+    }}
+    CasuSceneItem* temp = (CasuSceneItem*)arena_scene->selectedItems()[0];
+    connectDialog* addrDiag = new connectDialog(temp->widget_->sub_addr,temp->widget_->pub_addr,temp->widget_->msg_addr);
+    if(addrDiag->exec()){
+        temp->widget_->setAddr(addrDiag->sub_addr->text(), addrDiag->pub_addr->text(),addrDiag->msg_addr->text());
+    }
+}
