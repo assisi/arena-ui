@@ -6,17 +6,29 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1093</width>
-    <height>710</height>
+    <width>1170</width>
+    <height>850</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>Assisi|bf Arena UI</string>
   </property>
   <widget class="QWidget" name="centralWidget">
-   <layout class="QHBoxLayout" name="horizontalLayout" stretch="3,2">
+   <layout class="QHBoxLayout" name="horizontalLayout" stretch="0,0">
     <item>
-     <widget class="QGraphicsView" name="graphicsView">
+     <widget class="QGraphicsView" name="arenaSpace">
+      <property name="minimumSize">
+       <size>
+        <width>800</width>
+        <height>800</height>
+       </size>
+      </property>
+      <property name="maximumSize">
+       <size>
+        <width>800</width>
+        <height>800</height>
+       </size>
+      </property>
       <property name="styleSheet">
        <string notr="true">border-image: url(:/images/arena_sw.png);</string>
       </property>
@@ -24,11 +36,14 @@
     </item>
     <item>
      <widget class="QTabWidget" name="tabWidget">
+      <property name="enabled">
+       <bool>true</bool>
+      </property>
       <property name="tabPosition">
-       <enum>QTabWidget::East</enum>
+       <enum>QTabWidget::North</enum>
       </property>
       <property name="currentIndex">
-       <number>0</number>
+       <number>3</number>
       </property>
       <widget class="QWidget" name="tab_casus">
        <property name="enabled">
@@ -39,159 +54,35 @@
        </attribute>
        <layout class="QVBoxLayout" name="verticalLayout_2">
         <item>
-         <layout class="QVBoxLayout" name="verticalLayout">
-          <item>
-           <widget class="QTreeWidget" name="tree_casu">
-            <property name="allColumnsShowFocus">
-             <bool>true</bool>
-            </property>
-            <attribute name="headerDefaultSectionSize">
-             <number>180</number>
-            </attribute>
-            <column>
-             <property name="text">
-              <string>Device</string>
-             </property>
-            </column>
-            <column>
-             <property name="text">
-              <string>Value</string>
-             </property>
-            </column>
-            <item>
-             <property name="text">
-              <string>casu001</string>
-             </property>
-             <property name="text">
-              <string/>
-             </property>
-             <item>
-              <property name="text">
-               <string>IR</string>
-              </property>
-              <item>
-               <property name="text">
-                <string>ir_N</string>
-               </property>
-               <property name="text">
-                <string>0.53</string>
-               </property>
-              </item>
-              <item>
-               <property name="text">
-                <string>ir_NE</string>
-               </property>
-               <property name="text">
-                <string>2</string>
-               </property>
-              </item>
-              <item>
-               <property name="text">
-                <string>ir_SE</string>
-               </property>
-               <property name="text">
-                <string>2</string>
-               </property>
-              </item>
-              <item>
-               <property name="text">
-                <string>ir_S</string>
-               </property>
-               <property name="text">
-                <string>2</string>
-               </property>
-              </item>
-              <item>
-               <property name="text">
-                <string>ir_SW</string>
-               </property>
-               <property name="text">
-                <string>2</string>
-               </property>
-              </item>
-              <item>
-               <property name="text">
-                <string>ir_NW</string>
-               </property>
-               <property name="text">
-                <string>2</string>
-               </property>
-              </item>
-             </item>
-             <item>
-              <property name="text">
-               <string>Diagnostic LED</string>
-              </property>
-              <property name="text">
-               <string/>
-              </property>
-             </item>
-             <item>
-              <property name="text">
-               <string>Temperature</string>
-              </property>
-              <item>
-               <property name="text">
-                <string>temp_N</string>
-               </property>
-              </item>
-              <item>
-               <property name="text">
-                <string>temp_E</string>
-               </property>
-              </item>
-              <item>
-               <property name="text">
-                <string>temp_S</string>
-               </property>
-              </item>
-              <item>
-               <property name="text">
-                <string>temp_W</string>
-               </property>
-              </item>
-             </item>
-             <item>
-              <property name="text">
-               <string>Vibration</string>
-              </property>
-              <item>
-               <property name="text">
-                <string>acc_N</string>
-               </property>
-              </item>
-              <item>
-               <property name="text">
-                <string>acc_E</string>
-               </property>
-              </item>
-              <item>
-               <property name="text">
-                <string>acc_S</string>
-               </property>
-              </item>
-              <item>
-               <property name="text">
-                <string>acc_W</string>
-               </property>
-              </item>
-             </item>
-             <item>
-              <property name="text">
-               <string>Light</string>
-              </property>
-             </item>
-            </item>
-           </widget>
-          </item>
-         </layout>
+         <widget class="QTreeWidget" name="casuTree">
+          <property name="selectionMode">
+           <enum>QAbstractItemView::MultiSelection</enum>
+          </property>
+          <property name="sortingEnabled">
+           <bool>true</bool>
+          </property>
+          <attribute name="headerVisible">
+           <bool>false</bool>
+          </attribute>
+          <attribute name="headerDefaultSectionSize">
+           <number>150</number>
+          </attribute>
+          <column>
+           <property name="text">
+            <string>Name</string>
+           </property>
+          </column>
+          <column>
+           <property name="text">
+            <string>Value</string>
+           </property>
+           <property name="textAlignment">
+            <set>AlignTrailing|AlignVCenter</set>
+           </property>
+          </column>
+         </widget>
         </item>
        </layout>
-      </widget>
-      <widget class="QWidget" name="tab_global">
-       <attribute name="title">
-        <string>Global</string>
-       </attribute>
       </widget>
       <widget class="QWidget" name="tab_logging">
        <attribute name="title">
@@ -208,36 +99,106 @@
         <string>Camera</string>
        </attribute>
       </widget>
-      <widget class="QWidget" name="tab_sim">
-       <attribute name="title">
-        <string>Simulation</string>
-       </attribute>
-      </widget>
      </widget>
     </item>
    </layout>
   </widget>
-  <widget class="QMenuBar" name="menuBar">
-   <property name="geometry">
-    <rect>
-     <x>0</x>
-     <y>0</y>
-     <width>1093</width>
-     <height>25</height>
-    </rect>
-   </property>
-  </widget>
   <widget class="QToolBar" name="mainToolBar">
+   <property name="movable">
+    <bool>false</bool>
+   </property>
+   <property name="allowedAreas">
+    <set>Qt::AllToolBarAreas</set>
+   </property>
+   <property name="iconSize">
+    <size>
+     <width>48</width>
+     <height>48</height>
+    </size>
+   </property>
+   <property name="floatable">
+    <bool>false</bool>
+   </property>
    <attribute name="toolBarArea">
-    <enum>TopToolBarArea</enum>
+    <enum>LeftToolBarArea</enum>
    </attribute>
    <attribute name="toolBarBreak">
     <bool>false</bool>
    </attribute>
+   <addaction name="actionOpen_Arena"/>
+   <addaction name="actionGroup"/>
+   <addaction name="actionUngroup"/>
+   <addaction name="actionConnect"/>
+   <addaction name="separator"/>
   </widget>
-  <widget class="QStatusBar" name="statusBar"/>
+  <action name="actionGroup">
+   <property name="icon">
+    <iconset resource="images.qrc">
+     <normaloff>:/images/icons/group.png</normaloff>:/images/icons/group.png</iconset>
+   </property>
+   <property name="text">
+    <string>Group</string>
+   </property>
+   <property name="toolTip">
+    <string>Group selected CASUs (Ctrl+G)</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+G</string>
+   </property>
+  </action>
+  <action name="actionUngroup">
+   <property name="icon">
+    <iconset resource="images.qrc">
+     <normaloff>:/images/icons/ungroup.png</normaloff>:/images/icons/ungroup.png</iconset>
+   </property>
+   <property name="text">
+    <string>Ungroup</string>
+   </property>
+   <property name="toolTip">
+    <string>Ungroup selected CASUs (Ctrl+U)</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+U</string>
+   </property>
+  </action>
+  <action name="actionOpen_Arena">
+   <property name="icon">
+    <iconset resource="images.qrc">
+     <normaloff>:/images/icons/open_folder_yellow.png</normaloff>:/images/icons/open_folder_yellow.png</iconset>
+   </property>
+   <property name="text">
+    <string>Open Arena Configuration file (Ctrl+O)</string>
+   </property>
+   <property name="toolTip">
+    <string>Open Arena</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+O</string>
+   </property>
+  </action>
+  <action name="actionConnect">
+   <property name="icon">
+    <iconset resource="images.qrc">
+     <normaloff>:/images/icons/connect.png</normaloff>:/images/icons/connect.png</iconset>
+   </property>
+   <property name="text">
+    <string>Connect</string>
+   </property>
+   <property name="toolTip">
+    <string>Connect to CASU (Ctrl+C)</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+C</string>
+   </property>
+  </action>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
- <resources/>
+ <tabstops>
+  <tabstop>tabWidget</tabstop>
+  <tabstop>arenaSpace</tabstop>
+ </tabstops>
+ <resources>
+  <include location="images.qrc"/>
+ </resources>
  <connections/>
 </ui>
