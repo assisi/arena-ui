@@ -1,11 +1,15 @@
 #ifndef CASUTREEITEM_H
 #define CASUTREEITEM_H
 
+#include <fstream>
 #include <QTreeWidgetItem>
+
 #include <boost/lexical_cast.hpp>
+#include <boost/functional/hash.hpp>
 
 #include <nzmqt/nzmqt.hpp>
 #include "dev_msgs.pb.h"
+#include "global.h"
 
 using namespace nzmqt;
 using namespace AssisiMsg;
@@ -25,6 +29,14 @@ private:
 
     // Connect the publisher and subscriber
     void connect_();
+
+    QString log_name;
+    bool log_open;
+    ofstream log_file;
+    void openLogFile();
+    void closeLogFile();
+
+    QString casu_name;
 
 public:
     bool connected;

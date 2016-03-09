@@ -21,19 +21,23 @@ SOURCES += main.cpp\
         ../msg/cpp/sim_msgs.pb.cc \
     casutreeitem.cpp \
     casusceneitem.cpp \
-    connectdialog.cpp
+    connectdialog.cpp \
+    global.cpp
 
 HEADERS  += arenaui.h\
         nzmqt/nzmqt.hpp \
     casutreeitem.h \
     casusceneitem.h \
-    connectdialog.h
+    connectdialog.h \
+    global.h
 
 FORMS    += arenaui.ui
 
 LIBS += -lzmq\
         -lprotobuf\
-        -lyaml-cpp
+        -lyaml-cpp\
+        -lboost_system\
+        -lboost_filesystem
 
 RESOURCES += \
     images.qrc

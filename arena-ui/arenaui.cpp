@@ -5,6 +5,7 @@
 #include <QFileDialog>
 #include <QMessageBox>
 
+#include "global.h"
 #include "arenaui.h"
 #include "ui_arenaui.h"
 
@@ -22,6 +23,7 @@ ArenaUI::ArenaUI(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::ArenaUI)
 {
+    loadConfig();
     ui->setupUi(this);
 
     arena_scene = new QGraphicsScene(this);
@@ -39,6 +41,7 @@ ArenaUI::ArenaUI(QWidget *parent) :
 
 ArenaUI::~ArenaUI()
 {
+    saveConfig();
     delete ui;
 }
 
@@ -88,10 +91,10 @@ bool MouseClickHandler::eventFilter(QObject* obj, QEvent* event)
 
 void ArenaUI::on_actionOpen_Arena_triggered()
 {
-    arena_file = QFileDialog::getOpenFileName(this,tr("Open Arena configuration file"),"../arena_files",tr("*.arena"));
+    arena_file = QFileDialog::getOpenFileName(this,tr("Open Arena configuration file"), arena_folder, tr("*.arena"));
     if(!arena_file.toStdString().empty()){
         arena_scene->clear();
-        arena_config = YAML::LoadFile(arena_file.toStdString());
+            YAML::Node arena_config = YAML::LoadFile(arena_file.toStdString());
 
         for(YAML::const_iterator it=arena_config["beearena"].begin(); it!=arena_config["beearena"].end(); it++){
             QString name = QString::fromStdString(it->first.as<std::string>());
@@ -102,7 +105,7 @@ void ArenaUI::on_actionOpen_Arena_triggered()
 
             ui->casuTree->addTopLevelItem(temp_tree);
 
-            CasuSceneItem* temp_item = new CasuSceneItem(this, xpos*10+400, ypos*10+400, temp_tree);
+            CasuSceneItem* temp_item = new CasuSceneItem(this, xpos*10+400, -ypos*10+400, temp_tree);
 
             arena_scene->addItem(temp_item);
 
