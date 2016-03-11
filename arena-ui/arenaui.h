@@ -29,8 +29,6 @@ private:
     QGraphicsScene *arena_scene;
     QString arena_file;
 
-    YAML::Node arena_config;
-
 private slots:
     void on_actionOpen_Arena_triggered();
     void on_actionGroup_triggered();

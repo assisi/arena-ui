@@ -2,7 +2,9 @@
 
 CasuTreeItem::CasuTreeItem(QObject* parent, QString name) : QObject(parent)
 {
-    this->setData(0,Qt::DisplayRole,QStringList(name));
+    casu_name = name;
+
+    this->setData(0,Qt::DisplayRole,QStringList(casu_name));
     widget_IR = new QTreeWidgetItem(QStringList("IR - Proximity"));
     widget_LED= new QTreeWidgetItem(QStringList("LED"));
     widget_temp = new QTreeWidgetItem(QStringList("Temperature"));
@@ -111,27 +113,34 @@ void CasuTreeItem::messageReceived(const QList<QByteArray>& message){
     }
     connection_timer->start(2000);
 
+    if(log_on & !log_open) openLogFile();
+    if(!log_on & log_open) closeLogFile();
+
     string name(message.at(0).constData(), message.at(0).length());
     string device(message.at(1).constData(), message.at(1).length());
     string command(message.at(2).constData(), message.at(2).length());
     string data(message.at(3).constData(), message.at(3).length());
 
+    log_file << device << ";" << QDateTime::currentDateTime().toString(time_format).toStdString();
+
     if (device == "IR"){
         RangeArray ranges;
         ranges.ParseFromString(data);
-        int asd=ranges.range_size();
-        for (int k = 0; k < ranges.range_size()-1; k++)
-            widget_IR->child(k)->setData(1, Qt::DisplayRole,
-                                  QVariant(lexical_cast<string>(ranges.range(k)).c_str()));
+        for (int k = 0; k < ranges.range_size()-1; k++){
+            string value = lexical_cast<string>(ranges.range(k));
+            widget_IR->child(k)->setData(1, Qt::DisplayRole, QVariant(value.c_str()));
+            if(log_on) log_file << ";" << value;
+        }
     }
 
     if (device == "Temp"){
         TemperatureArray temperatures;
         temperatures.ParseFromString(data);
-        int asd=temperatures.temp_size();
-        for (int k = 0; k < temperatures.temp_size()-1; k++)
-            widget_temp->child(k)->setData(1, Qt::DisplayRole,
-                                  QVariant(lexical_cast<string>(temperatures.temp(k)).c_str()));
+        for (int k = 0; k < temperatures.temp_size()-1; k++){
+            string value = lexical_cast<string>(temperatures.temp(k));
+            widget_temp->child(k)->setData(1, Qt::DisplayRole, QVariant(value.c_str()));
+            if(log_on) log_file << ";" << value;
+        }
     }
 /*
     if (device == "Acc"){
@@ -158,6 +167,8 @@ void CasuTreeItem::messageReceived(const QList<QByteArray>& message){
     }
 */
 
+    log_file << endl;
+
 }
 
 void CasuTreeItem::connectionTimeout(){
@@ -165,3 +176,15 @@ void CasuTreeItem::connectionTimeout(){
     emit updateScene();
     connection_timer->stop();
 }
+
+void CasuTreeItem::openLogFile(){
+    log_name = log_folder + casu_name + QDateTime::currentDateTime().toString(date_time_format);
+    log_file.open(log_name.toStdString().c_str(), ofstream::out | ofstream::app);
+    log_open = true;
+}
+
+void CasuTreeItem::closeLogFile(){
+    log_file.close();
+    log_open = false;
+}
+
