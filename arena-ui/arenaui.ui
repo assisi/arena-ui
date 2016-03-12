@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1170</width>
+    <width>1250</width>
     <height>850</height>
    </rect>
   </property>
@@ -43,20 +43,32 @@
        <enum>QTabWidget::North</enum>
       </property>
       <property name="currentIndex">
-       <number>3</number>
+       <number>0</number>
       </property>
       <widget class="QWidget" name="tab_casus">
        <property name="enabled">
         <bool>true</bool>
        </property>
        <attribute name="title">
-        <string>Casus</string>
+        <string>Casu data</string>
        </attribute>
        <layout class="QVBoxLayout" name="verticalLayout_2">
         <item>
          <widget class="QTreeWidget" name="casuTree">
+          <property name="minimumSize">
+           <size>
+            <width>340</width>
+            <height>0</height>
+           </size>
+          </property>
+          <property name="contextMenuPolicy">
+           <enum>Qt::ActionsContextMenu</enum>
+          </property>
+          <property name="alternatingRowColors">
+           <bool>false</bool>
+          </property>
           <property name="selectionMode">
-           <enum>QAbstractItemView::MultiSelection</enum>
+           <enum>QAbstractItemView::ExtendedSelection</enum>
           </property>
           <property name="sortingEnabled">
            <bool>true</bool>
@@ -65,7 +77,7 @@
            <bool>false</bool>
           </attribute>
           <attribute name="headerDefaultSectionSize">
-           <number>150</number>
+           <number>200</number>
           </attribute>
           <column>
            <property name="text">
@@ -77,16 +89,16 @@
             <string>Value</string>
            </property>
            <property name="textAlignment">
-            <set>AlignTrailing|AlignVCenter</set>
+            <set>AlignRight|AlignVCenter</set>
            </property>
           </column>
          </widget>
         </item>
        </layout>
       </widget>
-      <widget class="QWidget" name="tab_logging">
+      <widget class="QWidget" name="tab_trend">
        <attribute name="title">
-        <string>Logging</string>
+        <string>Trend graphs</string>
        </attribute>
       </widget>
       <widget class="QWidget" name="tab_2">
@@ -96,7 +108,7 @@
       </widget>
       <widget class="QWidget" name="tab_camera">
        <attribute name="title">
-        <string>Camera</string>
+        <string>Settings</string>
        </attribute>
       </widget>
      </widget>
@@ -125,11 +137,12 @@
    <attribute name="toolBarBreak">
     <bool>false</bool>
    </attribute>
+   <addaction name="separator"/>
    <addaction name="actionOpen_Arena"/>
    <addaction name="actionGroup"/>
    <addaction name="actionUngroup"/>
    <addaction name="actionConnect"/>
-   <addaction name="separator"/>
+   <addaction name="actionToggleLog"/>
   </widget>
   <action name="actionGroup">
    <property name="icon">
@@ -170,7 +183,7 @@
     <string>Open Arena Configuration file (Ctrl+O)</string>
    </property>
    <property name="toolTip">
-    <string>Open Arena</string>
+    <string>Open Arena (Ctrl + O)</string>
    </property>
    <property name="shortcut">
     <string>Ctrl+O</string>
@@ -189,6 +202,50 @@
    </property>
    <property name="shortcut">
     <string>Ctrl+C</string>
+   </property>
+  </action>
+  <action name="actionToggleLog">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="checked">
+    <bool>false</bool>
+   </property>
+   <property name="icon">
+    <iconset resource="images.qrc">
+     <normaloff>:/images/icons/log_off.png</normaloff>
+     <normalon>:/images/icons/log_on.png</normalon>:/images/icons/log_off.png</iconset>
+   </property>
+   <property name="text">
+    <string>toggleLog</string>
+   </property>
+   <property name="toolTip">
+    <string>Toggle Log (Ctrl + L)</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+L</string>
+   </property>
+  </action>
+  <action name="actionPlot_selected_in_same_trend">
+   <property name="text">
+    <string>Plot selected in same trend</string>
+   </property>
+   <property name="toolTip">
+    <string>(Ctrl + P)</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+P</string>
+   </property>
+  </action>
+  <action name="actionPlot_selected_in_different_trends">
+   <property name="text">
+    <string>Plot selected in different trends</string>
+   </property>
+   <property name="toolTip">
+    <string>(Ctrl + Shift + P)</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+Shift+P</string>
    </property>
   </action>
  </widget>

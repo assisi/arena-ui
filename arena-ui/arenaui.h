@@ -8,8 +8,12 @@
 #include <yaml-cpp/yaml.h>
 #include <nzmqt/nzmqt.hpp>
 
-#include "casusceneitem.h"
-#include "connectdialog.h"
+#include "global.h"
+
+#include "qcasusceneitem.h"
+#include "qconnectdialog.h"
+#include "qtrendplot.h"
+
 
 
 namespace Ui {
@@ -27,13 +31,16 @@ public:
 private:
     Ui::ArenaUI *ui;
     QGraphicsScene *arena_scene;
-    QString arena_file;
+    QString arenaFile;
+    QVBoxLayout* trendTab;
 
 private slots:
     void on_actionOpen_Arena_triggered();
     void on_actionGroup_triggered();
     void on_actionUngroup_triggered();
     void on_actionConnect_triggered();
+    void on_actionToggleLog_triggered();
+    void on_actionPlot_selected_in_same_trend_triggered();
 };
 
 // ------------------------------------------------------------------------

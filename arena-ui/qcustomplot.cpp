@@ -14501,7 +14501,7 @@ QCPGraph::QCPGraph(QCPAxis *keyAxis, QCPAxis *valueAxis) :
 
 QCPGraph::~QCPGraph()
 {
-  delete mData;
+  //delete mData;
 }
 
 /*!

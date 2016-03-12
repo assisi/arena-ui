@@ -4,12 +4,11 @@
 #include <QGraphicsSceneMouseEvent>
 #include <QFileDialog>
 #include <QMessageBox>
+#include <typeinfo>
 
-#include "global.h"
 #include "arenaui.h"
 #include "ui_arenaui.h"
 
-#include "dev_msgs.pb.h"
 
 using namespace nzmqt;
 using namespace std;
@@ -25,7 +24,24 @@ ArenaUI::ArenaUI(QWidget *parent) :
 {
     loadConfig();
     ui->setupUi(this);
+    ui->actionToggleLog->setChecked(log_on);
 
+    //CASU TREE TAB
+    ui->casuTree->addAction(ui->actionPlot_selected_in_same_trend);
+    ui->casuTree->addAction(ui->actionPlot_selected_in_different_trends);
+
+    //TREND TAB SCROLLABLE LAYOUT
+    ui->tab_trend->setLayout(new QVBoxLayout);
+    QWidget* tempWidget = new QWidget;
+    QScrollArea* tempScroll = new QScrollArea;
+
+    tempScroll->setWidget(tempWidget);
+    tempScroll->setWidgetResizable(true);
+    trendTab = new QVBoxLayout(tempWidget);
+
+    ui->tab_trend->layout()->addWidget(tempScroll);
+
+    //GRAPHICS SCENE
     arena_scene = new QGraphicsScene(this);
     arena_scene->setSceneRect(0,0,800,800);
 
@@ -91,25 +107,27 @@ bool MouseClickHandler::eventFilter(QObject* obj, QEvent* event)
 
 void ArenaUI::on_actionOpen_Arena_triggered()
 {
-    arena_file = QFileDialog::getOpenFileName(this,tr("Open Arena configuration file"), arena_folder, tr("*.arena"));
-    if(!arena_file.toStdString().empty()){
+    arenaFile = QFileDialog::getOpenFileName(this,tr("Open Arena configuration file"), arenaFolder, tr("*.arena"));
+    if(!arenaFile.toStdString().empty()){
+        arenaFolder = arenaFile.left(arenaFile.lastIndexOf("/"));
         arena_scene->clear();
-            YAML::Node arena_config = YAML::LoadFile(arena_file.toStdString());
+        ui->casuTree->clear();
+            YAML::Node arena_config = YAML::LoadFile(arenaFile.toStdString());
 
         for(YAML::const_iterator it=arena_config["beearena"].begin(); it!=arena_config["beearena"].end(); it++){
             QString name = QString::fromStdString(it->first.as<std::string>());
             int xpos = arena_config["beearena"][name.toStdString()]["pose"]["x"].as<int>();
             int ypos = arena_config["beearena"][name.toStdString()]["pose"]["y"].as<int>();
 
-            CasuTreeItem* temp_tree = new CasuTreeItem(ui->casuTree, name);
+            QCasuTreeItem* tempTree = new QCasuTreeItem(ui->casuTree, name);
 
-            ui->casuTree->addTopLevelItem(temp_tree);
+            ui->casuTree->addTopLevelItem(tempTree);
 
-            CasuSceneItem* temp_item = new CasuSceneItem(this, xpos*10+400, -ypos*10+400, temp_tree);
+            QCasuSceneItem* tempItem = new QCasuSceneItem(this, xpos*10+400, -ypos*10+400, tempTree);
 
-            arena_scene->addItem(temp_item);
+            arena_scene->addItem(tempItem);
 
-            temp_tree->setAddr(QString::fromStdString(arena_config["beearena"][name.toStdString()]["sub_addr"].as<std::string>()),
+            tempTree->setAddr(QString::fromStdString(arena_config["beearena"][name.toStdString()]["sub_addr"].as<std::string>()),
                                QString::fromStdString(arena_config["beearena"][name.toStdString()]["pub_addr"].as<std::string>()),
                                QString::fromStdString(arena_config["beearena"][name.toStdString()]["msg_addr"].as<std::string>()));
         }
@@ -134,24 +152,22 @@ void ArenaUI::on_actionUngroup_triggered()
     QList<QGraphicsItem *> temp_itemList= arena_scene->selectedItems();
     for(int k=0;k<temp_itemList.size();k++)
         if(temp_itemList[k]->childItems().size()){
-            QList<QGraphicsItem *> temp_childList = temp_itemList[k]->childItems();
+            QList<QGraphicsItem *> tempChildList = temp_itemList[k]->childItems();
             if(!temp_itemList[k]->childItems().size())temp_itemList[k]->setZValue(1);
             arena_scene->destroyItemGroup((QGraphicsItemGroup*)temp_itemList[k]);
-            for(int i=0;i<temp_childList.size();i++){;
-                temp_childList[i]->setSelected(0);
-                temp_childList[i]->setSelected(1);
+            for(int i=0;i<tempChildList.size();i++){;
+                tempChildList[i]->setSelected(0);
+                tempChildList[i]->setSelected(1);
             }
         }
 }
 
 void ArenaUI::on_actionConnect_triggered()
 {
-    //Check if only one is selected
-    {
     bool error = false;
-    if (arena_scene->selectedItems().size() != 1) error = true;
-    if(arena_scene->selectedItems().size() == 1)
-        if(arena_scene->selectedItems()[0]->childItems().size()) error = true;
+    if (arena_scene->selectedItems().size() != 1) error = true; //Check if excactly one object is selected
+    if (arena_scene->selectedItems().size() == 1)
+        if(arena_scene->selectedItems()[0]->childItems().size()) error = true; // Check if object is single casu (no children)
     if(error){
         QMessageBox msgBox;
         msgBox.setWindowTitle("ERROR");
@@ -159,10 +175,31 @@ void ArenaUI::on_actionConnect_triggered()
         msgBox.setStandardButtons(QMessageBox::Ok);
         msgBox.exec();
         return;
-    }}
-    CasuSceneItem* temp = (CasuSceneItem*)arena_scene->selectedItems()[0];
-    connectDialog* addrDiag = new connectDialog(temp->widget_->sub_addr,temp->widget_->pub_addr,temp->widget_->msg_addr);
+    }
+    QCasuSceneItem* temp = (QCasuSceneItem*)arena_scene->selectedItems()[0];
+    QConnectDialog* addrDiag = new QConnectDialog(temp->widget_->sub_addr,temp->widget_->pub_addr,temp->widget_->msg_addr);
     if(addrDiag->exec()){
         temp->widget_->setAddr(addrDiag->sub_addr->text(), addrDiag->pub_addr->text(),addrDiag->msg_addr->text());
     }
+}
+
+void ArenaUI::on_actionToggleLog_triggered()
+{
+    ui->actionToggleLog->setChecked(log_on);
+    QString question = QString("Are you sure you want to turn ") + (log_on ? QString("OFF") : QString("ON")) + QString(" logging?");
+    QMessageBox::StandardButton reply = QMessageBox::question(this, "Toggle Log", question , QMessageBox::Yes|QMessageBox::No);
+    if(reply == QMessageBox::Yes)log_on = !log_on;
+    ui->actionToggleLog->setChecked(log_on);
+}
+
+void ArenaUI::on_actionPlot_selected_in_same_trend_triggered()
+{
+    QTrendPlot* tempWidget = new QTrendPlot;
+    for(int k=0; k < ui->casuTree->selectedItems().size() ; k++)
+        tempWidget->addCurve((QTreeBuffer*)ui->casuTree->selectedItems()[k]);
+
+    tempWidget->rescaleAxes();
+    if(tempWidget->yAxis->range().size() < 5)tempWidget->yAxis->setRange(tempWidget->yAxis->range().center(), 5, Qt::AlignCenter);
+    tempWidget->xAxis->setRange(tempWidget->graph()->data()->lastKey(), 60, Qt::AlignRight);
+    trendTab->addWidget(tempWidget);
 }

@@ -1,9 +1,7 @@
-#include "casutreeitem.h"
+#include "qcasutreeitem.h"
 
-CasuTreeItem::CasuTreeItem(QObject* parent, QString name) : QObject(parent)
+QCasuTreeItem::QCasuTreeItem(QObject* parent, QString name) : QObject(parent), casu_name(name), child_selected(false)
 {
-    casu_name = name;
-
     this->setData(0,Qt::DisplayRole,QStringList(casu_name));
     widget_IR = new QTreeWidgetItem(QStringList("IR - Proximity"));
     widget_LED= new QTreeWidgetItem(QStringList("LED"));
@@ -13,26 +11,26 @@ CasuTreeItem::CasuTreeItem(QObject* parent, QString name) : QObject(parent)
 
     //zadavanje djece IR grani:
     {
-        widget_IR->addChild(new QTreeWidgetItem(QStringList("N")));
-        widget_IR->addChild(new QTreeWidgetItem(QStringList("NE")));
-        widget_IR->addChild(new QTreeWidgetItem(QStringList("SE")));
-        widget_IR->addChild(new QTreeWidgetItem(QStringList("S")));
-        widget_IR->addChild(new QTreeWidgetItem(QStringList("SW")));
-        widget_IR->addChild(new QTreeWidgetItem(QStringList("NW")));
+        widget_IR->addChild(new QTreeBuffer(QStringList("N")));
+        widget_IR->addChild(new QTreeBuffer(QStringList("NE")));
+        widget_IR->addChild(new QTreeBuffer(QStringList("SE")));
+        widget_IR->addChild(new QTreeBuffer(QStringList("S")));
+        widget_IR->addChild(new QTreeBuffer(QStringList("SW")));
+        widget_IR->addChild(new QTreeBuffer(QStringList("NW")));
     }
     //zadavanje djece temp grani:
     {
-        widget_temp->addChild(new QTreeWidgetItem(QStringList("N")));
-        widget_temp->addChild(new QTreeWidgetItem(QStringList("E")));
-        widget_temp->addChild(new QTreeWidgetItem(QStringList("S")));
-        widget_temp->addChild(new QTreeWidgetItem(QStringList("W")));
+        widget_temp->addChild(new QTreeBuffer(QStringList("N")));
+        widget_temp->addChild(new QTreeBuffer(QStringList("E")));
+        widget_temp->addChild(new QTreeBuffer(QStringList("S")));
+        widget_temp->addChild(new QTreeBuffer(QStringList("W")));
     }
     //zadavanje djece vibr grani:
     {
-        widget_vibr->addChild(new QTreeWidgetItem(QStringList("N")));
-        widget_vibr->addChild(new QTreeWidgetItem(QStringList("E")));
-        widget_vibr->addChild(new QTreeWidgetItem(QStringList("S")));
-        widget_vibr->addChild(new QTreeWidgetItem(QStringList("W")));
+        widget_vibr->addChild(new QTreeBuffer(QStringList("N")));
+        widget_vibr->addChild(new QTreeBuffer(QStringList("E")));
+        widget_vibr->addChild(new QTreeBuffer(QStringList("S")));
+        widget_vibr->addChild(new QTreeBuffer(QStringList("W")));
     }
 
     QList<QTreeWidgetItem *> temp;{
@@ -44,6 +42,8 @@ CasuTreeItem::CasuTreeItem(QObject* parent, QString name) : QObject(parent)
     }
 
     this->addChildren(temp);
+    for(int k = 0; k < this->childCount(); k++)this->child(k)->setFlags(Qt::ItemIsEnabled);
+    this->setFlags(Qt::ItemIsEnabled);
 
     led_on = false;
     connection_timer = new QTimer(this);
@@ -57,33 +57,24 @@ CasuTreeItem::CasuTreeItem(QObject* parent, QString name) : QObject(parent)
 
     connect(connection_timer, SIGNAL(timeout()),SLOT(connectionTimeout()));
 
-    connect(this->QObject::parent(), SIGNAL(itemClicked(QTreeWidgetItem *,int)), SLOT(widgetClicked()));
+    connect(this->QObject::parent(), SIGNAL(itemSelectionChanged()), SLOT(widgetClicked()));
 }
 
-void CasuTreeItem::setSelected(bool select){
-    this->QTreeWidgetItem::setSelected(select);
-    if(!select)
-        for(int k=0;k<this->childCount();k++){
-            this->child(k)->setSelected(select);
-            for(int i=0;i<this->child(k)->childCount();i++)
-                this->child(k)->child(i)->setSelected(select);
-        }
+void QCasuTreeItem::resetSelection(){
+    for(int k=0;k<this->childCount();k++)
+        for(int i=0;i<this->child(k)->childCount();i++)
+            this->child(k)->child(i)->setSelected(false);
 }
 
-void CasuTreeItem::widgetClicked(){
-    bool child_selected = false;
-    for(int k=0;k<this->childCount();k++){
-        bool g_child_selected = false;
-        for(int i=0;i<this->child(k)->childCount();i++) if(this->child(k)->child(i)->isSelected()) g_child_selected = true;
-        this->child(k)->setSelected(g_child_selected);
-        if(this->child(k)->isSelected())child_selected = true;
-    }
-    this->setSelected(child_selected);
+void QCasuTreeItem::widgetClicked(){
+    child_selected = false;
+    for(int k=0;k<this->childCount();k++)
+        for(int i=0;i<this->child(k)->childCount();i++) if(this->child(k)->child(i)->isSelected()) child_selected = true;
 
     emit updateScene();
 }
 
-void CasuTreeItem::setAddr(QString sub, QString pub, QString msg){
+void QCasuTreeItem::setAddr(QString sub, QString pub, QString msg){
     sub_addr = sub;
     pub_addr = pub;
     msg_addr = msg;
@@ -91,7 +82,7 @@ void CasuTreeItem::setAddr(QString sub, QString pub, QString msg){
     this->connect_();
 }
 
-void CasuTreeItem::connect_()
+void QCasuTreeItem::connect_()
 {
     try{
         pub_sock_->connectTo(pub_addr);
@@ -106,7 +97,7 @@ void CasuTreeItem::connect_()
     }
 }
 
-void CasuTreeItem::messageReceived(const QList<QByteArray>& message){
+void QCasuTreeItem::messageReceived(const QList<QByteArray>& message){
     if(!connected){
         connected = true;
         emit updateScene();
@@ -127,8 +118,8 @@ void CasuTreeItem::messageReceived(const QList<QByteArray>& message){
         RangeArray ranges;
         ranges.ParseFromString(data);
         for (int k = 0; k < ranges.range_size()-1; k++){
-            string value = lexical_cast<string>(ranges.range(k));
-            widget_IR->child(k)->setData(1, Qt::DisplayRole, QVariant(value.c_str()));
+            double value = lexical_cast<double>(ranges.range(k));
+            widget_IR->child(k)->setData(1, Qt::DisplayRole, QVariant(value));
             if(log_on) log_file << ";" << value;
         }
     }
@@ -137,8 +128,9 @@ void CasuTreeItem::messageReceived(const QList<QByteArray>& message){
         TemperatureArray temperatures;
         temperatures.ParseFromString(data);
         for (int k = 0; k < temperatures.temp_size()-1; k++){
-            string value = lexical_cast<string>(temperatures.temp(k));
-            widget_temp->child(k)->setData(1, Qt::DisplayRole, QVariant(value.c_str()));
+            double value = lexical_cast <double>(temperatures.temp(k));
+            widget_temp->child(k)->setData(1, Qt::DisplayRole, QVariant(value));
+            ((QTreeBuffer *)widget_temp->child(k))->addToBuffer(QTime::currentTime(), value);
             if(log_on) log_file << ";" << value;
         }
     }
@@ -171,19 +163,19 @@ void CasuTreeItem::messageReceived(const QList<QByteArray>& message){
 
 }
 
-void CasuTreeItem::connectionTimeout(){
+void QCasuTreeItem::connectionTimeout(){
     connected = false;
     emit updateScene();
     connection_timer->stop();
 }
 
-void CasuTreeItem::openLogFile(){
-    log_name = log_folder + casu_name + QDateTime::currentDateTime().toString(date_time_format);
+void QCasuTreeItem::openLogFile(){
+    log_name = logSubFolder + QDateTime::currentDateTime().toString(date_time_format) + casu_name;
     log_file.open(log_name.toStdString().c_str(), ofstream::out | ofstream::app);
     log_open = true;
 }
 
-void CasuTreeItem::closeLogFile(){
+void QCasuTreeItem::closeLogFile(){
     log_file.close();
     log_open = false;
 }

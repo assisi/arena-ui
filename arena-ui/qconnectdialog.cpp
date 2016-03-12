@@ -1,6 +1,6 @@
-#include "connectdialog.h"
+#include "qconnectdialog.h"
 
-connectDialog::connectDialog(QString sub, QString pub, QString msg)
+QConnectDialog::QConnectDialog(QString sub, QString pub, QString msg)
 {
     this->setWindowTitle("CASU address");
 

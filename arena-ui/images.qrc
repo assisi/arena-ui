@@ -1,11 +1,12 @@
 <RCC>
     <qresource prefix="/">
         <file>images/arena_sw.png</file>
-        <file>images/icons/add.png</file>
-        <file>images/icons/delete.png</file>
         <file>images/icons/group.png</file>
         <file>images/icons/ungroup.png</file>
         <file>images/icons/open_folder_yellow.png</file>
         <file>images/icons/connect.png</file>
+        <file>images/icons/log.png</file>
+        <file>images/icons/log_off.png</file>
+        <file>images/icons/log_on.png</file>
     </qresource>
 </RCC>

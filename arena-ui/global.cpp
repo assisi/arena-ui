@@ -1,28 +1,34 @@
 #include "global.h"
 
 //extern variables initialization
-QString log_folder;
-QString cam_folder;
-QString arena_folder;
-bool log_on_def;
+QString logFolder;
+QString camFolder;
+QString logSubFolder;
+QString camSubFolder;
+QString arenaFolder;
+QTime trendTimeSpan;
+int trendSampleTime_ms;
 bool log_on;
-QString date_time_format = "yy-MM-dd_HH-mm";
+QString date_time_format = "yy-MM-dd_HH-mm_";
 QString time_format = "HH-mm-ss-zzz";
 Node ui_config;
 
 void createConfig(){
-    fs::path work_path(fs::current_path());
+    QString work_path = QDir::currentPath();
 
     Emitter new_config;
     new_config << BeginMap;
-    new_config << Key << "log_folder" << Value << work_path.string() + "/log/";
-    new_config << Key << "cam_folder" << Value << work_path.string() + "/cam/";
-    new_config << Key << "arena_folder" << Value << work_path.string() + "/arena/";
-    new_config << Key << "log_on_def" << Value << "1";
+    new_config << Key << "logFolder" << Value << work_path.toStdString() + "/log/";
+    new_config << Key << "camFolder" << Value << work_path.toStdString() + "/cam/";
+    new_config << Key << "arenaFolder" << Value << work_path.toStdString() + "/arena/";
+    new_config << Key << "trendTimeSpan" << Value << QTime(0,5,0).toString(time_format).toStdString();
+    new_config << Key << "trendSampleTime_ms" << Value << 500;
+    new_config << Key << "log_on" << Value << "1";
     new_config << EndMap;
 
     std::ofstream fout("ui.config", std::ofstream::out);
     fout << new_config.c_str();
+    fout.close();
 
     loadConfig();
 }
@@ -37,20 +43,32 @@ void loadConfig(){
         return;
     }
 
-    log_folder = QString::fromStdString(ui_config["log_folder"].as<std::string>());
-    cam_folder = QString::fromStdString(ui_config["cam_folder"].as<std::string>());
-    arena_folder = QString::fromStdString(ui_config["arena_folder"].as<std::string>());
-    log_on_def = ui_config["log_on_def"].as<int>() != 0;
-    log_on = log_on_def;
+    logFolder = QString::fromStdString(ui_config["logFolder"].as<std::string>());
+    camFolder = QString::fromStdString(ui_config["camFolder"].as<std::string>());
+    arenaFolder = QString::fromStdString(ui_config["arenaFolder"].as<std::string>());
+    trendTimeSpan = QTime().fromString(QString::fromStdString(ui_config["trendTimeSpan"].as<std::string>()), time_format);
+    trendSampleTime_ms = ui_config["trendSampleTime_ms"].as<int>();
+    log_on = ui_config["log_on"].as<int>() != 0;
+
+    logSubFolder = logFolder + QDate::currentDate().toString("yy-MM-dd") + "/";
+    camSubFolder = camFolder + QDate::currentDate().toString("yy-MM-dd") + "/";
+
+    if(!QDir(logFolder).exists())QDir().mkdir(logFolder);
+    if(!QDir(camFolder).exists())QDir().mkdir(camFolder);
+    if(!QDir(logSubFolder).exists())QDir().mkdir(logSubFolder);
+    if(!QDir(camSubFolder).exists())QDir().mkdir(camSubFolder);
+
 }
 
 void saveConfig(){
     Emitter new_config;
     new_config << BeginMap;
-    new_config << Key << "log_folder" << Value << log_folder.toStdString();
-    new_config << Key << "cam_folder" << Value << cam_folder.toStdString();
-    new_config << Key << "arena_folder" << Value << arena_folder.toStdString();
-    new_config << Key << "log_on_def" << Value << (log_on_def?1:0);
+    new_config << Key << "logFolder" << Value << logFolder.toStdString();
+    new_config << Key << "camFolder" << Value << camFolder.toStdString();
+    new_config << Key << "arenaFolder" << Value << arenaFolder.toStdString();
+    new_config << Key << "trendTimeSpan" << Value << trendTimeSpan.toString(time_format).toStdString();
+    new_config << Key << "trendSampleTime_ms" << Value << trendSampleTime_ms;
+    new_config << Key << "log_on" << Value << (log_on?1:0);
     new_config << EndMap;
 
     std::ofstream fout("ui.config");
