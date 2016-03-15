@@ -1,10 +1,11 @@
 #include "qtreebuffer.h"
 
-QTreeBuffer::QTreeBuffer(const QStringList & strings, QWidget *parent) :
+QTreeBuffer::QTreeBuffer(const QStringList & strings, QString lName, QWidget *parent) :
     QObject(parent),
     QTreeWidgetItem(strings),
     buffer(new QCPDataMap),
-    lastDataTime(QTime(0,0,0)){}
+    lastDataTime(QTime(0,0,0)),
+    legendName(lName){}
 
 QTreeBuffer::~QTreeBuffer(){
     delete buffer;

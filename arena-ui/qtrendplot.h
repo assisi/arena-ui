@@ -7,16 +7,24 @@
 class QTrendPlot : public QCustomPlot
 {
     Q_OBJECT
+private:
+    QTreeWidget* casuTree;
+    bool autoPosition;
+    bool showLegend;
+    bool docked;
+    QMap<QCPGraph*,QTreeBuffer*> connectionMap;
+    QWidget* originalParent;
+
 public:
-    explicit QTrendPlot(QWidget *parent = 0);
+    explicit QTrendPlot(QTreeWidget* tree, QWidget *parent = 0);
     ~QTrendPlot(){}
 
-    void addCurve(QTreeBuffer *treeItem);
-    void removeCurve();
+    void addGraph(QTreeBuffer *treeItem);
+    void addGraphList(QList<QTreeWidgetItem *> itemList);
+    void removeGraph(QCPGraph* graph);
 
 protected:
     virtual int heightForWidth(int w) const {return w*9/16;}
-    bool autoPosition;
 
 signals:
 
@@ -25,6 +33,12 @@ public slots:
     void enableAutoPosition();
     void disableAutoPosition(QMouseEvent *event);
     void setZoomFlags(QWheelEvent *event);
+    void selectionChanged();
+    void showContextMenu(QPoint pos);
+    void toggleLegend();
+    void dock_undock();
+    void removeSelectedGraphs();
+    void addSelectedGraphs();
 };
 
 #endif // QTRENDPLOT_H

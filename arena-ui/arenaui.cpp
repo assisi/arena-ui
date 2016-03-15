@@ -194,12 +194,8 @@ void ArenaUI::on_actionToggleLog_triggered()
 
 void ArenaUI::on_actionPlot_selected_in_same_trend_triggered()
 {
-    QTrendPlot* tempWidget = new QTrendPlot;
-    for(int k=0; k < ui->casuTree->selectedItems().size() ; k++)
-        tempWidget->addCurve((QTreeBuffer*)ui->casuTree->selectedItems()[k]);
-
-    tempWidget->rescaleAxes();
-    if(tempWidget->yAxis->range().size() < 5)tempWidget->yAxis->setRange(tempWidget->yAxis->range().center(), 5, Qt::AlignCenter);
-    tempWidget->xAxis->setRange(tempWidget->graph()->data()->lastKey(), 60, Qt::AlignRight);
+    QTrendPlot* tempWidget = new QTrendPlot(ui->casuTree);
     trendTab->addWidget(tempWidget);
+
+    tempWidget->addGraphList(ui->casuTree->selectedItems());
 }

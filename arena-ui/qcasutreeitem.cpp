@@ -11,26 +11,26 @@ QCasuTreeItem::QCasuTreeItem(QObject* parent, QString name) : QObject(parent), c
 
     //zadavanje djece IR grani:
     {
-        widget_IR->addChild(new QTreeBuffer(QStringList("N")));
-        widget_IR->addChild(new QTreeBuffer(QStringList("NE")));
-        widget_IR->addChild(new QTreeBuffer(QStringList("SE")));
-        widget_IR->addChild(new QTreeBuffer(QStringList("S")));
-        widget_IR->addChild(new QTreeBuffer(QStringList("SW")));
-        widget_IR->addChild(new QTreeBuffer(QStringList("NW")));
+        widget_IR->addChild(new QTreeBuffer(QStringList("N"), name + ": IR - N"));
+        widget_IR->addChild(new QTreeBuffer(QStringList("NE"), name + ": IR - NE"));
+        widget_IR->addChild(new QTreeBuffer(QStringList("SE"), name + ": IR - SE"));
+        widget_IR->addChild(new QTreeBuffer(QStringList("S"), name + ": IR - S"));
+        widget_IR->addChild(new QTreeBuffer(QStringList("SW"), name + ": IR - SW"));
+        widget_IR->addChild(new QTreeBuffer(QStringList("NW"), name + ": IR - NW"));
     }
     //zadavanje djece temp grani:
     {
-        widget_temp->addChild(new QTreeBuffer(QStringList("N")));
-        widget_temp->addChild(new QTreeBuffer(QStringList("E")));
-        widget_temp->addChild(new QTreeBuffer(QStringList("S")));
-        widget_temp->addChild(new QTreeBuffer(QStringList("W")));
+        widget_temp->addChild(new QTreeBuffer(QStringList("N"), name + ": IR - N"));
+        widget_temp->addChild(new QTreeBuffer(QStringList("E"), name + ": IR - E"));
+        widget_temp->addChild(new QTreeBuffer(QStringList("S"), name + ": IR - S"));
+        widget_temp->addChild(new QTreeBuffer(QStringList("W"), name + ": IR - W"));
     }
     //zadavanje djece vibr grani:
     {
-        widget_vibr->addChild(new QTreeBuffer(QStringList("N")));
-        widget_vibr->addChild(new QTreeBuffer(QStringList("E")));
-        widget_vibr->addChild(new QTreeBuffer(QStringList("S")));
-        widget_vibr->addChild(new QTreeBuffer(QStringList("W")));
+        widget_vibr->addChild(new QTreeBuffer(QStringList("N"), name + ": IR - N"));
+        widget_vibr->addChild(new QTreeBuffer(QStringList("E"), name + ": IR - E"));
+        widget_vibr->addChild(new QTreeBuffer(QStringList("S"), name + ": IR - S"));
+        widget_vibr->addChild(new QTreeBuffer(QStringList("W"), name + ": IR - W"));
     }
 
     QList<QTreeWidgetItem *> temp;{
@@ -120,6 +120,7 @@ void QCasuTreeItem::messageReceived(const QList<QByteArray>& message){
         for (int k = 0; k < ranges.range_size()-1; k++){
             double value = lexical_cast<double>(ranges.range(k));
             widget_IR->child(k)->setData(1, Qt::DisplayRole, QVariant(value));
+            ((QTreeBuffer *)widget_IR->child(k))->addToBuffer(QTime::currentTime(), value);
             if(log_on) log_file << ";" << value;
         }
     }

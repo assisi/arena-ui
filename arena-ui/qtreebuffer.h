@@ -14,8 +14,9 @@ private:
 public:
     QCPDataMap* buffer;
     QTime lastDataTime;
+    QString legendName;
 
-    explicit QTreeBuffer(const QStringList & strings, QWidget* parent = 0);
+    explicit QTreeBuffer(const QStringList & strings, QString lName, QWidget* parent = 0);
     ~QTreeBuffer();
 
     void addToBuffer(QTime time, double value);
