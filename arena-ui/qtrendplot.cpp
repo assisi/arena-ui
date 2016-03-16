@@ -5,8 +5,7 @@ QTrendPlot::QTrendPlot(QTreeWidget* tree, QWidget *parent) :
     casuTree(tree),
     autoPosition(true),
     showLegend(true),
-    docked(true),
-    originalParent(parent)
+    docked(true)
 {
    QSizePolicy customPolicy(sizePolicy());
    customPolicy.setHeightForWidth(true);
@@ -53,7 +52,7 @@ void QTrendPlot::addGraph(QTreeBuffer* treeItem){
 }
 
 void QTrendPlot::addGraphList(QList<QTreeWidgetItem*> itemList)
-{
+{    
     bool new_trend = true;
     if(this->graphCount()) new_trend = false;
 

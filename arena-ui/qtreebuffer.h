@@ -4,7 +4,7 @@
 
 #include <QTreeWidgetItem>
 #include "qcustomplot.h"
-#include "global.h"
+#include "globalHeader.h"
 
 class QTreeBuffer : public QObject, public QTreeWidgetItem
 {

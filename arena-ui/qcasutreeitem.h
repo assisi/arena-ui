@@ -9,7 +9,7 @@
 
 #include <nzmqt/nzmqt.hpp>
 #include "dev_msgs.pb.h"
-#include "global.h"
+#include "globalHeader.h"
 #include "qtreebuffer.h"
 
 using namespace nzmqt;

@@ -4,7 +4,6 @@
 #include <QGraphicsSceneMouseEvent>
 #include <QFileDialog>
 #include <QMessageBox>
-#include <typeinfo>
 
 #include "arenaui.h"
 #include "ui_arenaui.h"
@@ -24,7 +23,7 @@ ArenaUI::ArenaUI(QWidget *parent) :
 {
     loadConfig();
     ui->setupUi(this);
-    ui->actionToggleLog->setChecked(log_on);
+    ui->actionToggleLog->setChecked(settings->value("log_on").toBool());
 
     //CASU TREE TAB
     ui->casuTree->addAction(ui->actionPlot_selected_in_same_trend);
@@ -57,7 +56,6 @@ ArenaUI::ArenaUI(QWidget *parent) :
 
 ArenaUI::~ArenaUI()
 {
-    saveConfig();
     delete ui;
 }
 
@@ -107,9 +105,8 @@ bool MouseClickHandler::eventFilter(QObject* obj, QEvent* event)
 
 void ArenaUI::on_actionOpen_Arena_triggered()
 {
-    arenaFile = QFileDialog::getOpenFileName(this,tr("Open Arena configuration file"), arenaFolder, tr("*.arena"));
-    if(!arenaFile.toStdString().empty()){
-        arenaFolder = arenaFile.left(arenaFile.lastIndexOf("/"));
+    arenaFile = QFileDialog::getOpenFileName(this,tr("Open Arena configuration file"), settings->value("arenaFolder").toString(), tr("*.arena"));
+    if(arenaFile.size()){
         arena_scene->clear();
         ui->casuTree->clear();
             YAML::Node arena_config = YAML::LoadFile(arenaFile.toStdString());
@@ -177,7 +174,7 @@ void ArenaUI::on_actionConnect_triggered()
         return;
     }
     QCasuSceneItem* temp = (QCasuSceneItem*)arena_scene->selectedItems()[0];
-    QConnectDialog* addrDiag = new QConnectDialog(temp->widget_->sub_addr,temp->widget_->pub_addr,temp->widget_->msg_addr);
+    QDialogConnect* addrDiag = new QDialogConnect(temp->widget_->sub_addr,temp->widget_->pub_addr,temp->widget_->msg_addr);
     if(addrDiag->exec()){
         temp->widget_->setAddr(addrDiag->sub_addr->text(), addrDiag->pub_addr->text(),addrDiag->msg_addr->text());
     }
@@ -185,11 +182,11 @@ void ArenaUI::on_actionConnect_triggered()
 
 void ArenaUI::on_actionToggleLog_triggered()
 {
-    ui->actionToggleLog->setChecked(log_on);
-    QString question = QString("Are you sure you want to turn ") + (log_on ? QString("OFF") : QString("ON")) + QString(" logging?");
+    ui->actionToggleLog->setChecked(settings->value("log_on").toBool());
+    QString question = QString("Are you sure you want to turn ") + (settings->value("log_on").toBool() ? QString("OFF") : QString("ON")) + QString(" logging?");
     QMessageBox::StandardButton reply = QMessageBox::question(this, "Toggle Log", question , QMessageBox::Yes|QMessageBox::No);
-    if(reply == QMessageBox::Yes)log_on = !log_on;
-    ui->actionToggleLog->setChecked(log_on);
+    if(reply == QMessageBox::Yes)settings->setValue("log_on", !settings->value("log_on").toBool());
+    ui->actionToggleLog->setChecked(settings->value("log_on").toBool());
 }
 
 void ArenaUI::on_actionPlot_selected_in_same_trend_triggered()
@@ -197,5 +194,11 @@ void ArenaUI::on_actionPlot_selected_in_same_trend_triggered()
     QTrendPlot* tempWidget = new QTrendPlot(ui->casuTree);
     trendTab->addWidget(tempWidget);
 
-    tempWidget->addGraphList(ui->casuTree->selectedItems());
+    tempWidget->addSelectedGraphs();
+}
+
+void ArenaUI::on_actionSettings_triggered()
+{
+    QDialogSettings* settingsDiag = new QDialogSettings();
+    settingsDiag->exec();
 }

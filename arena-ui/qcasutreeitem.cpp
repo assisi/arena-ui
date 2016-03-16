@@ -104,8 +104,8 @@ void QCasuTreeItem::messageReceived(const QList<QByteArray>& message){
     }
     connection_timer->start(2000);
 
-    if(log_on & !log_open) openLogFile();
-    if(!log_on & log_open) closeLogFile();
+    if(settings->value("log_on").toBool() & !log_open) openLogFile();
+    if(!settings->value("log_on").toBool() & log_open) closeLogFile();
 
     string name(message.at(0).constData(), message.at(0).length());
     string device(message.at(1).constData(), message.at(1).length());
@@ -121,7 +121,7 @@ void QCasuTreeItem::messageReceived(const QList<QByteArray>& message){
             double value = lexical_cast<double>(ranges.range(k));
             widget_IR->child(k)->setData(1, Qt::DisplayRole, QVariant(value));
             ((QTreeBuffer *)widget_IR->child(k))->addToBuffer(QTime::currentTime(), value);
-            if(log_on) log_file << ";" << value;
+            if(settings->value("log_on").toBool()) log_file << ";" << value;
         }
     }
 
@@ -132,7 +132,7 @@ void QCasuTreeItem::messageReceived(const QList<QByteArray>& message){
             double value = lexical_cast <double>(temperatures.temp(k));
             widget_temp->child(k)->setData(1, Qt::DisplayRole, QVariant(value));
             ((QTreeBuffer *)widget_temp->child(k))->addToBuffer(QTime::currentTime(), value);
-            if(log_on) log_file << ";" << value;
+            if(settings->value("log_on").toBool()) log_file << ";" << value;
         }
     }
 /*
@@ -171,7 +171,7 @@ void QCasuTreeItem::connectionTimeout(){
 }
 
 void QCasuTreeItem::openLogFile(){
-    log_name = logSubFolder + QDateTime::currentDateTime().toString(date_time_format) + casu_name;
+    log_name = settings->value("logSubFolder").toString() + QDateTime::currentDateTime().toString(date_time_format) + casu_name;
     log_file.open(log_name.toStdString().c_str(), ofstream::out | ofstream::app);
     log_open = true;
 }

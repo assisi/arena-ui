@@ -13,7 +13,7 @@ QTreeBuffer::~QTreeBuffer(){
 
 void QTreeBuffer::addToBuffer(QTime time, double value)
 {
-    if(lastDataTime.msecsTo(time) < trendSampleTime_ms) return;
+    if(lastDataTime.msecsTo(time) < settings->value("trendSampleTime_ms").toInt()) return;
     else lastDataTime = time;
 
     QCPData newData;
@@ -21,7 +21,7 @@ void QTreeBuffer::addToBuffer(QTime time, double value)
     newData.value = value;
 
     buffer->insert(newData.key, newData);
-    while(newData.key - buffer->begin()->key > QTime(0,0,0).secsTo(trendTimeSpan)) buffer->erase(buffer->begin()); //Delete data older than $timeSpan
+    while(newData.key - buffer->begin()->key > QTime(0,0,0).secsTo(settings->value("trendTimeSpan").toTime())) buffer->erase(buffer->begin()); //Delete data older than $timeSpan
 
     emit updatePlot(newData.key, value);
 }

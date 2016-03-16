@@ -8,5 +8,6 @@
         <file>images/icons/log.png</file>
         <file>images/icons/log_off.png</file>
         <file>images/icons/log_on.png</file>
+        <file>images/icons/settings.png</file>
     </qresource>
 </RCC>

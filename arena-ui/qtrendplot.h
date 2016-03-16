@@ -13,7 +13,6 @@ private:
     bool showLegend;
     bool docked;
     QMap<QCPGraph*,QTreeBuffer*> connectionMap;
-    QWidget* originalParent;
 
 public:
     explicit QTrendPlot(QTreeWidget* tree, QWidget *parent = 0);

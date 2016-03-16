@@ -43,7 +43,7 @@
        <enum>QTabWidget::North</enum>
       </property>
       <property name="currentIndex">
-       <number>0</number>
+       <number>2</number>
       </property>
       <widget class="QWidget" name="tab_casus">
        <property name="enabled">
@@ -137,12 +137,12 @@
    <attribute name="toolBarBreak">
     <bool>false</bool>
    </attribute>
-   <addaction name="separator"/>
    <addaction name="actionOpen_Arena"/>
    <addaction name="actionGroup"/>
    <addaction name="actionUngroup"/>
    <addaction name="actionConnect"/>
    <addaction name="actionToggleLog"/>
+   <addaction name="actionSettings"/>
   </widget>
   <action name="actionGroup">
    <property name="icon">
@@ -246,6 +246,15 @@
    </property>
    <property name="shortcut">
     <string>Ctrl+Shift+P</string>
+   </property>
+  </action>
+  <action name="actionSettings">
+   <property name="icon">
+    <iconset resource="images.qrc">
+     <normaloff>:/images/icons/settings.png</normaloff>:/images/icons/settings.png</iconset>
+   </property>
+   <property name="text">
+    <string>Settings</string>
    </property>
   </action>
  </widget>

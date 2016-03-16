@@ -8,10 +8,11 @@
 #include <yaml-cpp/yaml.h>
 #include <nzmqt/nzmqt.hpp>
 
-#include "global.h"
+#include "globalHeader.h"
 
 #include "qcasusceneitem.h"
-#include "qconnectdialog.h"
+#include "qdialogconnect.h"
+#include "qdialogsettings.h"
 #include "qtrendplot.h"
 
 
@@ -41,6 +42,7 @@ private slots:
     void on_actionConnect_triggered();
     void on_actionToggleLog_triggered();
     void on_actionPlot_selected_in_same_trend_triggered();
+    void on_actionSettings_triggered();
 };
 
 // ------------------------------------------------------------------------
