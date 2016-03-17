@@ -38,6 +38,7 @@ public slots:
     void dock_undock();
     void removeSelectedGraphs();
     void addSelectedGraphs();
+    void saveToPDF();
 };
 
 #endif // QTRENDPLOT_H

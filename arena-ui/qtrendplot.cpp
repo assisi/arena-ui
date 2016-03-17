@@ -79,6 +79,13 @@ void QTrendPlot::addSelectedGraphs(){
     this->addGraphList(casuTree->selectedItems());
 }
 
+void QTrendPlot::saveToPDF()
+{
+    QString path = QFileDialog::getSaveFileName(this,tr("Export trend graph as PDF"),QString(), tr("*.pdf"));
+    if(!path.endsWith(".pdf",Qt::CaseInsensitive))path+=".pdf";
+    if(path.size())this->savePdf(path);
+}
+
 void QTrendPlot::updatePlot(double time, double value){
     double labelAngle = 45 - 30*(this->size().width() - 340)/ this->size().width(); //calculate angle so tick labels are readable
     this->xAxis->setTickLabelRotation(labelAngle > 30 ? labelAngle : 0); //angle is not needed when it is less than 30°
@@ -92,7 +99,7 @@ void QTrendPlot::updatePlot(double time, double value){
         if(value < yRange.lower || value > yRange.upper)
             this->yAxis->setRange(yRange.center(), abs(yRange.center()-value)+4, Qt::AlignCenter);
 
-        this->xAxis->setRange(time, xRange.size(), Qt::AlignRight);
+        this->xAxis->setRange(time + 1, xRange.size(), Qt::AlignRight);
     }
 }
 
@@ -143,6 +150,8 @@ void QTrendPlot::showContextMenu(QPoint pos){
 
     temp=menu->addAction("Add graphs (selected in tree)",this,SLOT(addSelectedGraphs()));
     if(!casuTree->selectedItems().count()) temp->setEnabled(false);
+
+    menu->addAction("Save to pdf",this,SLOT(saveToPDF()));
 
     menu->addAction("Close trend",this,SLOT(close()));
 
