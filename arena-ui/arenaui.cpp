@@ -50,6 +50,7 @@ ArenaUI::ArenaUI(QWidget *parent) :
     MouseClickHandler* click_handler = new MouseClickHandler(arena_scene, this);
     arena_scene->installEventFilter(click_handler);
 
+    connect(ui->arenaSpace,SIGNAL(customContextMenuRequested(QPoint)),this,SLOT(customContextMenu(QPoint)));
 }
 
 // -------------------------------------------------------------------------------
@@ -201,4 +202,35 @@ void ArenaUI::on_actionSettings_triggered()
 {
     QDialogSettings* settingsDiag = new QDialogSettings();
     settingsDiag->exec();
+}
+
+void ArenaUI::customContextMenu(QPoint pos)
+{
+    QMenu* menu = new QMenu(ui->arenaSpace);
+    QAction* temp;
+
+    menu->setAttribute(Qt::WA_DeleteOnClose);
+
+    bool error_single = false;
+    if (arena_scene->selectedItems().size() != 1) error_single = true; //Check if excactly one object is selected
+    if (arena_scene->selectedItems().size() == 1)
+        if(arena_scene->selectedItems()[0]->childItems().size()) error_single = true; // Check if object is single casu (no children)
+
+    bool error_selected = !arena_scene->selectedItems().size();
+
+    menu->addAction("Open arena file",this,SLOT(on_actionOpen_Arena_triggered()));
+    menu->addAction("Toggle logging",this,SLOT(on_actionToggleLog_triggered()));
+    menu->addSeparator();
+    if(error_selected)menu->addAction("Group selected",this,SLOT(on_actionGroup_triggered()));
+    if(error_selected)menu->addAction("Ungroup selected",this,SLOT(on_actionUngroup_triggered()));
+    menu->addSeparator();
+    temp = menu->addAction("Set connection",this,SLOT(on_actionConnect_triggered()));
+    if(error_single) temp->setEnabled(false);
+
+    QMenu* sendMenu = new QMenu(menu);
+    sendMenu->addAction("Temp");
+    sendMenu->addAction("asd");
+
+    menu->popup(this->mapToGlobal(pos));
+
 }

@@ -43,6 +43,8 @@ private slots:
     void on_actionToggleLog_triggered();
     void on_actionPlot_selected_in_same_trend_triggered();
     void on_actionSettings_triggered();
+
+    void customContextMenu(QPoint pos);
 };
 
 // ------------------------------------------------------------------------
