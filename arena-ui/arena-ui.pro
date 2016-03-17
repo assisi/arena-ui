@@ -31,7 +31,8 @@ SOURCES += main.cpp\
     qtreebuffer.cpp \
     qdialogsettings.cpp \
     qdialogconnect.cpp \
-    globalHeader.cpp
+    globalHeader.cpp \
+    qdialogsetpoint.cpp
 
 HEADERS  += arenaui.h\
         nzmqt/nzmqt.hpp \
@@ -42,7 +43,8 @@ HEADERS  += arenaui.h\
     qtreebuffer.h \
     qdialogsettings.h \
     qdialogconnect.h \
-    globalHeader.h
+    globalHeader.h \
+    qdialogsetpoint.h
 
 FORMS    += arenaui.ui
 

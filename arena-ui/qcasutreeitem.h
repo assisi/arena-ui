@@ -59,6 +59,7 @@ public:
     QCasuTreeItem(QObject *parent, QString name);
 
     void setAddr(QString sub, QString pub, QString msg);
+    bool sendSetpoint(QList<QByteArray> message);
 
     void resetSelection();
 

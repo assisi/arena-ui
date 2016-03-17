@@ -41,7 +41,7 @@ ArenaUI::ArenaUI(QWidget *parent) :
     ui->tab_trend->layout()->addWidget(tempScroll);
 
     //GRAPHICS SCENE
-    arena_scene = new QGraphicsScene(this);
+    arena_scene = new QArenaScene(this);
     arena_scene->setSceneRect(0,0,800,800);
 
     ui->arenaSpace->setScene(arena_scene);
@@ -53,8 +53,6 @@ ArenaUI::ArenaUI(QWidget *parent) :
     connect(ui->arenaSpace,SIGNAL(customContextMenuRequested(QPoint)),this,SLOT(customContextMenu(QPoint)));
 }
 
-// -------------------------------------------------------------------------------
-
 ArenaUI::~ArenaUI()
 {
     delete ui;
@@ -65,7 +63,7 @@ ArenaUI::~ArenaUI()
 MouseClickHandler::MouseClickHandler(QGraphicsScene* scene, QObject *parent) :
     QObject(parent),
     scene_(scene){}
-// -------------------------------------------------------------------------------
+
 bool MouseClickHandler::eventFilter(QObject* obj, QEvent* event)
 {
     if (event->type() == QEvent::GraphicsSceneMouseMove){
@@ -175,9 +173,9 @@ void ArenaUI::on_actionConnect_triggered()
         return;
     }
     QCasuSceneItem* temp = (QCasuSceneItem*)arena_scene->selectedItems()[0];
-    QDialogConnect* addrDiag = new QDialogConnect(temp->widget_->sub_addr,temp->widget_->pub_addr,temp->widget_->msg_addr);
+    QDialogConnect* addrDiag = new QDialogConnect(temp->treeItem->sub_addr,temp->treeItem->pub_addr,temp->treeItem->msg_addr);
     if(addrDiag->exec()){
-        temp->widget_->setAddr(addrDiag->sub_addr->text(), addrDiag->pub_addr->text(),addrDiag->msg_addr->text());
+        temp->treeItem->setAddr(addrDiag->sub_addr->text(), addrDiag->pub_addr->text(),addrDiag->msg_addr->text());
     }
 }
 
@@ -206,7 +204,7 @@ void ArenaUI::on_actionSettings_triggered()
 
 void ArenaUI::customContextMenu(QPoint pos)
 {
-    QMenu* menu = new QMenu(ui->arenaSpace);
+    QMenu* menu = new QMenu(); //no parent because it inherits background image from QGraphicsView
     QAction* temp;
 
     menu->setAttribute(Qt::WA_DeleteOnClose);
@@ -218,19 +216,63 @@ void ArenaUI::customContextMenu(QPoint pos)
 
     bool error_selected = !arena_scene->selectedItems().size();
 
-    menu->addAction("Open arena file",this,SLOT(on_actionOpen_Arena_triggered()));
-    menu->addAction("Toggle logging",this,SLOT(on_actionToggleLog_triggered()));
-    menu->addSeparator();
-    if(error_selected)menu->addAction("Group selected",this,SLOT(on_actionGroup_triggered()));
-    if(error_selected)menu->addAction("Ungroup selected",this,SLOT(on_actionUngroup_triggered()));
+    //menu->addAction("Open arena file",this,SLOT(on_actionOpen_Arena_triggered()));
+    //menu->addAction("Toggle logging",this,SLOT(on_actionToggleLog_triggered()));
+    //menu->addSeparator();
+    temp = menu->addAction("Group selected",this,SLOT(on_actionGroup_triggered()));
+    if(error_selected) temp->setEnabled(false);
+    temp = menu->addAction("Ungroup selected",this,SLOT(on_actionUngroup_triggered()));
+    if(error_selected) temp->setEnabled(false);
     menu->addSeparator();
     temp = menu->addAction("Set connection",this,SLOT(on_actionConnect_triggered()));
     if(error_single) temp->setEnabled(false);
 
-    QMenu* sendMenu = new QMenu(menu);
-    sendMenu->addAction("Temp");
-    sendMenu->addAction("asd");
+    QMenu* sendMenu = new QMenu("Setpoint");
+    if(error_selected) sendMenu->setEnabled(false);
+    menu->addMenu(sendMenu);
 
-    menu->popup(this->mapToGlobal(pos));
+    QSignalMapper* signalMapper = new QSignalMapper(menu);
 
+    temp = sendMenu->addAction("Temperature",signalMapper,SLOT(map()));
+    signalMapper->setMapping(temp,"Temperature");
+    temp = sendMenu->addAction("Vibration",signalMapper,SLOT(map()));
+    signalMapper->setMapping(temp,"Vibration");
+    temp = sendMenu->addAction("Airflow",signalMapper,SLOT(map()));
+    signalMapper->setMapping(temp,"Airflow");
+
+    connect(signalMapper,SIGNAL(mapped(QString)),this,SLOT(sendSetpoint(QString)));
+
+    menu->popup(ui->arenaSpace->mapToGlobal(pos));
+}
+
+void ArenaUI::sendSetpoint(QString actuator)
+{
+    QDialogSetpoint* dialog = new QDialogSetpoint(actuator);
+    if(dialog->exec())
+        for(int k = 0; k < arena_scene->selectedItems().count(); k++)
+            if(arena_scene->selectedItems()[k]->childItems().size())
+                groupSendSetpoint(arena_scene->selectedItems()[k],dialog->message);
+            else
+                ((QCasuSceneItem*)arena_scene->selectedItems()[k])->treeItem->sendSetpoint(dialog->message);
+}
+
+void ArenaUI::groupSendSetpoint(QGraphicsItem *group, QList<QByteArray> message)
+{
+    for(int k = 0; k < group->childItems().count(); k++)
+        if(group->childItems()[k]->childItems().size())
+            groupSendSetpoint(group->childItems()[k],message);
+        else
+            ((QCasuSceneItem*)group->childItems()[k])->treeItem->sendSetpoint(message);
+}
+
+
+QArenaScene::QArenaScene(QWidget *parent) : QGraphicsScene(parent){}
+
+void QArenaScene::mousePressEvent(QGraphicsSceneMouseEvent *event)
+{
+    if (event->button() != Qt::LeftButton) {
+            event->accept();
+            return;
+        }
+        QGraphicsScene::mousePressEvent(event);
 }

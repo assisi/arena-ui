@@ -17,7 +17,7 @@ private:
     int y_center;
 
 public:
-    QCasuTreeItem* widget_;
+    QCasuTreeItem* treeItem;
 
     QCasuSceneItem(QObject *parent, int x, int y, QCasuTreeItem *widget);
 

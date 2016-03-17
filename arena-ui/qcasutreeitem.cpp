@@ -82,6 +82,13 @@ void QCasuTreeItem::setAddr(QString sub, QString pub, QString msg){
     this->connect_();
 }
 
+bool QCasuTreeItem::sendSetpoint(QList<QByteArray> message)
+{
+    if(!connected) return false;
+    message.push_front(QString(casu_name).toLocal8Bit());
+    return pub_sock_->sendMessage(message);
+}
+
 void QCasuTreeItem::connect_()
 {
     try{

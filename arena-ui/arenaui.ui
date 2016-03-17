@@ -33,7 +33,7 @@
        <enum>Qt::CustomContextMenu</enum>
       </property>
       <property name="styleSheet">
-       <string notr="true">border-image: url(:/images/arena_sw.png);</string>
+       <string notr="true">border-image: url(:/images/arena_sw.png)</string>
       </property>
      </widget>
     </item>
