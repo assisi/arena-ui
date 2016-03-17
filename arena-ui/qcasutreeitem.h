@@ -1,18 +1,23 @@
 #ifndef CASUTREEITEM_H
 #define CASUTREEITEM_H
 
+#include <fstream>
 #include <QTreeWidgetItem>
+
 #include <boost/lexical_cast.hpp>
+#include <boost/functional/hash.hpp>
 
 #include <nzmqt/nzmqt.hpp>
 #include "dev_msgs.pb.h"
+#include "globalHeader.h"
+#include "qtreebuffer.h"
 
 using namespace nzmqt;
 using namespace AssisiMsg;
 using namespace boost;
 using namespace std;
 
-class CasuTreeItem : public QObject, public QTreeWidgetItem
+class QCasuTreeItem : public QObject, public QTreeWidgetItem
 {
     Q_OBJECT
 
@@ -26,9 +31,18 @@ private:
     // Connect the publisher and subscriber
     void connect_();
 
+    QString log_name;
+    bool log_open;
+    ofstream log_file;
+    void openLogFile();
+    void closeLogFile();
+
+    QString casu_name;
+
 public:
     bool connected;
     bool led_on;
+    bool child_selected;
 
     QColor led_color;
 
@@ -42,11 +56,11 @@ public:
     QTreeWidgetItem *widget_vibr;
     QTreeWidgetItem *widget_light;
 
-    CasuTreeItem(QObject *parent, QString name);
+    QCasuTreeItem(QObject *parent, QString name);
 
     void setAddr(QString sub, QString pub, QString msg);
 
-    void setSelected(bool select);
+    void resetSelection();
 
 signals:
     void updateScene();

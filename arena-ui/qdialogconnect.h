@@ -1,5 +1,5 @@
-#ifndef CONNECTDIALOG_H
-#define CONNECTDIALOG_H
+#ifndef QDIALOGCONNECT_H
+#define QDIALOGCONNECT_H
 
 #include <QDialogButtonBox>
 #include <QDialog>
@@ -8,7 +8,7 @@
 #include <QLabel>
 #include <QLineEdit>
 
-class connectDialog : public QDialog
+class QDialogConnect : public QDialog
 {
     Q_OBJECT
 
@@ -17,7 +17,7 @@ public:
     QLineEdit* pub_addr;
     QLineEdit* msg_addr;
 
-    connectDialog(QString sub, QString pub, QString msg);
+    QDialogConnect(QString sub, QString pub, QString msg);
 };
 
-#endif // CONNECTDIALOG_H
+#endif // QDIALOGCONNECT_H

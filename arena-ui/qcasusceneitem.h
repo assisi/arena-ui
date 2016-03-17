@@ -1,14 +1,14 @@
-#ifndef CASUSCENEITEM_H
-#define CASUSCENEITEM_H
+#ifndef QCASUSCENEITEM_H
+#define QCASUSCENEITEM_H
 
 #include <QPainter>
 #include <QGraphicsItem>
 #include <QGraphicsScene>
 
-#include "casutreeitem.h"
+#include "qcasutreeitem.h"
 
 
-class CasuSceneItem : public QObject, public QGraphicsItem
+class QCasuSceneItem : public QObject, public QGraphicsItem
 {
     Q_OBJECT
 
@@ -16,11 +16,10 @@ private:
     int x_center;
     int y_center;
 
-
 public:
-    CasuTreeItem* widget_;
+    QCasuTreeItem* widget_;
 
-    CasuSceneItem(QObject *parent, int x, int y, CasuTreeItem *widget);
+    QCasuSceneItem(QObject *parent, int x, int y, QCasuTreeItem *widget);
 
     QRectF boundingRect() const;
 
@@ -32,4 +31,4 @@ protected slots:
 
 };
 
-#endif // CASUSCENEITEM_H
+#endif // QCASUSCENEITEM_H

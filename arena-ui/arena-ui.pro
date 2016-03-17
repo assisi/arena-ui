@@ -6,10 +6,15 @@
 
 QT       += core gui
 
-greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
+QT       += widgets\
+           printsupport
 
 TARGET = arena-ui
 TEMPLATE = app
+
+CONFIG += link_pkgconfig
+PKGCONFIG += Qt5GStreamer-1.0 Qt5GStreamerUi-1.0
+
 
 INCLUDEPATH += ../msg/cpp
 
@@ -19,21 +24,32 @@ SOURCES += main.cpp\
         ../msg/cpp/base_msgs.pb.cc\
         ../msg/cpp/dev_msgs.pb.cc\
         ../msg/cpp/sim_msgs.pb.cc \
-    casutreeitem.cpp \
-    casusceneitem.cpp \
-    connectdialog.cpp
+    qcasusceneitem.cpp \
+    qcasutreeitem.cpp \
+    qcustomplot.cpp \
+    qtrendplot.cpp \
+    qtreebuffer.cpp \
+    qdialogsettings.cpp \
+    qdialogconnect.cpp \
+    globalHeader.cpp
 
 HEADERS  += arenaui.h\
         nzmqt/nzmqt.hpp \
-    casutreeitem.h \
-    casusceneitem.h \
-    connectdialog.h
+    qcasusceneitem.h \
+    qcasutreeitem.h \
+    qcustomplot.h \
+    qtrendplot.h \
+    qtreebuffer.h \
+    qdialogsettings.h \
+    qdialogconnect.h \
+    globalHeader.h
 
 FORMS    += arenaui.ui
 
 LIBS += -lzmq\
         -lprotobuf\
         -lyaml-cpp
+
 
 RESOURCES += \
     images.qrc

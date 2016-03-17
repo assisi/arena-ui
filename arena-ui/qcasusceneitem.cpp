@@ -1,23 +1,22 @@
-#include "casusceneitem.h"
+#include "qcasusceneitem.h"
 
-CasuSceneItem::CasuSceneItem(QObject *parent, int x, int y, CasuTreeItem *widget) : QObject(parent)
+QCasuSceneItem::QCasuSceneItem(QObject *parent, int x, int y, QCasuTreeItem *widget) : QObject(parent),
+    x_center(x),
+    y_center(y),
+    widget_(widget)
 {
-    x_center = x;
-    y_center = y;
-
     this->setFlag(QGraphicsItem::ItemIsSelectable);
-
-    widget_= widget;
 
     connect(widget_, SIGNAL(updateScene()), this, SLOT(updateScene()));
 }
 
-QRectF CasuSceneItem::boundingRect() const
+
+QRectF QCasuSceneItem::boundingRect() const
 {
     return QRectF(x_center-10,y_center-10,20,20);
 }
 
-void CasuSceneItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
+void QCasuSceneItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
 {
     QRectF model = boundingRect();
 
@@ -36,12 +35,12 @@ void CasuSceneItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *opt
     else{
         pen.setStyle(Qt::DotLine);
         widget_->setHidden(true);
-        widget_->setSelected(false);
+        widget_->resetSelection();
     }
     if(widget_->led_on)brush.setColor(widget_->led_color);
     else brush.setColor(Qt::gray);
 
-    if(widget_->isSelected())brush.setStyle(Qt::SolidPattern);
+    if(widget_->child_selected)brush.setStyle(Qt::SolidPattern);
     else brush.setStyle(Qt::Dense3Pattern);
 
     painter->setPen(pen);
@@ -49,7 +48,7 @@ void CasuSceneItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *opt
     painter->drawEllipse(model);
 }
 
-void CasuSceneItem::updateScene(){
+void QCasuSceneItem::updateScene(){
     this->scene()->update();
 }
 
