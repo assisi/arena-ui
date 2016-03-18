@@ -1,8 +1,9 @@
 #include "qcasusceneitem.h"
 
-QCasuSceneItem::QCasuSceneItem(QObject *parent, int x, int y, QCasuTreeItem *widget) : QObject(parent),
+QCasuSceneItem::QCasuSceneItem(QObject *parent, int x, int y, int yaw, QCasuTreeItem *widget) : QObject(parent),
     x_center(x),
     y_center(y),
+    yaw_(yaw),
     treeItem(widget)
 {
     this->setFlag(QGraphicsItem::ItemIsSelectable);
@@ -18,7 +19,8 @@ QRectF QCasuSceneItem::boundingRect() const
 
 void QCasuSceneItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
 {
-    QRectF model = boundingRect();
+    //paint main CASU object
+    QRectF model = QRectF(x_center-10,y_center-10,20,20);;
 
     QPen pen;
     QBrush brush;
@@ -46,6 +48,10 @@ void QCasuSceneItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *op
     painter->setPen(pen);
     painter->setBrush(brush);
     painter->drawEllipse(model);
+
+    //paint IR sensor readings
+    //paint Temp sensor readings
+
 }
 
 void QCasuSceneItem::updateScene(){

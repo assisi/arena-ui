@@ -28,6 +28,7 @@ ArenaUI::ArenaUI(QWidget *parent) :
     //CASU TREE TAB
     ui->casuTree->addAction(ui->actionPlot_selected_in_same_trend);
     ui->casuTree->addAction(ui->actionPlot_selected_in_different_trends);
+    ui->casuTree->header()->setSortIndicator(0,Qt::AscendingOrder);
 
     //TREND TAB SCROLLABLE LAYOUT
     ui->tab_trend->setLayout(new QVBoxLayout);
@@ -104,28 +105,38 @@ bool MouseClickHandler::eventFilter(QObject* obj, QEvent* event)
 
 void ArenaUI::on_actionOpen_Arena_triggered()
 {
+    QProgressBar progress;
+    progress.setMinimum(0);
+
     arenaFile = QFileDialog::getOpenFileName(this,tr("Open Arena configuration file"), settings->value("arenaFolder").toString(), tr("*.arena"));
     if(arenaFile.size()){
         arena_scene->clear();
         ui->casuTree->clear();
-            YAML::Node arena_config = YAML::LoadFile(arenaFile.toStdString());
+        YAML::Node arena_config = YAML::LoadFile(arenaFile.toStdString());
+        progress.setMaximum(arena_config["beearena"].size());
+        progress.show();
+        progress.move(ui->arenaSpace->mapToGlobal(QPoint(400-progress.width()/2,400-progress.height()/2)));
 
         for(YAML::const_iterator it=arena_config["beearena"].begin(); it!=arena_config["beearena"].end(); it++){
             QString name = QString::fromStdString(it->first.as<std::string>());
             int xpos = arena_config["beearena"][name.toStdString()]["pose"]["x"].as<int>();
             int ypos = arena_config["beearena"][name.toStdString()]["pose"]["y"].as<int>();
+            int yaw = arena_config["beearena"][name.toStdString()]["pose"]["yaw"].as<int>();
 
             QCasuTreeItem* tempTree = new QCasuTreeItem(ui->casuTree, name);
 
             ui->casuTree->addTopLevelItem(tempTree);
 
-            QCasuSceneItem* tempItem = new QCasuSceneItem(this, xpos*10+400, -ypos*10+400, tempTree);
+            QCasuSceneItem* tempItem = new QCasuSceneItem(this, xpos*10+400, -ypos*10+400, yaw, tempTree);
 
             arena_scene->addItem(tempItem);
 
             tempTree->setAddr(QString::fromStdString(arena_config["beearena"][name.toStdString()]["sub_addr"].as<std::string>()),
                                QString::fromStdString(arena_config["beearena"][name.toStdString()]["pub_addr"].as<std::string>()),
                                QString::fromStdString(arena_config["beearena"][name.toStdString()]["msg_addr"].as<std::string>()));
+
+            progress.setValue(progress.value()+1);
+            QApplication::processEvents();
         }
 
     }
@@ -239,6 +250,8 @@ void ArenaUI::customContextMenu(QPoint pos)
     signalMapper->setMapping(temp,"Vibration");
     temp = sendMenu->addAction("Airflow",signalMapper,SLOT(map()));
     signalMapper->setMapping(temp,"Airflow");
+    temp = sendMenu->addAction("LED",signalMapper,SLOT(map()));
+    signalMapper->setMapping(temp,"LED");
 
     connect(signalMapper,SIGNAL(mapped(QString)),this,SLOT(sendSetpoint(QString)));
 

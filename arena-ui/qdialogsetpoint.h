@@ -10,6 +10,9 @@
 #include <QLabel>
 #include <QLineEdit>
 #include <QDoubleValidator>
+#include <QRegularExpressionValidator>
+#include <QPushButton>
+#include <QColorDialog>
 
 #include <iostream>
 
@@ -31,6 +34,7 @@ public:
 
 private slots:
     void prepareMessage();
+    void colorDialog();
 };
 
 #endif // QDIALOGSETPOINT_H

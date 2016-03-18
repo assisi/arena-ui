@@ -38,6 +38,25 @@ QDialogSetpoint::QDialogSetpoint(QString command) : command_(command)
         tempLayout->addWidget(buttons,3,0);
     }
 
+    if(command == "LED"){
+        tempLayout->addWidget(new QLabel("Color[hex #RrGgBb]:"),1,0);
+        value1 = new QLineEdit("#7ABA71");
+        QRegularExpression re("^#([A-Fa-f0-9]{6})$");
+        value1->setValidator(new QRegularExpressionValidator(re, this));
+        tempLayout->addWidget(value1,1,1,1,2);
+
+        QIcon icon(":/images/icons/open_folder_yellow.png");
+        QPushButton* chooseColor = new QPushButton();
+        chooseColor->setIcon(icon);
+        chooseColor->setFixedSize(25,25);
+
+        connect(chooseColor,SIGNAL(clicked()),this,SLOT(colorDialog()));
+
+        tempLayout->addWidget(chooseColor,1,2);
+        tempLayout->addWidget(buttons,2,0);
+    }
+
+
     this->setLayout(tempLayout);
 
     QObject::connect(buttons, SIGNAL(accepted()), this, SLOT(prepareMessage()));
@@ -58,21 +77,44 @@ void QDialogSetpoint::prepareMessage()
         temp.SerializePartialToArray(buffer, size);
 
         message.append(QString("Peltier").toLocal8Bit());
-        message.push_back(QString(radioON->isChecked() ? "temp" : "Off").toLocal8Bit());
+        message.push_back(QString(radioON->isChecked() ? "On" : "Off").toLocal8Bit());
         message.push_back(QByteArray((char*)buffer, size));
     }
     if(command_ == "Vibration"){
-        VibrationSetpoint temp;
-        temp.set_freq(value1->text().toDouble());
-        temp.set_amplitude(value2->text().toDouble());
+        VibrationSetpoint vibr;
+        vibr.set_freq(value1->text().toDouble());
+        vibr.set_amplitude(value2->text().toDouble());
 
-        int size = temp.ByteSize();
+        int size = vibr.ByteSize();
         void *buffer = malloc(size);
+        vibr.SerializeToArray(buffer,size);
 
-        message.push_back(QString("VibeMotor").toLocal8Bit());
+        message.push_back(QString("Speaker").toLocal8Bit());
+        message.push_back(QString(radioON->isChecked() ? "On" : "Off").toLocal8Bit());
+        message.push_back(QByteArray((char*)buffer, size));
+    }
+    if(command_ == "LED"){
+        QColor userColor(value1->text());
+
+        ColorStamped color;
+        color.mutable_color()->set_red((double)userColor.red()/255);
+        color.mutable_color()->set_green((double)userColor.green()/255);
+        color.mutable_color()->set_blue((double)userColor.blue()/255);
+
+        int size = color.ByteSize();
+        void *buffer = malloc(size);
+        color.SerializeToArray(buffer, size);
+
+        message.push_back(QString("DiagnosticLed").toLocal8Bit());
         message.push_back(QString(radioON->isChecked() ? "On" : "Off").toLocal8Bit());
         message.push_back(QByteArray((char*)buffer, size));
     }
 
+
     accept();
+}
+
+void QDialogSetpoint::colorDialog()
+{
+    value1->setText(QColorDialog::getColor(value1->text(),this,"Choose color").name());
 }

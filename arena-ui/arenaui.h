@@ -3,7 +3,7 @@
 
 #include <QMainWindow>
 #include <QGraphicsScene>
-#include <vector>
+#include <QProgressBar>
 
 #include <yaml-cpp/yaml.h>
 #include <nzmqt/nzmqt.hpp>

@@ -50,11 +50,19 @@ public:
     QString pub_addr;
     QString msg_addr;
 
+    //pointers to tree objects needs to be saved because sorting changes children order
+
     QTreeWidgetItem *widget_IR;
     QTreeWidgetItem *widget_LED;
     QTreeWidgetItem *widget_temp;
     QTreeWidgetItem *widget_vibr;
-    QTreeWidgetItem *widget_light;
+    QTreeWidgetItem *widget_setpoints;
+
+    QList<QTreeWidgetItem*> widget_IR_children;
+    QList<QTreeWidgetItem*> widget_temp_children;
+    QList<QTreeWidgetItem*> widget_vibr_children;
+    QList<QTreeWidgetItem*> widget_setpoints_children;
+    QList<QTreeWidgetItem*> widget_setpoints_vibr_children;
 
     QCasuTreeItem(QObject *parent, QString name);
 
@@ -67,7 +75,7 @@ signals:
     void updateScene();
 
 private slots:
-    void widgetClicked();
+    void updateSelection();
 
     void messageReceived(const QList<QByteArray>& message);
 

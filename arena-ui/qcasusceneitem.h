@@ -15,11 +15,12 @@ class QCasuSceneItem : public QObject, public QGraphicsItem
 private:
     int x_center;
     int y_center;
+    int yaw_;
 
 public:
     QCasuTreeItem* treeItem;
 
-    QCasuSceneItem(QObject *parent, int x, int y, QCasuTreeItem *widget);
+    QCasuSceneItem(QObject *parent, int x, int y, int yaw, QCasuTreeItem *widget);
 
     QRectF boundingRect() const;
 

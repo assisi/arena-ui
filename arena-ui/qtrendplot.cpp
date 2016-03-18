@@ -97,7 +97,7 @@ void QTrendPlot::updatePlot(double time, double value){
         QCPRange xRange = this->xAxis->range();
 
         if(value < yRange.lower || value > yRange.upper)
-            this->yAxis->setRange(yRange.center(), abs(yRange.center()-value)+4, Qt::AlignCenter);
+            this->yAxis->setRange(yRange.center(), abs(yRange.center()-value)*2+4, Qt::AlignCenter);
 
         this->xAxis->setRange(time + 1, xRange.size(), Qt::AlignRight);
     }
