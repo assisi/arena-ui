@@ -77,7 +77,7 @@
            <bool>true</bool>
           </property>
           <attribute name="headerVisible">
-           <bool>true</bool>
+           <bool>false</bool>
           </attribute>
           <attribute name="headerDefaultSectionSize">
            <number>200</number>
@@ -141,6 +141,7 @@
     <bool>false</bool>
    </attribute>
    <addaction name="actionOpen_Arena"/>
+   <addaction name="actionSave"/>
    <addaction name="actionGroup"/>
    <addaction name="actionUngroup"/>
    <addaction name="actionConnect"/>
@@ -180,13 +181,13 @@
   <action name="actionOpen_Arena">
    <property name="icon">
     <iconset resource="images.qrc">
-     <normaloff>:/images/icons/open_folder_yellow.png</normaloff>:/images/icons/open_folder_yellow.png</iconset>
+     <normaloff>:/images/icons/open.png</normaloff>:/images/icons/open.png</iconset>
    </property>
    <property name="text">
-    <string>Open Arena Configuration file (Ctrl+O)</string>
+    <string>Open</string>
    </property>
    <property name="toolTip">
-    <string>Open Arena (Ctrl + O)</string>
+    <string>Open project or session (Ctrl + O)</string>
    </property>
    <property name="shortcut">
     <string>Ctrl+O</string>
@@ -258,6 +259,21 @@
    </property>
    <property name="text">
     <string>Settings</string>
+   </property>
+  </action>
+  <action name="actionSave">
+   <property name="icon">
+    <iconset resource="images.qrc">
+     <normaloff>:/images/icons/save.png</normaloff>:/images/icons/save.png</iconset>
+   </property>
+   <property name="text">
+    <string>Save</string>
+   </property>
+   <property name="toolTip">
+    <string>Save session (Ctrl + S)</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+S</string>
    </property>
   </action>
  </widget>

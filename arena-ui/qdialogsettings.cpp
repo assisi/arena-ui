@@ -13,10 +13,11 @@ QDialogSettings::QDialogSettings()
 
     trendTimeSpan = new QDateTimeEdit(settings->value("trendTimeSpan").toTime());
     trendTimeSpan->setMaximumTime(QTime(0,59,59));
+    trendTimeSpan->setDisplayFormat("mm:ss");
     trendSampleTime_ms = new QLineEdit(settings->value("trendSampleTime_ms").toString());
     trendSampleTime_ms->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
     trendSampleTime_ms->setMaximumWidth(50);
-    trendSampleTime_ms->setValidator(new QIntValidator(0,9999));
+    trendSampleTime_ms->setValidator(new QIntValidator(100,9999));
     logFolder = new QLineEdit(settings->value("logFolder").toString());
     camFolder = new QLineEdit(settings->value("camFolder").toString());
     arenaFolder = new QLineEdit(settings->value("arenaFolder").toString());
@@ -79,7 +80,7 @@ void QDialogSettings::saveConfig()
     settings->setValue("logFolder", logFolder->text());
     settings->setValue("camFolder", camFolder->text());
     settings->setValue("arenaFolder", arenaFolder->text());
-    settings->setValue("trendTimeSpan", trendTimeSpan->text());
+    settings->setValue("trendTimeSpan", QTime::fromString(trendTimeSpan->text(),"mm:ss"));
     settings->setValue("trendSampleTime_ms", trendSampleTime_ms->text());
     settings->setValue("forceLog", forceLog->isChecked());
     settings->setValue("forceScene", forceScene->isChecked());

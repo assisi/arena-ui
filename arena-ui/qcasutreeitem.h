@@ -37,9 +37,9 @@ private:
     void openLogFile();
     void closeLogFile();
 
-    QString casu_name;
-
 public:
+    QString casuName;
+
     bool connected;
     bool led_on;
     bool child_selected;

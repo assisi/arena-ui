@@ -3,11 +3,12 @@
         <file>images/arena_sw.png</file>
         <file>images/icons/group.png</file>
         <file>images/icons/ungroup.png</file>
-        <file>images/icons/open_folder_yellow.png</file>
+        <file>images/icons/open.png</file>
         <file>images/icons/connect.png</file>
         <file>images/icons/log.png</file>
         <file>images/icons/log_off.png</file>
         <file>images/icons/log_on.png</file>
         <file>images/icons/settings.png</file>
+        <file>images/icons/save.png</file>
     </qresource>
 </RCC>

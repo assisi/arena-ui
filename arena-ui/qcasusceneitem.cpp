@@ -48,6 +48,10 @@ void QCasuSceneItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *op
     painter->setPen(pen);
     painter->setBrush(brush);
     painter->drawEllipse(model);
+    painter->drawLine(x_center + 5*cos((yaw_ - 90)*PI/180),
+                      y_center + 5*sin((yaw_ - 90)*PI/180),
+                      x_center + 10*cos((yaw_ - 90)*PI/180),
+                      y_center + 10*sin((yaw_ - 90)*PI/180));
 
     pen.setStyle(Qt::SolidLine);
     brush.setStyle(Qt::SolidPattern);

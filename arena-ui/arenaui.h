@@ -43,10 +43,15 @@ public:
 private:
     Ui::ArenaUI *ui;
     QArenaScene *arena_scene;
-    QString arenaFile;
+    QString arenaLayer;
+
+    QString assisiFile;
+    YAML::Node assisiNode;
+
     QVBoxLayout* trendTab;
 
     void groupSendSetpoint(QGraphicsItem *group, QList<QByteArray> message);
+    void groupSave(QSettings *saveState, QList<QGraphicsItem*> items, QString groupName);
 
 private slots:
     void on_actionOpen_Arena_triggered();
@@ -63,6 +68,7 @@ private slots:
     void customContextMenu(QPoint pos);
 
     void sendSetpoint(QString actuator);
+    void on_actionSave_triggered();
 };
 
 // ------------------------------------------------------------------------

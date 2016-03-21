@@ -77,7 +77,7 @@ bool MouseClickHandler::eventFilter(QObject* obj, QEvent* event)
         QGraphicsItem * itemAtMouse= scene_->itemAt(mouse_click->scenePos().x(),mouse_click->scenePos().y(), QTransform());
 
         if (itemAtMouse && !drag_true)
-            if(QApplication::keyboardModifiers() == Qt::CTRL){
+            if(QApplication::keyboardModifiers() == Qt::ControlModifier){
                 if(itemAtMouse->isSelected())itemAtMouse->setSelected(0);
                 else itemAtMouse->setSelected(1);
             }
@@ -85,7 +85,7 @@ bool MouseClickHandler::eventFilter(QObject* obj, QEvent* event)
                 scene_->clearSelection();
                 itemAtMouse->setSelected(1);
             }
-        else if(QApplication::keyboardModifiers() != Qt::CTRL && !drag_true)
+        else if(QApplication::keyboardModifiers() != Qt::ControlModifier && !drag_true)
             scene_->clearSelection();
 
 
@@ -99,7 +99,23 @@ bool MouseClickHandler::eventFilter(QObject* obj, QEvent* event)
         return QObject::eventFilter(obj, event);
     }
 }
+//-------------------------------------------------------------------------------
+// Subclassed QGraphicsScene for a BUG [QTBUG-10138]
+// http://www.qtcentre.org/threads/36953-QGraphicsItem-deselected-on-contextMenuEvent
+QArenaScene::QArenaScene(QWidget *parent) : QGraphicsScene(parent){}
 
+void QArenaScene::mousePressEvent(QGraphicsSceneMouseEvent *event)
+{
+    if (event->button() == Qt::RightButton) {
+            event->accept();
+            return;
+        }
+    if (event->button() == Qt::LeftButton) {
+            event->accept();
+            return;
+        }
+    //QGraphicsScene::mousePressEvent(event);
+}
 // -------------------------------------------------------------------------------
 
 
@@ -107,21 +123,32 @@ void ArenaUI::on_actionOpen_Arena_triggered()
 {
     QProgressBar progress;
     progress.setMinimum(0);
+    QString tempString = QFileDialog::getOpenFileName(this,tr("Open Arena configuration file"), settings->value("arenaFolder").toString(), tr("*.assisi;;*.arenaUI"));
 
-    arenaFile = QFileDialog::getOpenFileName(this,tr("Open Arena configuration file"), settings->value("arenaFolder").toString(), tr("*.arena"));
-    if(arenaFile.size()){
+    if(tempString.endsWith(".assisi")){
+        assisiFile = tempString;
+        assisiNode = YAML::LoadFile(assisiFile.toStdString());
+        QString arenaFile = assisiFile.left(assisiFile.lastIndexOf('/')+1) + QString::fromStdString(assisiNode["arena"].as<std::string>());
+
+        YAML::Node arenaNode = YAML::LoadFile(arenaFile.toStdString());
+        QList<QString> layers;
+        for(YAML::const_iterator it=arenaNode.begin(); it!=arenaNode.end(); it++) layers.append(QString::fromStdString(it->first.as<std::string>()));
+
+        if(layers.size() > 1) arenaLayer = QInputDialog::getItem(this,tr("Select arena layer"),"",QStringList(layers));
+        else arenaLayer = layers[0];
+
         arena_scene->clear();
         ui->casuTree->clear();
-        YAML::Node arena_config = YAML::LoadFile(arenaFile.toStdString());
-        progress.setMaximum(arena_config["beearena"].size());
+
+        progress.setMaximum(arenaNode[arenaLayer.toStdString()].size());
         progress.show();
         progress.move(ui->arenaSpace->mapToGlobal(QPoint(400-progress.width()/2,400-progress.height()/2)));
 
-        for(YAML::const_iterator it=arena_config["beearena"].begin(); it!=arena_config["beearena"].end(); it++){
+        for(YAML::const_iterator it=arenaNode[arenaLayer.toStdString()].begin(); it!=arenaNode[arenaLayer.toStdString()].end(); it++){
             QString name = QString::fromStdString(it->first.as<std::string>());
-            int xpos = arena_config["beearena"][name.toStdString()]["pose"]["x"].as<int>();
-            int ypos = arena_config["beearena"][name.toStdString()]["pose"]["y"].as<int>();
-            int yaw = arena_config["beearena"][name.toStdString()]["pose"]["yaw"].as<int>();
+            int xpos = arenaNode[arenaLayer.toStdString()][name.toStdString()]["pose"]["x"].as<int>();
+            int ypos = arenaNode[arenaLayer.toStdString()][name.toStdString()]["pose"]["y"].as<int>();
+            int yaw = arenaNode[arenaLayer.toStdString()][name.toStdString()]["pose"]["yaw"].as<int>();
 
             QCasuTreeItem* tempTree = new QCasuTreeItem(ui->casuTree, name);
 
@@ -131,14 +158,13 @@ void ArenaUI::on_actionOpen_Arena_triggered()
 
             arena_scene->addItem(tempItem);
 
-            tempTree->setAddr(QString::fromStdString(arena_config["beearena"][name.toStdString()]["sub_addr"].as<std::string>()),
-                               QString::fromStdString(arena_config["beearena"][name.toStdString()]["pub_addr"].as<std::string>()),
-                               QString::fromStdString(arena_config["beearena"][name.toStdString()]["msg_addr"].as<std::string>()));
+            tempTree->setAddr(QString::fromStdString(arenaNode[arenaLayer.toStdString()][name.toStdString()]["sub_addr"].as<std::string>()),
+                               QString::fromStdString(arenaNode[arenaLayer.toStdString()][name.toStdString()]["pub_addr"].as<std::string>()),
+                               QString::fromStdString(arenaNode[arenaLayer.toStdString()][name.toStdString()]["msg_addr"].as<std::string>()));
 
             progress.setValue(progress.value()+1);
             QApplication::processEvents();
         }
-
     }
 }
 
@@ -288,17 +314,48 @@ void ArenaUI::groupSendSetpoint(QGraphicsItem *group, QList<QByteArray> message)
             ((QCasuSceneItem*)group->childItems()[k])->treeItem->sendSetpoint(message);
 }
 
-
-
-// Subclassed QGraphicsScene for a BUG [QTBUG-10138]
-// http://www.qtcentre.org/threads/36953-QGraphicsItem-deselected-on-contextMenuEvent
-QArenaScene::QArenaScene(QWidget *parent) : QGraphicsScene(parent){}
-
-void QArenaScene::mousePressEvent(QGraphicsSceneMouseEvent *event)
+void ArenaUI::groupSave(QSettings *saveState, QList<QGraphicsItem *> items, QString groupName)
 {
-    if (event->button() != Qt::LeftButton) {
-            event->accept();
-            return;
-        }
-        QGraphicsScene::mousePressEvent(event);
+    saveState->beginGroup(groupName);
+    for(int k=0; k < items.size() ; k++)
+        if(!items[k]->childItems().size()) saveState->setValue(QString(k),((QCasuSceneItem*)items[k])->treeItem->casuName);
+        else groupSave(saveState, items[k]->childItems(), QString(k));
+    saveState->endGroup();
+}
+
+void ArenaUI::on_actionSave_triggered()
+{
+    QString saveFile = QFileDialog::getSaveFileName(this,tr("Save As"),settings->value("arenaFolder").toString(),tr("*.arenaUI"));
+
+    if(!saveFile.size())return;
+    if(!saveFile.endsWith(".arenaUI")) saveFile += ".arenaUI";
+    if(QFile(saveFile).exists())QFile(saveFile).remove();
+
+    QSettings saveState(saveFile,QSettings::IniFormat);
+    saveState.setValue("assisiFile",assisiFile);
+    saveState.setValue("arenaLayer",arenaLayer);
+
+    //save CASU graphics scene
+
+    QList<QGraphicsItem*> tempSelection = arena_scene->selectedItems(); // save active selection
+    QPainterPath pp;
+    pp.addRect(arena_scene->sceneRect()); // select all -- selectedItems() doesnt return group children which is a case with items()
+    arena_scene->setSelectionArea(pp);
+
+    groupSave(&saveState, arena_scene->selectedItems(),"CASU");
+
+    pp = pp.subtracted(pp);
+    pp.addRect(0,0,0,0);
+    arena_scene->setSelectionArea(pp);
+    foreach(QGraphicsItem* item, tempSelection) item->setSelected(true);
+
+    saveState.beginGroup("trendGraphs");
+    for(int k=0; k < trendTab->children().size() ; k++){
+        saveState.beginGroup(QString(k));
+        QTrendPlot* tempPlot = (QTrendPlot*) trendTab->children()[k];
+        for(int i=0; i < tempPlot->graphCount(); i++)
+            saveState.setValue(QString(i),tempPlot->connectionMap[tempPlot->graph(i)]->legendName);
+        saveState.endGroup();
+    }
+    saveState.endGroup();
 }

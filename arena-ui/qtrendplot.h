@@ -12,9 +12,10 @@ private:
     bool autoPosition;
     bool showLegend;
     bool docked;
-    QMap<QCPGraph*,QTreeBuffer*> connectionMap;
 
 public:
+    QMap<QCPGraph*,QTreeBuffer*> connectionMap;
+
     explicit QTrendPlot(QTreeWidget* tree, QWidget *parent = 0);
     ~QTrendPlot(){}
 

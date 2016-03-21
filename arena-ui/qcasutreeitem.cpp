@@ -1,8 +1,8 @@
 #include "qcasutreeitem.h"
 
-QCasuTreeItem::QCasuTreeItem(QObject* parent, QString name) : QObject(parent), casu_name(name), child_selected(false)
+QCasuTreeItem::QCasuTreeItem(QObject* parent, QString name) : QObject(parent), casuName(name), child_selected(false)
 {
-    this->setData(0,Qt::DisplayRole,QStringList(casu_name));
+    this->setData(0,Qt::DisplayRole,QStringList(casuName));
     widget_IR = new QTreeWidgetItem(QStringList("IR - Proximity"));
     widget_LED= new QTreeWidgetItem(QStringList("LED"));
     widget_temp = new QTreeWidgetItem(QStringList("Temperature"));
@@ -103,7 +103,7 @@ void QCasuTreeItem::setAddr(QString sub, QString pub, QString msg){
 bool QCasuTreeItem::sendSetpoint(QList<QByteArray> message)
 {
     if(!connected) return false;
-    message.push_front(QString(casu_name).toLocal8Bit());
+    message.push_front(QString(casuName).toLocal8Bit());
     return pub_sock_->sendMessage(message);
 }
 
@@ -123,6 +123,15 @@ void QCasuTreeItem::connect_()
 }
 
 void QCasuTreeItem::messageReceived(const QList<QByteArray>& message){
+
+    string name(message.at(0).constData(), message.at(0).length());
+
+    if(name != casuName.toStdString()) return;
+
+    string device(message.at(1).constData(), message.at(1).length());
+    string command(message.at(2).constData(), message.at(2).length());
+    string data(message.at(3).constData(), message.at(3).length());
+
     bool emit_update = false;
 
     if(!connected){
@@ -133,11 +142,6 @@ void QCasuTreeItem::messageReceived(const QList<QByteArray>& message){
 
     if(settings->value("log_on").toBool() & !log_open) openLogFile();
     if(!settings->value("log_on").toBool() & log_open) closeLogFile();
-
-    string name(message.at(0).constData(), message.at(0).length());
-    string device(message.at(1).constData(), message.at(1).length());
-    string command(message.at(2).constData(), message.at(2).length());
-    string data(message.at(3).constData(), message.at(3).length());
 
     log_file << device << ";" << QDateTime::currentDateTime().toString(time_format).toStdString();
 
@@ -263,7 +267,7 @@ void QCasuTreeItem::connectionTimeout(){
 }
 
 void QCasuTreeItem::openLogFile(){
-    log_name = settings->value("logSubFolder").toString() + QDateTime::currentDateTime().toString(date_time_format) + casu_name;
+    log_name = settings->value("logSubFolder").toString() + QDateTime::currentDateTime().toString(date_time_format) + casuName;
     log_file.open(log_name.toStdString().c_str(), ofstream::out | ofstream::app);
     log_open = true;
 }
