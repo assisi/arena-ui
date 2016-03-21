@@ -7,6 +7,7 @@
 
 #include "qcasutreeitem.h"
 
+#define PI 3.14159265
 
 class QCasuSceneItem : public QObject, public QGraphicsItem
 {
@@ -30,6 +31,21 @@ public:
 protected slots:
     void updateScene();
 
+};
+
+class QIRTriangle : public QPolygonF
+{
+public:
+    QIRTriangle(QPointF center, double angle);
+};
+
+class QTempArc
+{
+public:
+    QTempArc(QPointF center, double angle);
+    int start;
+    int span;
+    QRectF rect;
 };
 
 #endif // QCASUSCENEITEM_H

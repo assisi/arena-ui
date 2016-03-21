@@ -213,6 +213,16 @@ void ArenaUI::on_actionSettings_triggered()
     settingsDiag->exec();
 }
 
+void ArenaUI::toggleIR()
+{
+    settings->setValue("IR_on",!settings->value("IR_on").toBool());
+}
+
+void ArenaUI::toggleTemp()
+{
+    settings->setValue("temp_on",!settings->value("temp_on").toBool());
+}
+
 void ArenaUI::customContextMenu(QPoint pos)
 {
     QMenu* menu = new QMenu(); //no parent because it inherits background image from QGraphicsView
@@ -227,9 +237,9 @@ void ArenaUI::customContextMenu(QPoint pos)
 
     bool error_selected = !arena_scene->selectedItems().size();
 
-    //menu->addAction("Open arena file",this,SLOT(on_actionOpen_Arena_triggered()));
-    //menu->addAction("Toggle logging",this,SLOT(on_actionToggleLog_triggered()));
-    //menu->addSeparator();
+    menu->addAction(settings->value("IR_on").toBool() ? "Hide proximity sensors" : "Show proximity sensors",this,SLOT(toggleIR()));
+    menu->addAction(settings->value("temp_on").toBool() ? "Hide temperature sensors" : "Show temperature sensors",this,SLOT(toggleTemp()));
+    menu->addSeparator();
     temp = menu->addAction("Group selected",this,SLOT(on_actionGroup_triggered()));
     if(error_selected) temp->setEnabled(false);
     temp = menu->addAction("Ungroup selected",this,SLOT(on_actionUngroup_triggered()));
@@ -279,6 +289,9 @@ void ArenaUI::groupSendSetpoint(QGraphicsItem *group, QList<QByteArray> message)
 }
 
 
+
+// Subclassed QGraphicsScene for a BUG [QTBUG-10138]
+// http://www.qtcentre.org/threads/36953-QGraphicsItem-deselected-on-contextMenuEvent
 QArenaScene::QArenaScene(QWidget *parent) : QGraphicsScene(parent){}
 
 void QArenaScene::mousePressEvent(QGraphicsSceneMouseEvent *event)

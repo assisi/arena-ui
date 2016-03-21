@@ -57,6 +57,9 @@ private slots:
     void on_actionPlot_selected_in_same_trend_triggered();
     void on_actionSettings_triggered();
 
+    void toggleIR();
+    void toggleTemp();
+
     void customContextMenu(QPoint pos);
 
     void sendSetpoint(QString actuator);
