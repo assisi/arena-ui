@@ -17,7 +17,10 @@ void loadConfig(){
         settings->setValue("trendTimeSpan", QTime(0,5,0));
         settings->setValue("trendSampleTime_ms", 500);
         settings->setValue("log_on", true);
+        settings->setValue("IR_on", true);
+        settings->setValue("temp_on", true);
         settings->setValue("forceLog", true);
+        settings->setValue("forceScene", true);
 
         settings->setValue("exists",true);
     }
@@ -30,5 +33,9 @@ void loadConfig(){
     if(!QDir(settings->value("logSubFolder").toString()).exists())QDir().mkdir(settings->value("logSubFolder").toString());
     if(!QDir(settings->value("camSubFolder").toString()).exists())QDir().mkdir(settings->value("camSubFolder").toString());
 
-    settings->setValue("log_on", settings->value("forceLog").toBool());
+    if(settings->value("forceLog").toBool()) settings->setValue("log_on", true);
+    if(settings->value("forceScene").toBool()){
+        settings->setValue("IR_on", true);
+        settings->setValue("temp_on", true);
+    }
 }

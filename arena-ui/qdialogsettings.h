@@ -36,6 +36,8 @@ private:
        QDateTimeEdit* trendTimeSpan;
        QLineEdit* trendSampleTime_ms;
        QCheckBox* forceLog;
+       QCheckBox* forceScene;
+
 
        QMap<QPushButton*,QLineEdit*> link;
 
