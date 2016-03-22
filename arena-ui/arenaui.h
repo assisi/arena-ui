@@ -50,7 +50,7 @@ private:
 
     QVBoxLayout* trendTab;
 
-    void groupSendSetpoint(QGraphicsItem *group, QList<QByteArray> message);
+    void groupSendSetpoint(QList<QGraphicsItem *> group, QList<QByteArray> message);
     void groupSave(QSettings *saveState, QList<QGraphicsItem*> items, QString groupName);
 
 private slots:
@@ -86,6 +86,7 @@ protected:
 private:
     QGraphicsScene* scene_;
     bool drag_true;
+    QList<QGraphicsItem*> selectedList;
 };
 // ------------------------------------------------------------------------
 #endif // ARENAUI_H

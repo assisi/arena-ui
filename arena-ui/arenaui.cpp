@@ -67,13 +67,26 @@ MouseClickHandler::MouseClickHandler(QGraphicsScene* scene, QObject *parent) :
 
 bool MouseClickHandler::eventFilter(QObject* obj, QEvent* event)
 {
-    if (event->type() == QEvent::GraphicsSceneMouseMove){
-        drag_true = true;
+    if (event->type() == QEvent::GraphicsSceneMousePress){
+        if(QApplication::keyboardModifiers() == Qt::ControlModifier)
+            selectedList = scene_->selectedItems();
+        else selectedList.clear();
+
+        return true;
     }
+    else
+    if (event->type() == QEvent::GraphicsSceneMouseMove){
+        foreach(QGraphicsItem* item, selectedList) item->setSelected(true);
+        drag_true = true;
+
+        return true;
+    }
+    else
     if (event->type() == QEvent::GraphicsSceneMouseRelease)
     {
-        QGraphicsSceneMouseEvent* mouse_click = static_cast<QGraphicsSceneMouseEvent *>(event);
+        foreach(QGraphicsItem* item, selectedList) item->setSelected(true);
 
+        QGraphicsSceneMouseEvent* mouse_click = static_cast<QGraphicsSceneMouseEvent *>(event);
         QGraphicsItem * itemAtMouse= scene_->itemAt(mouse_click->scenePos().x(),mouse_click->scenePos().y(), QTransform());
 
         if (itemAtMouse && !drag_true)
@@ -106,15 +119,8 @@ QArenaScene::QArenaScene(QWidget *parent) : QGraphicsScene(parent){}
 
 void QArenaScene::mousePressEvent(QGraphicsSceneMouseEvent *event)
 {
-    if (event->button() == Qt::RightButton) {
-            event->accept();
-            return;
-        }
-    if (event->button() == Qt::LeftButton) {
-            event->accept();
-            return;
-        }
-    //QGraphicsScene::mousePressEvent(event);
+    if (event->button() == Qt::RightButton) event->accept();
+    else QGraphicsScene::mousePressEvent(event);
 }
 // -------------------------------------------------------------------------------
 
@@ -183,11 +189,11 @@ void ArenaUI::on_actionGroup_triggered()
 void ArenaUI::on_actionUngroup_triggered()
 {
     QList<QGraphicsItem *> temp_itemList= arena_scene->selectedItems();
-    for(int k=0;k<temp_itemList.size();k++)
-        if(temp_itemList[k]->childItems().size()){
-            QList<QGraphicsItem *> tempChildList = temp_itemList[k]->childItems();
-            if(!temp_itemList[k]->childItems().size())temp_itemList[k]->setZValue(1);
-            arena_scene->destroyItemGroup((QGraphicsItemGroup*)temp_itemList[k]);
+    foreach(QGraphicsItem* item, temp_itemList)
+        if(item->childItems().size()){
+            QList<QGraphicsItem *> tempChildList = item->childItems();
+            if(!item->childItems().size())item->setZValue(1);
+            arena_scene->destroyItemGroup((QGraphicsItemGroup*)item);
             for(int i=0;i<tempChildList.size();i++){;
                 tempChildList[i]->setSelected(0);
                 tempChildList[i]->setSelected(1);
@@ -298,29 +304,27 @@ void ArenaUI::sendSetpoint(QString actuator)
 {
     QDialogSetpoint* dialog = new QDialogSetpoint(actuator);
     if(dialog->exec())
-        for(int k = 0; k < arena_scene->selectedItems().count(); k++)
-            if(arena_scene->selectedItems()[k]->childItems().size())
-                groupSendSetpoint(arena_scene->selectedItems()[k],dialog->message);
-            else
-                ((QCasuSceneItem*)arena_scene->selectedItems()[k])->treeItem->sendSetpoint(dialog->message);
+        groupSendSetpoint(arena_scene->selectedItems(),dialog->message);
 }
 
-void ArenaUI::groupSendSetpoint(QGraphicsItem *group, QList<QByteArray> message)
+void ArenaUI::groupSendSetpoint(QList<QGraphicsItem *> group, QList<QByteArray> message)
 {
-    for(int k = 0; k < group->childItems().count(); k++)
-        if(group->childItems()[k]->childItems().size())
-            groupSendSetpoint(group->childItems()[k],message);
+    foreach(QGraphicsItem* item, group)
+        if(item->childItems().size())
+            groupSendSetpoint(item->childItems(),message);
         else
-            ((QCasuSceneItem*)group->childItems()[k])->treeItem->sendSetpoint(message);
+            ((QCasuSceneItem*)item)->treeItem->sendSetpoint(message);
 }
 
-void ArenaUI::groupSave(QSettings *saveState, QList<QGraphicsItem *> items, QString groupName)
+void ArenaUI::groupSave(QSettings *saveState, QList<QGraphicsItem *> group, QString groupName)
 {
-    saveState->beginGroup(groupName);
-    for(int k=0; k < items.size() ; k++)
-        if(!items[k]->childItems().size()) saveState->setValue(QString(k),((QCasuSceneItem*)items[k])->treeItem->casuName);
-        else groupSave(saveState, items[k]->childItems(), QString(k));
-    saveState->endGroup();
+    saveState->beginWriteArray(groupName);
+    for(int k=0; k < group.size() ; k++){
+        saveState->setArrayIndex(k);
+        if(!group[k]->childItems().size()) saveState->setValue("casuName",((QCasuSceneItem*)group[k])->treeItem->casuName);
+        else groupSave(saveState, group[k]->childItems(), "group");
+    }
+    saveState->endArray();
 }
 
 void ArenaUI::on_actionSave_triggered()
@@ -342,20 +346,42 @@ void ArenaUI::on_actionSave_triggered()
     pp.addRect(arena_scene->sceneRect()); // select all -- selectedItems() doesnt return group children which is a case with items()
     arena_scene->setSelectionArea(pp);
 
-    groupSave(&saveState, arena_scene->selectedItems(),"CASU");
+    saveState.beginGroup("sceneHierarchy");
+    groupSave(&saveState, arena_scene->selectedItems(),"main");
+    saveState.endGroup();
 
     pp = pp.subtracted(pp);
     pp.addRect(0,0,0,0);
     arena_scene->setSelectionArea(pp);
-    foreach(QGraphicsItem* item, tempSelection) item->setSelected(true);
+    foreach(QGraphicsItem* item, tempSelection) item->setSelected(true); // after saving items and groups, return selection as was before
+
+    //save trend position and graphs
 
     saveState.beginGroup("trendGraphs");
-    for(int k=0; k < trendTab->children().size() ; k++){
-        saveState.beginGroup(QString(k));
-        QTrendPlot* tempPlot = (QTrendPlot*) trendTab->children()[k];
-        for(int i=0; i < tempPlot->graphCount(); i++)
-            saveState.setValue(QString(i),tempPlot->connectionMap[tempPlot->graph(i)]->legendName);
-        saveState.endGroup();
+    saveState.beginWriteArray("plot");
+    for(int k=0; k < trendTab->count() ; k++){
+        QTrendPlot* tempPlot = (QTrendPlot*) trendTab->itemAt(k)->widget();
+        saveState.setArrayIndex(k);
+        saveState.beginWriteArray("graph");
+        for(int i=0; i < tempPlot->graphCount(); i++){
+            saveState.setArrayIndex(i);
+            saveState.setValue("data",tempPlot->connectionMap[tempPlot->graph(i)]->legendName);
+        }
+        saveState.endArray();
     }
+    saveState.endArray();
+    saveState.endGroup();
+
+    //save connection settins
+
+    saveState.beginGroup("connectionSettings");
+    saveState.beginWriteArray("connections");
+    for(int k=0; k < ui->casuTree->topLevelItemCount(); k++){
+        saveState.setArrayIndex(k);
+        saveState.setValue("pub_adr",((QCasuTreeItem*)ui->casuTree->topLevelItem(k))->pub_addr);
+        saveState.setValue("sub_adr",((QCasuTreeItem*)ui->casuTree->topLevelItem(k))->sub_addr);
+        saveState.setValue("msg_adr",((QCasuTreeItem*)ui->casuTree->topLevelItem(k))->msg_addr);
+    }
+    saveState.endArray();
     saveState.endGroup();
 }
