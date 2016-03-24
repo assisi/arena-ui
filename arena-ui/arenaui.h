@@ -50,8 +50,11 @@ private:
 
     QVBoxLayout* trendTab;
 
+    void sortGraphicsScene();
+
     void groupSendSetpoint(QList<QGraphicsItem *> group, QList<QByteArray> message);
     void groupSave(QSettings *saveState, QList<QGraphicsItem*> items, QString groupName);
+    QList<QGraphicsItem *> *groupLoad(YAML::Node *arenaNode, QSettings *loadState, int groupSize, QMap<QString, QCasuTreeItem *> *linker, QProgressBar *progress);
 
 private slots:
     void on_actionOpen_Arena_triggered();

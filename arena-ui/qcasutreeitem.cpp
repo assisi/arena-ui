@@ -22,10 +22,10 @@ QCasuTreeItem::QCasuTreeItem(QObject* parent, QString name) : QObject(parent), c
 
     //zadavanje djece temp grani:
     {
-        widget_temp_children.append((QTreeWidgetItem*)new QTreeBuffer(QStringList("N"), name + ": IR - N"));
-        widget_temp_children.append((QTreeWidgetItem*)new QTreeBuffer(QStringList("E"), name + ": IR - E"));
-        widget_temp_children.append((QTreeWidgetItem*)new QTreeBuffer(QStringList("S"), name + ": IR - S"));
-        widget_temp_children.append((QTreeWidgetItem*)new QTreeBuffer(QStringList("W"), name + ": IR - W"));
+        widget_temp_children.append((QTreeWidgetItem*)new QTreeBuffer(QStringList("N"), name + ": Temp - N"));
+        widget_temp_children.append((QTreeWidgetItem*)new QTreeBuffer(QStringList("E"), name + ": Temp - E"));
+        widget_temp_children.append((QTreeWidgetItem*)new QTreeBuffer(QStringList("S"), name + ": Temp - S"));
+        widget_temp_children.append((QTreeWidgetItem*)new QTreeBuffer(QStringList("W"), name + ": Temp - W"));
         widget_temp->addChildren(widget_temp_children);
     }
     //zadavanje djece vibr grani:

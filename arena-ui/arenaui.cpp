@@ -59,6 +59,42 @@ ArenaUI::~ArenaUI()
     delete ui;
 }
 
+void ArenaUI::sortGraphicsScene()
+{
+    QList<QGraphicsItem*> tempSelection = arena_scene->selectedItems(); // save active selection
+    QPainterPath pp;
+    pp.addRect(arena_scene->sceneRect()); // select all -- selectedItems() doesnt return group children which is a case with items()
+    arena_scene->setSelectionArea(pp);
+
+    for(int k = 0; k+1 < arena_scene->selectedItems().size(); k++)
+        for(int i = k+1; i < arena_scene->selectedItems().size(); i++){
+            QGraphicsItem* item1 = arena_scene->selectedItems()[k];
+            QGraphicsItem* item2 = arena_scene->selectedItems()[i];
+            if(item1->boundingRect().intersects(item2->boundingRect())){
+                int z1 = item1->zValue();
+                int z2 = item2->zValue();
+                if(z1 > z2) swap(z1,z2);
+
+                double area1 = item1->boundingRect().height() * item1->boundingRect().width();
+                double area2 = item2->boundingRect().height() * item2->boundingRect().width();
+
+                if(z1 == z2)
+                    (area1 > area2 ? item2 : item1)->setZValue(++z1);
+                else{
+                    (area1 > area2 ? item1 : item2)->setZValue(z1);
+                    (area1 > area2 ? item2 : item1)->setZValue(z2);
+                }
+                //cout << area1 << " " << item1->zValue() << " - " << area2 << " " << item2->zValue() << endl;
+            }
+        }
+
+    pp = pp.subtracted(pp);
+    pp.addRect(0,0,0,0);
+    arena_scene->setSelectionArea(pp);
+    foreach(QGraphicsItem* item, tempSelection) item->setSelected(true); // after saving items and groups, return selection as was before
+
+}
+
 // -------------------------------------------------------------------------------
 
 MouseClickHandler::MouseClickHandler(QGraphicsScene* scene, QObject *parent) :
@@ -129,10 +165,13 @@ void ArenaUI::on_actionOpen_Arena_triggered()
 {
     QProgressBar progress;
     progress.setMinimum(0);
-    QString tempString = QFileDialog::getOpenFileName(this,tr("Open Arena configuration file"), settings->value("arenaFolder").toString(), tr("*.assisi;;*.arenaUI"));
+    QString loadFile = QFileDialog::getOpenFileName(this,tr("Open Arena configuration file"), settings->value("arenaFolder").toString(), tr("All(*.arenaUI *assisi);;Project(*.assisi);;Session(*.arenaUI)"));
 
-    if(tempString.endsWith(".assisi")){
-        assisiFile = tempString;
+    arena_scene->clear();
+    ui->casuTree->clear();
+
+    if(loadFile.endsWith(".assisi")){
+        assisiFile = loadFile;
         assisiNode = YAML::LoadFile(assisiFile.toStdString());
         QString arenaFile = assisiFile.left(assisiFile.lastIndexOf('/')+1) + QString::fromStdString(assisiNode["arena"].as<std::string>());
 
@@ -142,9 +181,6 @@ void ArenaUI::on_actionOpen_Arena_triggered()
 
         if(layers.size() > 1) arenaLayer = QInputDialog::getItem(this,tr("Select arena layer"),"",QStringList(layers));
         else arenaLayer = layers[0];
-
-        arena_scene->clear();
-        ui->casuTree->clear();
 
         progress.setMaximum(arenaNode[arenaLayer.toStdString()].size());
         progress.show();
@@ -172,17 +208,79 @@ void ArenaUI::on_actionOpen_Arena_triggered()
             QApplication::processEvents();
         }
     }
+    else if(loadFile.endsWith(".arenaUI")){
+
+        QSettings loadSession(loadFile,QSettings::IniFormat);
+
+        //GENERAL INFORMATION
+        assisiFile = loadSession.value("assisiFile").toString();
+        arenaLayer = loadSession.value("arenaLayer").toString();
+
+        assisiNode = YAML::LoadFile(assisiFile.toStdString());
+        QString arenaFile = assisiFile.left(assisiFile.lastIndexOf('/')+1) + QString::fromStdString(assisiNode["arena"].as<std::string>());
+        YAML::Node arenaNode = YAML::LoadFile(arenaFile.toStdString());
+        QMap<QString, QCasuTreeItem*> linker;
+
+        //LOAD AND SPAWN CASUs
+        loadSession.beginGroup("sceneHierarchy");
+        int tempSize = loadSession.beginReadArray("main");
+        progress.setMaximum(progress.maximum() + tempSize);
+        groupLoad(&arenaNode, &loadSession, tempSize, &linker, &progress);
+        loadSession.endArray();
+        loadSession.endGroup();
+        this->sortGraphicsScene();
+
+        //LOAD AND SET CONNECTIONS
+        loadSession.beginGroup("connectionSettings");
+        tempSize = loadSession.beginReadArray("addresses");
+        for(int k = 0; k < tempSize; k++){
+            loadSession.setArrayIndex(k);
+            linker[loadSession.value("casuName").toString()]->setAddr(loadSession.value("sub_addr").toString(),
+                                                                      loadSession.value("pub_addr").toString(),
+                                                                      loadSession.value("msg_addr").toString());
+        }
+        loadSession.endArray();
+        loadSession.endGroup();
+
+        //LOAD AND LINK TREND GRAPHS
+        loadSession.beginGroup("trendGraphs");
+        tempSize = loadSession.beginReadArray("plot");
+        for(int k = 0; k < tempSize; k++){
+            loadSession.setArrayIndex(k);
+            int graphSize = loadSession.beginReadArray("graph");
+            QList<QTreeWidgetItem*> toAdd;
+
+            for(int i = 0; i < graphSize; i++){
+                loadSession.setArrayIndex(i);
+                QString graphName = loadSession.value("data").toString();
+                QString casuName = graphName.left(graphName.indexOf(":"));
+
+                QSet<QTreeWidgetItem*> temp = linker[casuName]->widget_IR_children.toSet() +
+                        linker[casuName]->widget_temp_children.toSet();
+
+                foreach(QTreeWidgetItem* item, temp)
+                    if(((QTreeBuffer*)item)->legendName == graphName)
+                        toAdd.append(item);
+            }
+            QTrendPlot* tempWidget = new QTrendPlot(ui->casuTree);
+            trendTab->addWidget(tempWidget);
+            tempWidget->addGraphList(toAdd);
+
+            loadSession.endArray();
+        }
+        loadSession.endArray();
+        loadSession.endGroup();
+    }
 }
 
 void ArenaUI::on_actionGroup_triggered()
 {
     QList<QGraphicsItem *> temp_itemList= arena_scene->selectedItems();
     arena_scene->clearSelection();
-    QGraphicsItemGroup *temp_group = arena_scene->createItemGroup(temp_itemList);
-    temp_group->setFlag(QGraphicsItem::ItemIsSelectable, true);
-    temp_group->setFlag(QGraphicsItem::ItemIsFocusable, false);
-    temp_group->setSelected(1);
-    temp_group->setZValue(-1);
+    QGraphicsItemGroup *tempGroup = arena_scene->createItemGroup(temp_itemList);
+    tempGroup->setFlag(QGraphicsItem::ItemIsSelectable, true);
+    tempGroup->setSelected(1);
+    this->sortGraphicsScene();
 }
 
 
@@ -199,6 +297,7 @@ void ArenaUI::on_actionUngroup_triggered()
                 tempChildList[i]->setSelected(1);
             }
         }
+    this->sortGraphicsScene();
 }
 
 void ArenaUI::on_actionConnect_triggered()
@@ -327,6 +426,47 @@ void ArenaUI::groupSave(QSettings *saveState, QList<QGraphicsItem *> group, QStr
     saveState->endArray();
 }
 
+QList<QGraphicsItem *>* ArenaUI::groupLoad(YAML::Node* arenaNode, QSettings *loadState, int groupSize, QMap<QString, QCasuTreeItem*>* linker, QProgressBar* progress)
+{
+    QList<QGraphicsItem *>* returnGroup = new QList<QGraphicsItem *>;
+    for(int k=0; k < groupSize; k++){
+        loadState->setArrayIndex(k);
+        progress->setValue(progress->value()+1);
+        QGraphicsItem* tempItem;
+
+        if(loadState->childKeys().size()){
+            QString name = loadState->value("casuName").toString();
+            int xpos = (*arenaNode)[arenaLayer.toStdString()][name.toStdString()]["pose"]["x"].as<int>();
+            int ypos =(*arenaNode)[arenaLayer.toStdString()][name.toStdString()]["pose"]["y"].as<int>();
+            int yaw = (*arenaNode)[arenaLayer.toStdString()][name.toStdString()]["pose"]["yaw"].as<int>();
+
+            QCasuTreeItem* tempTree = new QCasuTreeItem(ui->casuTree, name);
+
+            ui->casuTree->addTopLevelItem(tempTree);
+
+            tempItem = new QCasuSceneItem(this, xpos*10+400, -ypos*10+400, yaw, tempTree);
+
+            arena_scene->addItem(tempItem);
+
+            linker->insert(name, tempTree);
+
+            progress->setValue(progress->value()+1);
+        }
+        else{
+            int tempSize = loadState->beginReadArray("group");
+            progress->setMaximum(progress->maximum() + tempSize);
+            tempItem = (QGraphicsItem*) arena_scene->createItemGroup(*groupLoad(arenaNode, loadState, tempSize, linker, progress));
+            tempItem->setFlag(QGraphicsItem::ItemIsSelectable, true);
+            tempItem->setSelected(0);
+            tempItem->setZValue(-1);
+            loadState->endArray();
+        }
+        returnGroup->append(tempItem);
+        QApplication::processEvents();
+    }
+   return returnGroup;
+}
+
 void ArenaUI::on_actionSave_triggered()
 {
     QString saveFile = QFileDialog::getSaveFileName(this,tr("Save As"),settings->value("arenaFolder").toString(),tr("*.arenaUI"));
@@ -336,6 +476,7 @@ void ArenaUI::on_actionSave_triggered()
     if(QFile(saveFile).exists())QFile(saveFile).remove();
 
     QSettings saveState(saveFile,QSettings::IniFormat);
+
     saveState.setValue("assisiFile",assisiFile);
     saveState.setValue("arenaLayer",arenaLayer);
 
@@ -375,12 +516,13 @@ void ArenaUI::on_actionSave_triggered()
     //save connection settins
 
     saveState.beginGroup("connectionSettings");
-    saveState.beginWriteArray("connections");
+    saveState.beginWriteArray("addresses");
     for(int k=0; k < ui->casuTree->topLevelItemCount(); k++){
         saveState.setArrayIndex(k);
-        saveState.setValue("pub_adr",((QCasuTreeItem*)ui->casuTree->topLevelItem(k))->pub_addr);
-        saveState.setValue("sub_adr",((QCasuTreeItem*)ui->casuTree->topLevelItem(k))->sub_addr);
-        saveState.setValue("msg_adr",((QCasuTreeItem*)ui->casuTree->topLevelItem(k))->msg_addr);
+        saveState.setValue("casuName",((QCasuTreeItem*)ui->casuTree->topLevelItem(k))->casuName);
+        saveState.setValue("sub_addr",((QCasuTreeItem*)ui->casuTree->topLevelItem(k))->sub_addr);
+        saveState.setValue("pub_addr",((QCasuTreeItem*)ui->casuTree->topLevelItem(k))->pub_addr);
+        saveState.setValue("msg_addr",((QCasuTreeItem*)ui->casuTree->topLevelItem(k))->msg_addr);
     }
     saveState.endArray();
     saveState.endGroup();

@@ -61,7 +61,8 @@ void QTrendPlot::addGraphList(QList<QTreeWidgetItem*> itemList)
     if(new_trend){
         this->rescaleAxes();
         if(this->yAxis->range().size() < 5)this->yAxis->setRange(this->yAxis->range().center(), 5, Qt::AlignCenter);
-        this->xAxis->setRange(this->graph()->data()->lastKey(), 60, Qt::AlignRight);
+        if(this->graph()->data()->isEmpty())this->xAxis->setRange(QTime(0,0,0).msecsTo(QTime::currentTime()) /1000, 60, Qt::AlignRight);
+        else this->xAxis->setRange(this->graph()->data()->lastKey(), 60, Qt::AlignRight);
     }
 }
 

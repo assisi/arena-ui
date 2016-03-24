@@ -7,7 +7,7 @@ QDialogSettings::QDialogSettings()
 
     temp->addWidget(new QtempLabel("Trend buffer size[mm:ss]:"),0,0);
     temp->addWidget(new QtempLabel("Trend sample time[ms]:"),1,0);
-    temp->addWidget(new QtempLabel("Default arena folder location:"),2,0);
+    temp->addWidget(new QtempLabel("Session save folder location:"),2,0);
     temp->addWidget(new QtempLabel("Camera save folder location:"),3,0);
     temp->addWidget(new QtempLabel("Log save folder location:"),4,0);
 
