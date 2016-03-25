@@ -46,7 +46,7 @@
        <enum>QTabWidget::North</enum>
       </property>
       <property name="currentIndex">
-       <number>0</number>
+       <number>2</number>
       </property>
       <widget class="QWidget" name="tab_casus">
        <property name="enabled">
@@ -104,14 +104,9 @@
         <string>Trend graphs</string>
        </attribute>
       </widget>
-      <widget class="QWidget" name="tab_2">
+      <widget class="QWidget" name="tab_deploy">
        <attribute name="title">
         <string>Deployment</string>
-       </attribute>
-      </widget>
-      <widget class="QWidget" name="tab_camera">
-       <attribute name="title">
-        <string>Settings</string>
        </attribute>
       </widget>
      </widget>

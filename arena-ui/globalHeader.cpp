@@ -3,6 +3,7 @@
 QSettings* settings;
 QString date_time_format = "yy-MM-dd_HH-mm_";
 QString time_format = "HH-mm-ss-zzz";
+QString assisiFile;
 
 void loadConfig(){
 

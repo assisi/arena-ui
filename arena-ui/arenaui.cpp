@@ -31,7 +31,7 @@ ArenaUI::ArenaUI(QWidget *parent) :
     ui->casuTree->header()->setSortIndicator(0,Qt::AscendingOrder);
 
     //TREND TAB SCROLLABLE LAYOUT
-    ui->tab_trend->setLayout(new QVBoxLayout);
+
     QWidget* tempWidget = new QWidget;
     QScrollArea* tempScroll = new QScrollArea;
 
@@ -39,6 +39,7 @@ ArenaUI::ArenaUI(QWidget *parent) :
     tempScroll->setWidgetResizable(true);
     trendTab = new QVBoxLayout(tempWidget);
 
+    ui->tab_trend->setLayout(new QVBoxLayout);
     ui->tab_trend->layout()->addWidget(tempScroll);
 
     //GRAPHICS SCENE
@@ -52,6 +53,83 @@ ArenaUI::ArenaUI(QWidget *parent) :
     arena_scene->installEventFilter(click_handler);
 
     connect(ui->arenaSpace,SIGNAL(customContextMenuRequested(QPoint)),this,SLOT(customContextMenu(QPoint)));
+
+    //DEPLOYMENT
+    ui->tab_deploy->setLayout(new QVBoxLayout);
+
+    // - deployment header
+    tempWidget = new QWidget;
+    QGridLayout* tempLayout = new QGridLayout;
+    deployWidget = new QDeploy(this);
+
+    deployArena = new QLabel;
+    deployNeighborhood = new QLabel;
+    deployFile = new QLabel;
+
+    QFont tempFont;
+    tempFont.setBold(true);
+    QLabel* tempLabel = new QLabel("Arena description file:");
+    tempLabel->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Fixed);
+    tempLabel->setAlignment(Qt::AlignRight);
+    tempLabel->setFont(tempFont);
+    tempLayout->addWidget(tempLabel,1,1);
+    tempLabel = new QLabel("Neighborhood file:");
+    tempLabel->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Fixed);
+    tempLabel->setAlignment(Qt::AlignRight);
+    tempLabel->setFont(tempFont);
+    tempLayout->addWidget(tempLabel,2,1);
+    tempLabel = new QLabel("Deployment file:");
+    tempLabel->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Fixed);
+    tempLabel->setAlignment(Qt::AlignRight);
+    tempLabel->setFont(tempFont);
+    tempLayout->addWidget(tempLabel,3,1);
+
+    tempLayout->addWidget(deployArena,1,2);
+    tempLayout->addWidget(deployNeighborhood,2,2);
+    tempLayout->addWidget(deployFile,3,2);
+
+    tempWidget->setLayout(tempLayout);
+    ui->tab_deploy->layout()->addWidget(tempWidget);
+
+    // - interaction buttons
+    tempWidget = new QWidget;
+    tempWidget->setLayout(new FlowLayout);
+
+    QPushButton* tempButton = new QPushButton("Deploy");
+    connect(tempButton,SIGNAL(clicked()), deployWidget, SLOT(deploy()));
+    tempWidget->layout()->addWidget(tempButton);
+
+    tempButton = new QPushButton("Run");
+    connect(tempButton,SIGNAL(clicked()), deployWidget, SLOT(run()));
+    tempWidget->layout()->addWidget(tempButton);
+
+    tempButton = new QPushButton("Stop");
+    connect(tempButton,SIGNAL(clicked()), deployWidget, SLOT(stop()));
+    tempWidget->layout()->addWidget(tempButton);
+
+    tempButton = new QPushButton("Collect data");
+    connect(tempButton,SIGNAL(clicked()), deployWidget, SLOT(collect()));
+    tempWidget->layout()->addWidget(tempButton);
+
+    tempButton = new QPushButton("Clean log");
+    connect(tempButton,SIGNAL(clicked()), deployWidget, SLOT(cleanLog()));
+    tempWidget->layout()->addWidget(tempButton);
+
+    ui->tab_deploy->layout()->addWidget(tempWidget);
+
+    // - text output window
+    tempScroll = new QScrollArea;
+    tempScroll->setWidget(deployWidget);
+    tempScroll->setFrameStyle(QFrame::Panel | QFrame::Sunken);
+    tempScroll->setWidgetResizable(true);
+    tempScroll->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+
+    ui->tab_deploy->layout()->addWidget(tempScroll);
+
+    tempButton = new QPushButton("Clear output");
+    tempButton->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Fixed);
+    connect(tempButton,SIGNAL(clicked()), deployWidget, SLOT(clear()));
+    ui->tab_deploy->layout()->addWidget(tempButton);
 }
 
 ArenaUI::~ArenaUI()
@@ -173,8 +251,14 @@ void ArenaUI::on_actionOpen_Arena_triggered()
     if(loadFile.endsWith(".assisi")){
         assisiFile = loadFile;
         assisiNode = YAML::LoadFile(assisiFile.toStdString());
-        QString arenaFile = assisiFile.left(assisiFile.lastIndexOf('/')+1) + QString::fromStdString(assisiNode["arena"].as<std::string>());
 
+        deployArena->setText(QString::fromStdString(assisiNode["arena"].as<std::string>()));
+        deployFile->setText(QString::fromStdString(assisiNode["dep"].as<std::string>()));
+        deployNeighborhood->setText(QString::fromStdString(assisiNode["nbg"].as<std::string>()));
+
+        deployWidget->setWorkingDirectory(assisiFile.left(assisiFile.lastIndexOf('/')));
+
+        QString arenaFile = assisiFile.left(assisiFile.lastIndexOf('/')+1) + QString::fromStdString(assisiNode["arena"].as<std::string>());
         YAML::Node arenaNode = YAML::LoadFile(arenaFile.toStdString());
         QList<QString> layers;
         for(YAML::const_iterator it=arenaNode.begin(); it!=arenaNode.end(); it++) layers.append(QString::fromStdString(it->first.as<std::string>()));
@@ -217,6 +301,13 @@ void ArenaUI::on_actionOpen_Arena_triggered()
         arenaLayer = loadSession.value("arenaLayer").toString();
 
         assisiNode = YAML::LoadFile(assisiFile.toStdString());
+
+        deployArena->setText(QString::fromStdString(assisiNode["arena"].as<std::string>()));
+        deployFile->setText(QString::fromStdString(assisiNode["dep"].as<std::string>()));
+        deployNeighborhood->setText(QString::fromStdString(assisiNode["nbg"].as<std::string>()));
+
+        deployWidget->setWorkingDirectory(assisiFile.left(assisiFile.lastIndexOf('/')));
+
         QString arenaFile = assisiFile.left(assisiFile.lastIndexOf('/')+1) + QString::fromStdString(assisiNode["arena"].as<std::string>());
         YAML::Node arenaNode = YAML::LoadFile(arenaFile.toStdString());
         QMap<QString, QCasuTreeItem*> linker;
@@ -265,6 +356,7 @@ void ArenaUI::on_actionOpen_Arena_triggered()
             QTrendPlot* tempWidget = new QTrendPlot(ui->casuTree);
             trendTab->addWidget(tempWidget);
             tempWidget->addGraphList(toAdd);
+            tempWidget->setWindowTitle(arenaLayer);
 
             loadSession.endArray();
         }
@@ -336,6 +428,21 @@ void ArenaUI::on_actionPlot_selected_in_same_trend_triggered()
     trendTab->addWidget(tempWidget);
 
     tempWidget->addSelectedGraphs();
+    tempWidget->setWindowTitle(arenaLayer);
+}
+
+void ArenaUI::on_actionPlot_selected_in_different_trends_triggered()
+{
+    foreach (QTreeWidgetItem* item, ui->casuTree->selectedItems()) {
+        QList<QTreeWidgetItem*> tempList;
+        tempList.append(item);
+
+        QTrendPlot* tempWidget = new QTrendPlot(ui->casuTree);
+        trendTab->addWidget(tempWidget);
+
+        tempWidget->addGraphList(tempList);
+        tempWidget->setWindowTitle(arenaLayer);
+    }
 }
 
 void ArenaUI::on_actionSettings_triggered()
