@@ -5,16 +5,20 @@
 #include <QGraphicsScene>
 #include <QProgressBar>
 
-#include <yaml-cpp/yaml.h>
 #include <nzmqt/nzmqt.hpp>
+#include <yaml-cpp/yaml.h>
 
 #include "globalHeader.h"
 
+//3rd party class implementations
 #include "qcasusceneitem.h"
+#include "flowlayout.h"
+
 #include "qdialogconnect.h"
 #include "qdialogsettings.h"
 #include "qdialogsetpoint.h"
 #include "qtrendplot.h"
+#include "qdeploy.h"
 
 
 
@@ -45,13 +49,19 @@ private:
     QArenaScene *arena_scene;
     QString arenaLayer;
 
-    QString assisiFile;
     YAML::Node assisiNode;
 
     QVBoxLayout* trendTab;
+    QDeploy* deployWidget;
+    QLabel* deployArena;
+    QLabel* deployFile;
+    QLabel* deployNeighborhood;
 
-    void groupSendSetpoint(QGraphicsItem *group, QList<QByteArray> message);
+    void sortGraphicsScene();
+
+    void groupSendSetpoint(QList<QGraphicsItem *> group, QList<QByteArray> message);
     void groupSave(QSettings *saveState, QList<QGraphicsItem*> items, QString groupName);
+    QList<QGraphicsItem *> *groupLoad(YAML::Node *arenaNode, QSettings *loadState, int groupSize, QMap<QString, QCasuTreeItem *> *linker, QProgressBar *progress);
 
 private slots:
     void on_actionOpen_Arena_triggered();
@@ -69,6 +79,7 @@ private slots:
 
     void sendSetpoint(QString actuator);
     void on_actionSave_triggered();
+    void on_actionPlot_selected_in_different_trends_triggered();
 };
 
 // ------------------------------------------------------------------------
@@ -86,6 +97,7 @@ protected:
 private:
     QGraphicsScene* scene_;
     bool drag_true;
+    QList<QGraphicsItem*> selectedList;
 };
 // ------------------------------------------------------------------------
 #endif // ARENAUI_H
