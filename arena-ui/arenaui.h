@@ -47,12 +47,12 @@ public:
 private:
     Ui::ArenaUI *ui;
     QArenaScene *arena_scene;
-    QString arenaLayer;
 
     YAML::Node assisiNode;
 
     QVBoxLayout* trendTab;
     QDeploy* deployWidget;
+    QScrollArea* deployScroll;
     QLabel* deployArena;
     QLabel* deployFile;
     QLabel* deployNeighborhood;
@@ -76,6 +76,7 @@ private slots:
     void toggleTemp();
 
     void customContextMenu(QPoint pos);
+    void moveDeployScroll(int min, int max);
 
     void sendSetpoint(QString actuator);
     void on_actionSave_triggered();

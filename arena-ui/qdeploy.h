@@ -3,6 +3,9 @@
 
 #include <QLabel>
 #include <QProcess>
+#include <QWindow>
+
+#include <QThread>
 
 #include "globalHeader.h"
 
@@ -15,9 +18,12 @@ public:
     void setWorkingDirectory(QString dir);
 
 private:
-    QProcess shell;
+    QProcess* shell;
+    QProcess* simulatorProcess;
+    QProcess* spawner;
 
     void appendText(QString text);
+
 signals:
 
 public slots:
@@ -26,6 +32,9 @@ public slots:
     void stop();
     void collect();
     void cleanLog();
+
+    void simulatorStart();
+    void simulatorStop();
 
 private slots:
     void appendOut();

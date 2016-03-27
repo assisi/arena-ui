@@ -4,10 +4,9 @@
 #
 #-------------------------------------------------
 
-QT       += core gui
-
-QT       += widgets\
-           printsupport
+QT       += core gui\
+            widgets\
+            printsupport
 
 TARGET = arena-ui
 TEMPLATE = app

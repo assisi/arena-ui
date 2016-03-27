@@ -3,7 +3,7 @@
 QSettings* settings;
 QString date_time_format = "yy-MM-dd_HH-mm_";
 QString time_format = "HH-mm-ss-zzz";
-QString assisiFile;
+_assisi assisiFile;
 
 void loadConfig(){
 
@@ -15,6 +15,7 @@ void loadConfig(){
         settings->setValue("logFolder", work_path + "/log/");
         settings->setValue("camFolder", work_path + "/cam/");
         settings->setValue("arenaFolder", work_path + "/arena/");
+        settings->setValue("simulator", "");
         settings->setValue("trendTimeSpan", QTime(0,5,0));
         settings->setValue("trendSampleTime_ms", 500);
         settings->setValue("log_on", true);
