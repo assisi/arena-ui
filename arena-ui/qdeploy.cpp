@@ -11,10 +11,16 @@ QDeploy::QDeploy(QWidget *parent) :
     simulatorProcess = new QProcess;
     spawner = new QProcess;
 
-    connect(shell, SIGNAL(readyReadStandardOutput()), this, SLOT(appendOut()));
-    connect(shell, SIGNAL(readyReadStandardError()), this, SLOT(appendErr()));
-    connect(spawner, SIGNAL(readyReadStandardOutput()), this, SLOT(appendOut()));
-    connect(spawner, SIGNAL(readyReadStandardError()), this, SLOT(appendErr()));
+}
+
+QDeploy::~QDeploy()
+{
+    shell->close();
+    spawner->close();
+    simulatorProcess->close();
+    delete shell;
+    delete spawner;
+    delete simulatorProcess;
 }
 
 
@@ -30,26 +36,35 @@ void QDeploy::appendText(QString text)
 
 void QDeploy::deploy()
 {
-    this->appendText(assisiFile.name +"\n");
-    if(shell->state() == QProcess::NotRunning) shell->start("deploy.py", QStringList(assisiFile.name));
+    if(shell->state() == QProcess::NotRunning){
+        shell->start("deploy.py", QStringList(assisiFile.name));
+        this->appendText("[arenaUI] Starting 'deploy.py'\n");
+    }
     else this->appendText("[arenaUI] Already running a program\n");
 }
 
 void QDeploy::run()
 {
-    if(shell->state() == QProcess::NotRunning) shell->start("assisirun.py", QStringList(assisiFile.name));
+    if(shell->state() == QProcess::NotRunning){
+        shell->start("assisirun.py", QStringList(assisiFile.name));
+        this->appendText("[arenaUI] Starting 'assisirun.py'\n");
+    }
     else this->appendText("[arenaUI] Already running a program\n");
 }
 
 void QDeploy::stop()
 {
-    if(shell->state() != QProcess::NotRunning) shell->terminate();
+    if(shell->state() != QProcess::NotRunning) shell->close();
     else this->appendText("[arenaUI] Program is not running\n");
 }
 
 void QDeploy::collect()
 {
-    shell->start("collect_data.py", QStringList(assisiFile.name));
+    if(shell->state() == QProcess::NotRunning){
+        shell->start("collect_data.py", QStringList(assisiFile.name));
+        this->appendText("[arenaUI] Starting 'collect_data.py'\n");
+    }
+    else this->appendText("[arenaUI] Already running a program\n");
 }
 
 void QDeploy::cleanLog()
@@ -69,7 +84,7 @@ void QDeploy::simulatorStart()
 
 void QDeploy::simulatorStop()
 {
-    simulatorProcess->terminate();
+    simulatorProcess->close();
 }
 
 void QDeploy::appendOut()
@@ -88,3 +103,22 @@ void QDeploy::appendErr()
     this->appendText(proc->readAllStandardError());
 }
 
+void QDeploy::toggleOutput(int state){
+    if(state){
+        shell->readAllStandardError();
+        shell->readAllStandardOutput();
+        spawner->readAllStandardError();
+        spawner->readAllStandardOutput();
+        connect(shell, SIGNAL(readyReadStandardOutput()), this, SLOT(appendOut()));
+        connect(shell, SIGNAL(readyReadStandardError()), this, SLOT(appendErr()));
+        connect(spawner, SIGNAL(readyReadStandardOutput()), this, SLOT(appendOut()));
+        connect(spawner, SIGNAL(readyReadStandardError()), this, SLOT(appendErr()));
+    }
+    else{
+        disconnect(shell, SIGNAL(readyReadStandardOutput()), this, SLOT(appendOut()));
+        disconnect(shell, SIGNAL(readyReadStandardError()), this, SLOT(appendErr()));
+        disconnect(spawner, SIGNAL(readyReadStandardOutput()), this, SLOT(appendOut()));
+        disconnect(spawner, SIGNAL(readyReadStandardError()), this, SLOT(appendErr()));
+    }
+
+}

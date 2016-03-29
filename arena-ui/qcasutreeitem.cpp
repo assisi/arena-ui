@@ -143,7 +143,7 @@ void QCasuTreeItem::messageReceived(const QList<QByteArray>& message){
     if(settings->value("log_on").toBool() & !log_open) openLogFile();
     if(!settings->value("log_on").toBool() & log_open) closeLogFile();
 
-    log_file << device << ";" << QDateTime::currentDateTime().toString(time_format).toStdString();
+    log_file << device << ";" << (float) QDateTime::currentDateTime().toMSecsSinceEpoch() / 1000 ;
 
     if (device == "IR"){
         RangeArray ranges;
@@ -267,7 +267,7 @@ void QCasuTreeItem::connectionTimeout(){
 }
 
 void QCasuTreeItem::openLogFile(){
-    log_name = settings->value("logSubFolder").toString() + QDateTime::currentDateTime().toString(date_time_format) + casuName;
+    log_name = settings->value("logSubFolder").toString() + QDateTime::currentDateTime().toString(date_time_format) + casuName + ".log";
     log_file.open(log_name.toStdString().c_str(), ofstream::out | ofstream::app);
     log_open = true;
 }

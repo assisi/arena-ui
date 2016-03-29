@@ -12,11 +12,12 @@
 class QDeploy : public QLabel
 {
     Q_OBJECT
+
 public:
     QDeploy(QWidget *parent = 0);
+    ~QDeploy();
 
     void setWorkingDirectory(QString dir);
-
 private:
     QProcess* shell;
     QProcess* simulatorProcess;
@@ -32,6 +33,7 @@ public slots:
     void stop();
     void collect();
     void cleanLog();
+    void toggleOutput(int state);
 
     void simulatorStart();
     void simulatorStop();

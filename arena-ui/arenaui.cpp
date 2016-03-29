@@ -136,10 +136,20 @@ ArenaUI::ArenaUI(QWidget *parent) :
 
     connect(deployScroll->verticalScrollBar(),SIGNAL(rangeChanged(int,int)),this,SLOT(moveDeployScroll(int,int)));
 
+    tempWidget = new QWidget;
+    tempWidget->setLayout(new FlowLayout);
+
     tempButton = new QPushButton("Clear output");
     tempButton->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Fixed);
     connect(tempButton,SIGNAL(clicked()), deployWidget, SLOT(clear()));
-    ui->tab_deploy->layout()->addWidget(tempButton);
+    tempWidget->layout()->addWidget(tempButton);
+
+    QCheckBox* temCheckBox = new QCheckBox("Catch shell output");
+    temCheckBox->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Fixed);
+    connect(temCheckBox,SIGNAL(stateChanged(int)), deployWidget, SLOT(toggleOutput(int)));
+    tempWidget->layout()->addWidget(temCheckBox);
+
+    ui->tab_deploy->layout()->addWidget(tempWidget);
 }
 
 ArenaUI::~ArenaUI()
@@ -203,6 +213,7 @@ bool MouseClickHandler::eventFilter(QObject* obj, QEvent* event)
     if (event->type() == QEvent::GraphicsSceneMouseMove){
         foreach(QGraphicsItem* item, selectedList) item->setSelected(true);
         drag_true = true;
+        scene_->update();
 
         return true;
     }
@@ -228,6 +239,7 @@ bool MouseClickHandler::eventFilter(QObject* obj, QEvent* event)
 
 
         drag_true = false;
+        scene_->update();
 
         return true;
     }
@@ -255,9 +267,14 @@ void ArenaUI::on_actionOpen_Arena_triggered()
     QProgressBar progress;
     progress.setMinimum(0);
     QString loadFile = QFileDialog::getOpenFileName(this,tr("Open Arena configuration file"), settings->value("arenaFolder").toString(), tr("All(*.arenaUI *assisi);;Project(*.assisi);;Session(*.arenaUI)"));
+    if(!loadFile.size()) return;
 
     arena_scene->clear();
     ui->casuTree->clear();
+
+    for(int k = 0; k < trendTab->count(); k++){
+        trendTab->removeItem(trendTab->itemAt(k));
+    }
 
     if(loadFile.endsWith(".assisi")){
         assisiFile.name = loadFile;
