@@ -3,21 +3,28 @@
 
 #include <QLabel>
 #include <QProcess>
+#include <QWindow>
+
+#include <QThread>
 
 #include "globalHeader.h"
 
 class QDeploy : public QLabel
 {
     Q_OBJECT
+
 public:
     QDeploy(QWidget *parent = 0);
+    ~QDeploy();
 
     void setWorkingDirectory(QString dir);
-
 private:
-    QProcess shell;
+    QProcess* shell;
+    QProcess* simulatorProcess;
+    QProcess* spawner;
 
     void appendText(QString text);
+
 signals:
 
 public slots:
@@ -26,6 +33,10 @@ public slots:
     void stop();
     void collect();
     void cleanLog();
+    void toggleOutput(int state);
+
+    void simulatorStart();
+    void simulatorStop();
 
 private slots:
     void appendOut();

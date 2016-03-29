@@ -115,21 +115,41 @@ ArenaUI::ArenaUI(QWidget *parent) :
     connect(tempButton,SIGNAL(clicked()), deployWidget, SLOT(cleanLog()));
     tempWidget->layout()->addWidget(tempButton);
 
+    tempButton = new QPushButton("Start simulator");
+    connect(tempButton,SIGNAL(clicked()), deployWidget, SLOT(simulatorStart()));
+    tempWidget->layout()->addWidget(tempButton);
+
+    tempButton = new QPushButton("Stop simulator");
+    connect(tempButton,SIGNAL(clicked()), deployWidget, SLOT(simulatorStop()));
+    tempWidget->layout()->addWidget(tempButton);
+
     ui->tab_deploy->layout()->addWidget(tempWidget);
 
     // - text output window
-    tempScroll = new QScrollArea;
-    tempScroll->setWidget(deployWidget);
-    tempScroll->setFrameStyle(QFrame::Panel | QFrame::Sunken);
-    tempScroll->setWidgetResizable(true);
-    tempScroll->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+    deployScroll = new QScrollArea;
+    deployScroll->setWidget(deployWidget);
+    deployScroll->setFrameStyle(QFrame::Panel | QFrame::Sunken);
+    deployScroll->setWidgetResizable(true);
+    deployScroll->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 
-    ui->tab_deploy->layout()->addWidget(tempScroll);
+    ui->tab_deploy->layout()->addWidget(deployScroll);
+
+    connect(deployScroll->verticalScrollBar(),SIGNAL(rangeChanged(int,int)),this,SLOT(moveDeployScroll(int,int)));
+
+    tempWidget = new QWidget;
+    tempWidget->setLayout(new FlowLayout);
 
     tempButton = new QPushButton("Clear output");
     tempButton->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Fixed);
     connect(tempButton,SIGNAL(clicked()), deployWidget, SLOT(clear()));
-    ui->tab_deploy->layout()->addWidget(tempButton);
+    tempWidget->layout()->addWidget(tempButton);
+
+    QCheckBox* temCheckBox = new QCheckBox("Catch shell output");
+    temCheckBox->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Fixed);
+    connect(temCheckBox,SIGNAL(stateChanged(int)), deployWidget, SLOT(toggleOutput(int)));
+    tempWidget->layout()->addWidget(temCheckBox);
+
+    ui->tab_deploy->layout()->addWidget(tempWidget);
 }
 
 ArenaUI::~ArenaUI()
@@ -182,6 +202,7 @@ MouseClickHandler::MouseClickHandler(QGraphicsScene* scene, QObject *parent) :
 bool MouseClickHandler::eventFilter(QObject* obj, QEvent* event)
 {
     if (event->type() == QEvent::GraphicsSceneMousePress){
+        if(((QGraphicsSceneMouseEvent*)event)->button() == Qt::RightButton) return QObject::eventFilter(obj, event);
         if(QApplication::keyboardModifiers() == Qt::ControlModifier)
             selectedList = scene_->selectedItems();
         else selectedList.clear();
@@ -192,6 +213,7 @@ bool MouseClickHandler::eventFilter(QObject* obj, QEvent* event)
     if (event->type() == QEvent::GraphicsSceneMouseMove){
         foreach(QGraphicsItem* item, selectedList) item->setSelected(true);
         drag_true = true;
+        scene_->update();
 
         return true;
     }
@@ -217,6 +239,7 @@ bool MouseClickHandler::eventFilter(QObject* obj, QEvent* event)
 
 
         drag_true = false;
+        scene_->update();
 
         return true;
     }
@@ -244,37 +267,45 @@ void ArenaUI::on_actionOpen_Arena_triggered()
     QProgressBar progress;
     progress.setMinimum(0);
     QString loadFile = QFileDialog::getOpenFileName(this,tr("Open Arena configuration file"), settings->value("arenaFolder").toString(), tr("All(*.arenaUI *assisi);;Project(*.assisi);;Session(*.arenaUI)"));
+    if(!loadFile.size()) return;
 
     arena_scene->clear();
     ui->casuTree->clear();
 
+    for(int k = 0; k < trendTab->count(); k++){
+        trendTab->removeItem(trendTab->itemAt(k));
+    }
+
     if(loadFile.endsWith(".assisi")){
-        assisiFile = loadFile;
-        assisiNode = YAML::LoadFile(assisiFile.toStdString());
+        assisiFile.name = loadFile;
+        assisiNode = YAML::LoadFile(assisiFile.name.toStdString());
 
         deployArena->setText(QString::fromStdString(assisiNode["arena"].as<std::string>()));
         deployFile->setText(QString::fromStdString(assisiNode["dep"].as<std::string>()));
         deployNeighborhood->setText(QString::fromStdString(assisiNode["nbg"].as<std::string>()));
 
-        deployWidget->setWorkingDirectory(assisiFile.left(assisiFile.lastIndexOf('/')));
+        deployWidget->setWorkingDirectory(assisiFile.name.left(assisiFile.name.lastIndexOf('/')));
 
-        QString arenaFile = assisiFile.left(assisiFile.lastIndexOf('/')+1) + QString::fromStdString(assisiNode["arena"].as<std::string>());
-        YAML::Node arenaNode = YAML::LoadFile(arenaFile.toStdString());
+        assisiFile.arenaFile = assisiFile.name.left(assisiFile.name.lastIndexOf('/')+1) + QString::fromStdString(assisiNode["arena"].as<std::string>());
+        assisiFile.depFile = assisiFile.name.left(assisiFile.name.lastIndexOf('/')+1) + QString::fromStdString(assisiNode["dep"].as<std::string>());
+        assisiFile.ngbFile = assisiFile.name.left(assisiFile.name.lastIndexOf('/')+1) + QString::fromStdString(assisiNode["nbg"].as<std::string>());
+
+        YAML::Node arenaNode = YAML::LoadFile(assisiFile.arenaFile.toStdString());
         QList<QString> layers;
         for(YAML::const_iterator it=arenaNode.begin(); it!=arenaNode.end(); it++) layers.append(QString::fromStdString(it->first.as<std::string>()));
 
-        if(layers.size() > 1) arenaLayer = QInputDialog::getItem(this,tr("Select arena layer"),"",QStringList(layers));
-        else arenaLayer = layers[0];
+        if(layers.size() > 1) assisiFile.arenaLayer = QInputDialog::getItem(this,tr("Select arena layer"),"",QStringList(layers));
+        else assisiFile.arenaLayer = layers[0];
 
-        progress.setMaximum(arenaNode[arenaLayer.toStdString()].size());
+        progress.setMaximum(arenaNode[assisiFile.arenaLayer.toStdString()].size());
         progress.show();
         progress.move(ui->arenaSpace->mapToGlobal(QPoint(400-progress.width()/2,400-progress.height()/2)));
 
-        for(YAML::const_iterator it=arenaNode[arenaLayer.toStdString()].begin(); it!=arenaNode[arenaLayer.toStdString()].end(); it++){
+        for(YAML::const_iterator it=arenaNode[assisiFile.arenaLayer.toStdString()].begin(); it!=arenaNode[assisiFile.arenaLayer.toStdString()].end(); it++){
             QString name = QString::fromStdString(it->first.as<std::string>());
-            int xpos = arenaNode[arenaLayer.toStdString()][name.toStdString()]["pose"]["x"].as<int>();
-            int ypos = arenaNode[arenaLayer.toStdString()][name.toStdString()]["pose"]["y"].as<int>();
-            int yaw = arenaNode[arenaLayer.toStdString()][name.toStdString()]["pose"]["yaw"].as<int>();
+            int xpos = arenaNode[assisiFile.arenaLayer.toStdString()][name.toStdString()]["pose"]["x"].as<int>();
+            int ypos = arenaNode[assisiFile.arenaLayer.toStdString()][name.toStdString()]["pose"]["y"].as<int>();
+            int yaw = arenaNode[assisiFile.arenaLayer.toStdString()][name.toStdString()]["pose"]["yaw"].as<int>();
 
             QCasuTreeItem* tempTree = new QCasuTreeItem(ui->casuTree, name);
 
@@ -284,9 +315,9 @@ void ArenaUI::on_actionOpen_Arena_triggered()
 
             arena_scene->addItem(tempItem);
 
-            tempTree->setAddr(QString::fromStdString(arenaNode[arenaLayer.toStdString()][name.toStdString()]["sub_addr"].as<std::string>()),
-                               QString::fromStdString(arenaNode[arenaLayer.toStdString()][name.toStdString()]["pub_addr"].as<std::string>()),
-                               QString::fromStdString(arenaNode[arenaLayer.toStdString()][name.toStdString()]["msg_addr"].as<std::string>()));
+            tempTree->setAddr(QString::fromStdString(arenaNode[assisiFile.arenaLayer.toStdString()][name.toStdString()]["sub_addr"].as<std::string>()),
+                               QString::fromStdString(arenaNode[assisiFile.arenaLayer.toStdString()][name.toStdString()]["pub_addr"].as<std::string>()),
+                               QString::fromStdString(arenaNode[assisiFile.arenaLayer.toStdString()][name.toStdString()]["msg_addr"].as<std::string>()));
 
             progress.setValue(progress.value()+1);
             QApplication::processEvents();
@@ -297,19 +328,22 @@ void ArenaUI::on_actionOpen_Arena_triggered()
         QSettings loadSession(loadFile,QSettings::IniFormat);
 
         //GENERAL INFORMATION
-        assisiFile = loadSession.value("assisiFile").toString();
-        arenaLayer = loadSession.value("arenaLayer").toString();
+        assisiFile.name = loadSession.value("assisiFile").toString();
+        assisiFile.arenaLayer = loadSession.value("arenaLayer").toString();
 
-        assisiNode = YAML::LoadFile(assisiFile.toStdString());
+        assisiNode = YAML::LoadFile(assisiFile.name.toStdString());
 
         deployArena->setText(QString::fromStdString(assisiNode["arena"].as<std::string>()));
         deployFile->setText(QString::fromStdString(assisiNode["dep"].as<std::string>()));
         deployNeighborhood->setText(QString::fromStdString(assisiNode["nbg"].as<std::string>()));
 
-        deployWidget->setWorkingDirectory(assisiFile.left(assisiFile.lastIndexOf('/')));
+        deployWidget->setWorkingDirectory(assisiFile.name.left(assisiFile.name.lastIndexOf('/')));
 
-        QString arenaFile = assisiFile.left(assisiFile.lastIndexOf('/')+1) + QString::fromStdString(assisiNode["arena"].as<std::string>());
-        YAML::Node arenaNode = YAML::LoadFile(arenaFile.toStdString());
+        assisiFile.arenaFile = assisiFile.name.left(assisiFile.name.lastIndexOf('/')+1) + QString::fromStdString(assisiNode["arena"].as<std::string>());
+        assisiFile.depFile = assisiFile.name.left(assisiFile.name.lastIndexOf('/')+1) + QString::fromStdString(assisiNode["dep"].as<std::string>());
+        assisiFile.ngbFile = assisiFile.name.left(assisiFile.name.lastIndexOf('/')+1) + QString::fromStdString(assisiNode["nbg"].as<std::string>());
+
+        YAML::Node arenaNode = YAML::LoadFile(assisiFile.arenaFile.toStdString());
         QMap<QString, QCasuTreeItem*> linker;
 
         //LOAD AND SPAWN CASUs
@@ -356,7 +390,7 @@ void ArenaUI::on_actionOpen_Arena_triggered()
             QTrendPlot* tempWidget = new QTrendPlot(ui->casuTree);
             trendTab->addWidget(tempWidget);
             tempWidget->addGraphList(toAdd);
-            tempWidget->setWindowTitle(arenaLayer);
+            tempWidget->setWindowTitle(assisiFile.arenaLayer);
 
             loadSession.endArray();
         }
@@ -428,7 +462,7 @@ void ArenaUI::on_actionPlot_selected_in_same_trend_triggered()
     trendTab->addWidget(tempWidget);
 
     tempWidget->addSelectedGraphs();
-    tempWidget->setWindowTitle(arenaLayer);
+    tempWidget->setWindowTitle(assisiFile.arenaLayer);
 }
 
 void ArenaUI::on_actionPlot_selected_in_different_trends_triggered()
@@ -441,7 +475,7 @@ void ArenaUI::on_actionPlot_selected_in_different_trends_triggered()
         trendTab->addWidget(tempWidget);
 
         tempWidget->addGraphList(tempList);
-        tempWidget->setWindowTitle(arenaLayer);
+        tempWidget->setWindowTitle(assisiFile.arenaLayer);
     }
 }
 
@@ -506,6 +540,12 @@ void ArenaUI::customContextMenu(QPoint pos)
     menu->popup(ui->arenaSpace->mapToGlobal(pos));
 }
 
+void ArenaUI::moveDeployScroll(int min, int max)
+{
+    Q_UNUSED(min)
+    deployScroll->verticalScrollBar()->setValue(max);
+}
+
 void ArenaUI::sendSetpoint(QString actuator)
 {
     QDialogSetpoint* dialog = new QDialogSetpoint(actuator);
@@ -543,9 +583,9 @@ QList<QGraphicsItem *>* ArenaUI::groupLoad(YAML::Node* arenaNode, QSettings *loa
 
         if(loadState->childKeys().size()){
             QString name = loadState->value("casuName").toString();
-            int xpos = (*arenaNode)[arenaLayer.toStdString()][name.toStdString()]["pose"]["x"].as<int>();
-            int ypos =(*arenaNode)[arenaLayer.toStdString()][name.toStdString()]["pose"]["y"].as<int>();
-            int yaw = (*arenaNode)[arenaLayer.toStdString()][name.toStdString()]["pose"]["yaw"].as<int>();
+            int xpos = (*arenaNode)[assisiFile.arenaLayer.toStdString()][name.toStdString()]["pose"]["x"].as<int>();
+            int ypos =(*arenaNode)[assisiFile.arenaLayer.toStdString()][name.toStdString()]["pose"]["y"].as<int>();
+            int yaw = (*arenaNode)[assisiFile.arenaLayer.toStdString()][name.toStdString()]["pose"]["yaw"].as<int>();
 
             QCasuTreeItem* tempTree = new QCasuTreeItem(ui->casuTree, name);
 
@@ -584,8 +624,8 @@ void ArenaUI::on_actionSave_triggered()
 
     QSettings saveState(saveFile,QSettings::IniFormat);
 
-    saveState.setValue("assisiFile",assisiFile);
-    saveState.setValue("arenaLayer",arenaLayer);
+    saveState.setValue("assisiFile",assisiFile.name);
+    saveState.setValue("arenaLayer",assisiFile.arenaLayer);
 
     //save CASU graphics scene
 

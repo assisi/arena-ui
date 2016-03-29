@@ -19,6 +19,8 @@ QRectF QCasuSceneItem::boundingRect() const
 
 void QCasuSceneItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
 {
+    Q_UNUSED(option)
+    Q_UNUSED(widget)
     //paint main CASU object
     QRectF model = QRectF(x_center-10,y_center-10,20,20);;
 
@@ -42,16 +44,16 @@ void QCasuSceneItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *op
     if(treeItem->led_on)brush.setColor(treeItem->led_color);
     else brush.setColor(Qt::gray);
 
-    if(treeItem->child_selected)brush.setStyle(Qt::SolidPattern);
-    else brush.setStyle(Qt::Dense3Pattern);
+    if(treeItem->child_selected)brush.setStyle(Qt::Dense3Pattern);
+    else brush.setStyle(Qt::SolidPattern);
 
     painter->setPen(pen);
     painter->setBrush(brush);
     painter->drawEllipse(model);
-    painter->drawLine(x_center + 5*cos((yaw_ - 90)*PI/180),
-                      y_center + 5*sin((yaw_ - 90)*PI/180),
-                      x_center + 10*cos((yaw_ - 90)*PI/180),
-                      y_center + 10*sin((yaw_ - 90)*PI/180));
+    painter->drawLine(x_center + 5*cos(yaw_*PI/180),
+                      y_center + 5*sin(yaw_*PI/180),
+                      x_center + 10*cos(yaw_*PI/180),
+                      y_center + 10*sin(yaw_*PI/180));
 
     pen.setStyle(Qt::SolidLine);
     brush.setStyle(Qt::SolidPattern);
@@ -71,7 +73,7 @@ void QCasuSceneItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *op
             }
             else brush.setColor(Qt::gray);
             painter->setBrush(brush);
-            painter->drawPolygon(QIRTriangle(QPointF(x_center, y_center), yaw_ + k*60)); // 0° is at 12 o'clock, clockwise direction
+            painter->drawPolygon(QIRTriangle(QPointF(x_center, y_center), yaw_ - k*60)); // 0° is at 3 o'clock, ccw direction
         }
 
     //paint Temp sensor readings
@@ -88,7 +90,7 @@ void QCasuSceneItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *op
 
             painter->setPen(pen);
 
-            QTempArc arc(QPointF(x_center, y_center), yaw_ + k*90); // 0° is at 12 o'clock, clockwise direction
+            QTempArc arc(QPointF(x_center, y_center), yaw_ - k*90); // 0° is at 3 o'clock, ccw direction
             painter->drawArc(arc.rect, arc.start ,arc.span);
         }
 }
@@ -106,7 +108,6 @@ QIRTriangle::QIRTriangle(QPointF center, double angle)
     double side = 2/sqrt(3) * 7; // 10 is the altitude length
     double offset = 11; // offset from center of CASU
 
-    angle = angle - 90; // angle conversion from UI to scene coordinates
     double angleTop = angle * PI/180;
     double angleLeft = (angle - 30) * PI/180;
     double angleRight = (angle + 30) * PI/180;
@@ -122,7 +123,6 @@ QIRTriangle::QIRTriangle(QPointF center, double angle)
 QTempArc::QTempArc(QPointF center, double angle)
 {
     double offset = settings->value("IR_on").toBool()? 42 : 30; // offset from center of CASU
-    angle = angle - 90; // angle conversion from UI to scene coordinates
 
     span = 50 * 16; //Qt angles are in increments of 1°/16
     start = (angle - 25) * 16;

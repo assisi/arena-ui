@@ -33,6 +33,7 @@ private:
        QLineEdit* logFolder;
        QLineEdit* camFolder;
        QLineEdit* arenaFolder;
+       QLineEdit* simFile;
        QDateTimeEdit* trendTimeSpan;
        QLineEdit* trendSampleTime_ms;
        QCheckBox* forceLog;
