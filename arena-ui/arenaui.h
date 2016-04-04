@@ -74,7 +74,9 @@ private slots:
 
     void toggleIR();
     void toggleTemp();
+    void toggleAir();
 
+    void updateTreeSelection();
     void customContextMenu(QPoint pos);
     void moveDeployScroll(int min, int max);
 

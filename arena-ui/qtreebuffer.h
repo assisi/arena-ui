@@ -22,7 +22,7 @@ public:
     void addToBuffer(QTime time, double value);
 
 signals:
-    void updatePlot(double time, double value);
+    void updatePlot();
 
 public slots:
 

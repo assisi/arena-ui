@@ -29,7 +29,6 @@ protected:
 signals:
 
 public slots:
-    void updatePlot(double time, double value);
     void enableAutoPosition();
     void disableAutoPosition(QMouseEvent *event);
     void setZoomFlags(QWheelEvent *event);
@@ -40,6 +39,9 @@ public slots:
     void removeSelectedGraphs();
     void addSelectedGraphs();
     void saveToPDF();
+
+private slots:
+    void prettyPlot();
 };
 
 #endif // QTRENDPLOT_H

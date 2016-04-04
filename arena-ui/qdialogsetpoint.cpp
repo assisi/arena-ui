@@ -56,6 +56,9 @@ QDialogSetpoint::QDialogSetpoint(QString command) : command_(command)
         tempLayout->addWidget(buttons,2,0);
     }
 
+    if(command == "LED"){
+        tempLayout->addWidget(buttons,1,0);
+    }
 
     this->setLayout(tempLayout);
 
@@ -108,6 +111,17 @@ void QDialogSetpoint::prepareMessage()
         message.push_back(QString("DiagnosticLed").toLocal8Bit());
         message.push_back(QString(radioON->isChecked() ? "On" : "Off").toLocal8Bit());
         message.push_back(QByteArray((char*)buffer, size));
+    }
+    if(command_ == "Airflow"){
+        Airflow intesity;
+
+        int size = intesity.ByteSize();
+        void *buffer = malloc(size);
+        intesity.SerializeToArray(buffer, size);
+
+        message.push_back(QString("Airflow").toLocal8Bit());
+        message.push_back(QString(radioON->isChecked() ? "On" : "Off").toLocal8Bit());
+        message.push_back(QByteArray((char*) buffer,size));
     }
 
 
