@@ -30,6 +30,8 @@ ArenaUI::ArenaUI(QWidget *parent) :
     ui->casuTree->addAction(ui->actionPlot_selected_in_different_trends);
     ui->casuTree->header()->setSortIndicator(0,Qt::AscendingOrder);
 
+    connect(ui->casuTree,SIGNAL(itemSelectionChanged()),this,SLOT(updateTreeSelection()));
+
     //TREND TAB SCROLLABLE LAYOUT
 
     QWidget* tempWidget = new QWidget;
@@ -269,12 +271,15 @@ void ArenaUI::on_actionOpen_Arena_triggered()
     QString loadFile = QFileDialog::getOpenFileName(this,tr("Open Arena configuration file"), settings->value("arenaFolder").toString(), tr("All(*.arenaUI *assisi);;Project(*.assisi);;Session(*.arenaUI)"));
     if(!loadFile.size()) return;
 
+    while(trendTab->count()){
+        ((QCustomPlot*)trendTab->itemAt(0)->widget())->close();
+        trendTab->removeWidget(trendTab->itemAt(0)->widget());
+    }
+
     arena_scene->clear();
     ui->casuTree->clear();
 
-    for(int k = 0; k < trendTab->count(); k++){
-        trendTab->removeItem(trendTab->itemAt(k));
-    }
+
 
     if(loadFile.endsWith(".assisi")){
         assisiFile.name = loadFile;
@@ -387,16 +392,20 @@ void ArenaUI::on_actionOpen_Arena_triggered()
                     if(((QTreeBuffer*)item)->legendName == graphName)
                         toAdd.append(item);
             }
-            QTrendPlot* tempWidget = new QTrendPlot(ui->casuTree);
-            trendTab->addWidget(tempWidget);
-            tempWidget->addGraphList(toAdd);
-            tempWidget->setWindowTitle(assisiFile.arenaLayer);
+            if(toAdd.size()){
+                QTrendPlot* tempWidget = new QTrendPlot(ui->casuTree);
+                trendTab->addWidget(tempWidget);
+                tempWidget->addGraphList(toAdd);
+                tempWidget->setWindowTitle(assisiFile.arenaLayer);
+            }
 
             loadSession.endArray();
         }
         loadSession.endArray();
         loadSession.endGroup();
     }
+
+    arena_scene->addItem(new QColorbar());
 }
 
 void ArenaUI::on_actionGroup_triggered()
@@ -495,6 +504,23 @@ void ArenaUI::toggleTemp()
     settings->setValue("temp_on",!settings->value("temp_on").toBool());
 }
 
+void ArenaUI::toggleAir()
+{
+    settings->setValue("air_on",!settings->value("air_on").toBool());
+}
+
+void ArenaUI::updateTreeSelection()
+{
+    if(ui->casuTree->selectedItems().size()){
+        ui->actionPlot_selected_in_same_trend->setEnabled(true);
+        ui->actionPlot_selected_in_different_trends->setEnabled(true);
+    }
+    else{
+        ui->actionPlot_selected_in_same_trend->setEnabled(false);
+        ui->actionPlot_selected_in_different_trends->setEnabled(false);
+    }
+}
+
 void ArenaUI::customContextMenu(QPoint pos)
 {
     QMenu* menu = new QMenu(); //no parent because it inherits background image from QGraphicsView
@@ -511,6 +537,7 @@ void ArenaUI::customContextMenu(QPoint pos)
 
     menu->addAction(settings->value("IR_on").toBool() ? "Hide proximity sensors" : "Show proximity sensors",this,SLOT(toggleIR()));
     menu->addAction(settings->value("temp_on").toBool() ? "Hide temperature sensors" : "Show temperature sensors",this,SLOT(toggleTemp()));
+    menu->addAction(settings->value("air_on").toBool() ? "Hide airflow marker" : "Show airflow marker",this,SLOT(toggleTemp()));
     menu->addSeparator();
     temp = menu->addAction("Group selected",this,SLOT(on_actionGroup_triggered()));
     if(error_selected) temp->setEnabled(false);
