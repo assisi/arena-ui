@@ -11,12 +11,13 @@
 #include "globalHeader.h"
 
 //3rd party class implementations
-#include "qcasusceneitem.h"
 #include "flowlayout.h"
 
 #include "qdialogconnect.h"
 #include "qdialogsettings.h"
 #include "qdialogsetpoint.h"
+#include "qcasusceneitem.h"
+#include "qcolorbar.h"
 #include "qtrendplot.h"
 #include "qdeploy.h"
 

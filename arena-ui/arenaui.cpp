@@ -404,6 +404,8 @@ void ArenaUI::on_actionOpen_Arena_triggered()
         loadSession.endArray();
         loadSession.endGroup();
     }
+
+    arena_scene->addItem(new QColorbar());
 }
 
 void ArenaUI::on_actionGroup_triggered()
