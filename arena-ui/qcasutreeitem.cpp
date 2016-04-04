@@ -204,8 +204,14 @@ void QCasuTreeItem::messageReceived(const QList<QByteArray>& message){
        air.ParseFromString(data);
        double value = air.intensity();
        widget_setpoints_children[1]->setData(1, Qt::DisplayRole, value);
-       if(command == "On")widget_setpoints_children[1]->setTextColor(1, Qt::green);
-       else widget_setpoints_children[1]->setTextColor(1, Qt::red);
+       if(command == "On"){
+            widget_setpoints_children[1]->setTextColor(1, Qt::green);
+            airflowON = true;
+       }
+       else {
+           widget_setpoints_children[1]->setTextColor(1, Qt::red);
+           airflowON = false;
+       }
        if(settings->value("log_on").toBool()) log_file << ";" << value;
     }
 

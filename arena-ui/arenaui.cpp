@@ -504,7 +504,7 @@ void ArenaUI::toggleTemp()
 
 void ArenaUI::toggleAir()
 {
-// add toggling airflow graphics through custom context menu
+    settings->setValue("air_on",!settings->value("air_on").toBool());
 }
 
 void ArenaUI::updateTreeSelection()
@@ -535,6 +535,7 @@ void ArenaUI::customContextMenu(QPoint pos)
 
     menu->addAction(settings->value("IR_on").toBool() ? "Hide proximity sensors" : "Show proximity sensors",this,SLOT(toggleIR()));
     menu->addAction(settings->value("temp_on").toBool() ? "Hide temperature sensors" : "Show temperature sensors",this,SLOT(toggleTemp()));
+    menu->addAction(settings->value("air_on").toBool() ? "Hide airflow marker" : "Show airflow marker",this,SLOT(toggleTemp()));
     menu->addSeparator();
     temp = menu->addAction("Group selected",this,SLOT(on_actionGroup_triggered()));
     if(error_selected) temp->setEnabled(false);

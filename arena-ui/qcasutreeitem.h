@@ -43,6 +43,7 @@ public:
     bool connected;
     bool led_on;
     bool child_selected;
+    bool airflowON;
 
     QColor led_color;
 
