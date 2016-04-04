@@ -56,6 +56,14 @@ QDialogSetpoint::QDialogSetpoint(QString command) : command_(command)
         tempLayout->addWidget(buttons,2,0);
     }
 
+    if(command == "Airflow"){
+        tempLayout->addWidget(new QLabel("Intensity setpoint:"),1,0);
+        value1 = new QLineEdit;
+        value1->setValidator(new QDoubleValidator(0,99,2));
+        tempLayout->addWidget(value1,1,1);
+        tempLayout->addWidget(buttons,2,0);
+    }
+
     if(command == "LED"){
         tempLayout->addWidget(buttons,1,0);
     }
@@ -113,11 +121,11 @@ void QDialogSetpoint::prepareMessage()
         message.push_back(QByteArray((char*)buffer, size));
     }
     if(command_ == "Airflow"){
-        Airflow intesity;
-
-        int size = intesity.ByteSize();
+        Airflow air;
+        air.set_intensity(value1->text().toFloat());
+        int size = air.ByteSize();
         void *buffer = malloc(size);
-        intesity.SerializeToArray(buffer, size);
+        air.SerializeToArray(buffer, size);
 
         message.push_back(QString("Airflow").toLocal8Bit());
         message.push_back(QString(radioON->isChecked() ? "On" : "Off").toLocal8Bit());
