@@ -11,21 +11,21 @@ QCasuTreeItem::QCasuTreeItem(QObject* parent, QString name) : QObject(parent), c
 
     //zadavanje djece IR grani:
     {
-        widget_IR_children.append((QTreeWidgetItem*)new QTreeBuffer(QStringList("N"), name + ": IR - N"));
-        widget_IR_children.append((QTreeWidgetItem*)new QTreeBuffer(QStringList("NE"), name + ": IR - NE"));
-        widget_IR_children.append((QTreeWidgetItem*)new QTreeBuffer(QStringList("SE"), name + ": IR - SE"));
-        widget_IR_children.append((QTreeWidgetItem*)new QTreeBuffer(QStringList("S"), name + ": IR - S"));
-        widget_IR_children.append((QTreeWidgetItem*)new QTreeBuffer(QStringList("SW"), name + ": IR - SW"));
-        widget_IR_children.append((QTreeWidgetItem*)new QTreeBuffer(QStringList("NW"), name + ": IR - NW"));
+        widget_IR_children.append((QTreeWidgetItem*)new QTreeBuffer(QStringList("F"), name + ": IR - F"));
+        widget_IR_children.append((QTreeWidgetItem*)new QTreeBuffer(QStringList("FR"), name + ": IR - FR"));
+        widget_IR_children.append((QTreeWidgetItem*)new QTreeBuffer(QStringList("BR"), name + ": IR - BR"));
+        widget_IR_children.append((QTreeWidgetItem*)new QTreeBuffer(QStringList("B"), name + ": IR - B"));
+        widget_IR_children.append((QTreeWidgetItem*)new QTreeBuffer(QStringList("BL"), name + ": IR - BL"));
+        widget_IR_children.append((QTreeWidgetItem*)new QTreeBuffer(QStringList("FL"), name + ": IR - FL"));
         widget_IR->addChildren(widget_IR_children);
     }
 
     //zadavanje djece temp grani:
     {
-        widget_temp_children.append((QTreeWidgetItem*)new QTreeBuffer(QStringList("N"), name + ": Temp - N"));
-        widget_temp_children.append((QTreeWidgetItem*)new QTreeBuffer(QStringList("E"), name + ": Temp - E"));
-        widget_temp_children.append((QTreeWidgetItem*)new QTreeBuffer(QStringList("S"), name + ": Temp - S"));
-        widget_temp_children.append((QTreeWidgetItem*)new QTreeBuffer(QStringList("W"), name + ": Temp - W"));
+        widget_temp_children.append((QTreeWidgetItem*)new QTreeBuffer(QStringList("F"), name + ": Temp - F"));
+        widget_temp_children.append((QTreeWidgetItem*)new QTreeBuffer(QStringList("R"), name + ": Temp - R"));
+        widget_temp_children.append((QTreeWidgetItem*)new QTreeBuffer(QStringList("B"), name + ": Temp - B"));
+        widget_temp_children.append((QTreeWidgetItem*)new QTreeBuffer(QStringList("L"), name + ": Temp - L"));
         widget_temp->addChildren(widget_temp_children);
     }
     //zadavanje djece vibr grani:
