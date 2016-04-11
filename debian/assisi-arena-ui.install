@@ -1,0 +1,4 @@
+build/bin/arena-ui usr/bin
+#build/bin/ArenaUI usr/bin
+assisi-arena-ui.desktop usr/share/applications
+src/images/icons/assisi.ico usr/share/pixmaps

@@ -1,0 +1,2 @@
+version=3
+https://github.com/larics/assisi-arena-ui/tags .*/archive/[a-z](\d\S*)\.tar\.gz

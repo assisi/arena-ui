@@ -1,0 +1,4 @@
+?package(assisi-arena-ui):needs="x11" \
+    section="Applications" \
+    title="ASSISI Arena UI" \
+    command="/usr/bin/arena-ui"
