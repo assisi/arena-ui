@@ -47,10 +47,10 @@ Building the package
 Switch to the folder where you have cloned the git repo, and export the source. All changes need to be committed! Pay special attention to `-` and `_` signs, they are different in different commands. This is a bit convoluted but supposedly necessary. (TODO: try using git-buildpackage, it might be simpler).
 
 ```
-mkdir ../assisi-arena-ui-x.y.z
-git archive master | tar -x -C ../assisi-arena-ui_x.y.z
-tar cvf - ../assisi-arena-ui-x.y.z/ | gzip > ../assisi-arena-ui_x.y.z.orig.tar.gz
-cd ../assisi-arena-ui-x.y.z
+mkdir -p ../debs/assisi-arena-ui-x.y.z
+git archive master | tar -x -C ../debs/assisi-arena-ui-x.y.z
+cd ../debs/assisi-arena-ui-x.y.z
+tar cvf - * | gzip > ../debs/assisi-arena-ui_x.y.z.orig.tar.gz
 dh_make -e your@email.domain -f ../assisi-arena-ui_x.y.z.orig.tar.gz -s
-pdebuild -debbuildopts -sa
+pdebuild --debbuildopts -sa
 ```
