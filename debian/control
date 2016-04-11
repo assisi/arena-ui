@@ -2,7 +2,7 @@ Source: assisi-arena-ui
 Section: applications
 Priority: optional
 Maintainer: Damjan Miklic <damjan.miklic@fer.hr>
-Build-Depends: debhelper (>= 9), qtbase5-dev, qtbase5-dev-tools, qt5-qmake, libprotobf-dev, libprotoc-dev, libzmq3-dev, libzmqpp-dev
+Build-Depends: debhelper (>= 9), qtbase5-dev, qtbase5-dev-tools, qt5-qmake, libprotobuf-dev, libprotoc-dev, libzmq3-dev, libzmqpp-dev
 Standards-Version: 3.9.8
 homepage: https://github.com/larics/assisi-arena-ui.git
 
