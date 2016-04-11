@@ -19,9 +19,12 @@ qrc_*.cpp
 Makefile
 *-build-*
 
-# Emacs autosave files
+# Emacs droppings
 *~
+\#*#
+.#*
 
-# Doc and test folders
+# Build, and test folders
 test*
 userdoc/build
+build*

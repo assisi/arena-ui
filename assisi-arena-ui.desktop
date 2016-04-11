@@ -1,1 +1,11 @@
-some stuff...
+[Desktop Entry]
+Version=0.10.0
+Type=Application
+Terminal=false
+Name=AssisiArenaUI
+Exec=/usr/bin/arena-ui
+Comment=User interface for the ASSISIbf bee arena
+Icon=/usr/share/pixmaps/assisi.ico
+StartupNotify=false
+Encoding=UTF-8
+Categories=Applications;

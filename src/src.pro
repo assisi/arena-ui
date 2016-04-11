@@ -10,10 +10,17 @@ QT       += core gui\
 
 TARGET = arena-ui
 TEMPLATE = app
+CONFIG += warn_on
 
-CONFIG += link_pkgconfig
-PKGCONFIG += Qt5GStreamer-1.0 Qt5GStreamerUi-1.0
+#CONFIG += link_pkgconfig
+#PKGCONFIG += Qt5GStreamer-1.0 Qt5GStreamerUi-1.0
 
+
+DESTDIR = ../build/bin
+MOC_DIR = ../build/moc
+RCC_DIR = ../build/rcc
+UI_DIR = ../build/ui
+OBJECTS_DIR = ../build/o
 
 INCLUDEPATH += ../msg/cpp
 
