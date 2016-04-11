@@ -44,7 +44,7 @@ After making any changes to `.pbuilderrc` you might need to `sudo pbuilder updat
 Building the package
 ~~~~~~~~~~~~~~~~~~~~
 
-Switch to the folder where you have cloned the git repo, and export the source. All changes need to be committed! Pay special attention to `-` and `_` signs, they are different in different commands. This is a bit convoluted but supposedly necessary. (TODO: try using git-buildpackage, it might be simpler).
+Switch to the folder where you have cloned the git repo, and export the source. All changes need to be committed! Pay special attention to `-` and `_` signs, they are different in different commands. This is a bit convoluted but supposedly necessary. (TODO: try using git-buildpackage, it should be simpler).
 
 ```
 mkdir -p ../debs/assisi-arena-ui-x.y.z
