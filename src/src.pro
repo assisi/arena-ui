@@ -22,14 +22,14 @@ RCC_DIR = ../build/rcc
 UI_DIR = ../build/ui
 OBJECTS_DIR = ../build/o
 
-INCLUDEPATH += ../msg/cpp
+INCLUDEPATH += msg
 
 SOURCES += main.cpp\
         arenaui.cpp\
         nzmqt/nzmqt.cpp\
-        ../msg/cpp/base_msgs.pb.cc\
-        ../msg/cpp/dev_msgs.pb.cc\
-        ../msg/cpp/sim_msgs.pb.cc \
+        msg/base_msgs.pb.cc\
+        msg/dev_msgs.pb.cc\
+        msg/sim_msgs.pb.cc \
     qcasusceneitem.cpp \
     qcasutreeitem.cpp \
     qcustomplot.cpp \
