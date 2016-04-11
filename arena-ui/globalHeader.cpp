@@ -21,6 +21,7 @@ void loadConfig(){
         settings->setValue("log_on", true);
         settings->setValue("IR_on", true);
         settings->setValue("temp_on", true);
+        settings->setValue("air_on", true);
         settings->setValue("forceLog", true);
         settings->setValue("forceScene", true);
 
@@ -39,5 +40,6 @@ void loadConfig(){
     if(settings->value("forceScene").toBool()){
         settings->setValue("IR_on", true);
         settings->setValue("temp_on", true);
+        settings->setValue("air_on", true);
     }
 }

@@ -24,11 +24,12 @@ QTrendPlot::QTrendPlot(QTreeWidget* tree, QWidget *parent) :
 
    this->setContextMenuPolicy(Qt::CustomContextMenu);
 
-   QCustomPlot::connect(this,&QTrendPlot::mouseDoubleClick,this,&QTrendPlot::enableAutoPosition);
-   QCustomPlot::connect(this,&QTrendPlot::mouseMove,this,&QTrendPlot::disableAutoPosition);
-   QCustomPlot::connect(this,&QTrendPlot::mouseWheel,this,&QTrendPlot::setZoomFlags);
-   QCustomPlot::connect(this,&QTrendPlot::selectionChangedByUser,this,&QTrendPlot::selectionChanged);
-   QCustomPlot::connect(this,&QTrendPlot::customContextMenuRequested,this,&QTrendPlot::showContextMenu);
+   connect(this,&QTrendPlot::mouseDoubleClick,this,&QTrendPlot::enableAutoPosition);
+   connect(this,&QTrendPlot::mouseMove,this,&QTrendPlot::disableAutoPosition);
+   connect(this,&QTrendPlot::mouseWheel,this,&QTrendPlot::setZoomFlags);
+   connect(this,&QTrendPlot::selectionChangedByUser,this,&QTrendPlot::selectionChanged);
+   connect(this,&QTrendPlot::customContextMenuRequested,this,&QTrendPlot::showContextMenu);
+   connect(this,&QTrendPlot::beforeReplot,this,&QTrendPlot::prettyPlot);
 }
 
 void QTrendPlot::addGraph(QTreeBuffer* treeItem){
@@ -47,7 +48,7 @@ void QTrendPlot::addGraph(QTreeBuffer* treeItem){
         }
     }
 
-    QCustomPlot::connect(treeItem,&QTreeBuffer::updatePlot,this,&QTrendPlot::updatePlot);
+    QCustomPlot::connect(treeItem,SIGNAL(updatePlot()),this,SLOT(replot()));
     connectionMap[this->graph()] = treeItem;
 }
 
@@ -87,22 +88,34 @@ void QTrendPlot::saveToPDF()
     if(path.size())this->savePdf(path);
 }
 
-void QTrendPlot::updatePlot(double time, double value){
+void QTrendPlot::prettyPlot()
+{
+    //it is called before replot() to tidy everything
     double labelAngle = 45 - 30*(this->size().width() - 340)/ this->size().width(); //calculate angle so tick labels are readable
     this->xAxis->setTickLabelRotation(labelAngle > 30 ? labelAngle : 0); //angle is not needed when it is less than 30°
-
-    this->replot();
 
     if(autoPosition){
         QCPRange yRange = this->yAxis->range();
         QCPRange xRange = this->xAxis->range();
 
-        if(value < yRange.lower || value > yRange.upper)
-            this->yAxis->setRange(yRange.center(), abs(yRange.center()-value)*2+4, Qt::AlignCenter);
+        QCPData temp;
+        temp.key = 0;
 
-        this->xAxis->setRange(time + 1, xRange.size(), Qt::AlignRight);
+        for(int k = 0; k < this->graphCount();k++){
+            QCPDataMap* tempMap = this->graph(k)->data();
+            if(tempMap->isEmpty()) continue;
+            double tempKey = tempMap->lastKey();
+            if(k==0 || temp.key < tempKey) temp = tempMap->find(tempKey).value();
+        }
+        if(!temp.key) return;
+
+        if(temp.value < yRange.lower || temp.value > yRange.upper)
+            this->yAxis->setRange(yRange.center(), abs(yRange.center()- temp.value)*2+4, Qt::AlignCenter);
+
+        this->xAxis->setRange(temp.key + 1, xRange.size(), Qt::AlignRight);
     }
 }
+
 
 void QTrendPlot::enableAutoPosition(){
     autoPosition = true;

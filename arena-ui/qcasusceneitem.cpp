@@ -63,7 +63,7 @@ void QCasuSceneItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *op
     painter->setPen(pen);
 
     //paint IR sensor readings
-    if(settings->value("IR_on").toBool())
+    if(settings->value("IR_on").toBool()){
         for(int k = 0; k < 6; k++){
             if(treeItem->connected){
                 double tempGradient = treeItem->widget_IR_children[k]->data(1,Qt::DisplayRole).toDouble() / 2;
@@ -75,12 +75,15 @@ void QCasuSceneItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *op
             painter->setBrush(brush);
             painter->drawPolygon(QIRTriangle(QPointF(x_center, y_center), yaw_ - k*60)); // 0° is at 3 o'clock, ccw direction
         }
+    }
 
     //paint Temp sensor readings
-    if(settings->value("temp_on").toBool())
+    if(settings->value("temp_on").toBool()){
         for(int k = 0; k < 4; k++){
             if(treeItem->connected){
-                double tempGradient = (treeItem->widget_temp_children[k]->data(1,Qt::DisplayRole).toDouble() - 20) / 20;
+                double tempTemp = treeItem->widget_temp_children[k]->data(1,Qt::DisplayRole).toDouble();
+                if (tempTemp > 40) tempTemp = 40;
+                double tempGradient = (tempTemp - 20) / 20;
                 tempGradient = ((240 + (int)(tempGradient * 180)) % 360); // / 360; // calculate color gradiend in HSV space 
                 QColor tempColor;
                 tempColor.setHsv(tempGradient, 255, 255);
@@ -93,6 +96,18 @@ void QCasuSceneItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *op
             QTempArc arc(QPointF(x_center, y_center), yaw_ - k*90); // 0° is at 3 o'clock, ccw direction
             painter->drawArc(arc.rect, arc.start ,arc.span);
         }
+    }
+
+    //paint airflow marker
+    if(settings->value("air_on").toBool() &&
+            treeItem->connected &&
+            treeItem->airflowON){
+        pen.setColor(Qt::transparent);
+        brush.setColor(QColor(250, 218, 94,64));
+        painter->setPen(pen);
+        painter->setBrush(brush);
+        painter->drawEllipse(x_center-20,y_center-20,40,40);
+    }
 }
 
 void QCasuSceneItem::updateScene(){

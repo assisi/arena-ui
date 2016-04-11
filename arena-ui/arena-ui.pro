@@ -33,7 +33,8 @@ SOURCES += main.cpp\
     globalHeader.cpp \
     qdialogsetpoint.cpp \
     flowlayout.cpp \
-    qdeploy.cpp
+    qdeploy.cpp \
+    qcolorbar.cpp
 
 HEADERS  += arenaui.h\
         nzmqt/nzmqt.hpp \
@@ -47,7 +48,8 @@ HEADERS  += arenaui.h\
     globalHeader.h \
     qdialogsetpoint.h \
     flowlayout.h \
-    qdeploy.h
+    qdeploy.h \
+    qcolorbar.h
 
 FORMS    += arenaui.ui
 
