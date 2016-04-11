@@ -21,3 +21,7 @@ Makefile
 
 # Emacs autosave files
 *~
+
+# Doc and test folders
+test*
+userdoc/build
