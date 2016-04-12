@@ -19,7 +19,7 @@ Contents:
    basics
    trends
    deployment
-   
+   logging
    
 
 

@@ -16,9 +16,9 @@
    version="1.1"
    inkscape:version="0.48.4 r9939"
    inkscape:export-filename="/home/damjan/devel/assisi/arena-ui/userdoc/source/figures/arena_ui_elements.png"
-   inkscape:export-xdpi="50"
-   inkscape:export-ydpi="50"
-   sodipodi:docname="New document 1">
+   inkscape:export-xdpi="56.206089"
+   inkscape:export-ydpi="56.206089"
+   sodipodi:docname="arena_ui_elements.svg">
   <defs
      id="defs4" />
   <sodipodi:namedview
@@ -29,8 +29,8 @@
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
      inkscape:zoom="1.4"
-     inkscape:cx="226.35085"
-     inkscape:cy="154.88092"
+     inkscape:cx="908.01947"
+     inkscape:cy="277.99538"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
      showgrid="false"
@@ -40,7 +40,7 @@
      fit-margin-bottom="0"
      inkscape:window-width="1863"
      inkscape:window-height="1056"
-     inkscape:window-x="1337"
+     inkscape:window-x="57"
      inkscape:window-y="24"
      inkscape:window-maximized="1" />
   <metadata
@@ -61,9 +61,9 @@
      id="layer1"
      transform="translate(-591.76237,-609.52948)">
     <image
-       y="609.52948"
-       x="595.29541"
-       id="image2993"
+       y="421.64789"
+       x="444.83383"
+       id="image3015"
        xlink:href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAABQEAAAOPCAIAAAD0cpCpAAAAA3NCSVQICAjb4U/gAAAgAElEQVR4
 nOzdeXwU5f048M/M7Ox95Nicm5MEwyHhRlAQxYAcXqCFili1KhXUr1VAqPXXr1+x3mcVK1ahAhU5
 CwLWC6KiVcGKUiExkJBjQzbHJnvvzu7M8/z+GFiWHJsICRvI5/3SMPvMPDOfeTaQfPY5hiktLSWE
@@ -1210,36 +1210,36 @@ gQEAAMgLHRgAAIC80IEBAADICx0YAACAvNCBAQAAyAsdGACAjxXH8dHRUegUAO+mAwMA8LGyLLt3
 fmAAAADyQgcGAAAgL3RgAAAA8kIHBgAAIC90YAAAAPJCBwYAACAvdGAAAADyQgcGAAAgL3RgAAAA
 8kIHBgAAIC/+H5/arzDreZImAAAAAElFTkSuQmCC
 "
-       height="389.76126"
-       width="548.06171" />
+       height="911"
+       width="1281" />
     <rect
-       style="fill:none;stroke:#ff0000;stroke-width:1.85171616;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0"
+       style="fill:none;stroke:#ff0000;stroke-width:3.66949868;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0"
        id="rect2996"
-       width="31.702042"
-       height="254.46332"
-       x="592.68823"
-       y="623.85864" />
+       width="55.598545"
+       height="569.78839"
+       x="449.31143"
+       y="460.48184" />
     <rect
-       style="fill:none;stroke:#ff0000;stroke-width:2;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0"
+       style="fill:none;stroke:#ff0000;stroke-width:4.70796061;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0"
        id="rect2998"
-       width="341.0488"
-       height="364.27432"
-       x="628.91132"
-       y="624.6261" />
+       width="809.76941"
+       height="850.13782"
+       x="517.4082"
+       y="463.12292" />
     <rect
-       style="fill:none;stroke:#ff0000;stroke-width:2.32421613;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0"
+       style="fill:none;stroke:#ff0000;stroke-width:4.79039812;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0"
        id="rect3000"
-       width="159.19859"
-       height="162.93904"
-       x="974.82062"
-       y="643.08081" />
+       width="366.73242"
+       height="300.47287"
+       x="1337.4822"
+       y="504.3139" />
     <rect
-       style="fill:none;stroke:#ff0000;stroke-width:1.78004479;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0"
+       style="fill:none;stroke:#ff0000;stroke-width:4.78189039;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0"
        id="rect3002"
-       width="133.24704"
-       height="27.812664"
-       x="974.23566"
-       y="610.87384" />
+       width="383.10236"
+       height="69.810814"
+       x="1332.8795"
+       y="425.2319" />
     <flowRoot
        xml:space="preserve"
        id="flowRoot3012"
@@ -1251,53 +1251,57 @@ fmAAAADyQgcGAAAgL3RgAAAA8kIHBgAAIC90YAAAAPJCBwYAACAvdGAAAADyQgcGAAAgL3RgAAAA
            height="270.72089"
            x="183.84776"
            y="-472.909" /></flowRegion><flowPara
-         id="flowPara3018"></flowPara></flowRoot>    <flowRoot
+         id="flowPara3018" /></flowRoot>    <flowRoot
        xml:space="preserve"
        id="flowRoot3020"
        style="font-size:12px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:start;line-height:125%;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:start;fill:#ff0000;fill-opacity:1;stroke:none;font-family:FreeSans;-inkscape-font-specification:FreeSans"
-       transform="translate(163.79294,1325.9096)"><flowRegion
+       transform="translate(369.50723,1628.7667)"><flowRegion
          id="flowRegion3022"><rect
            id="rect3024"
-           width="131.31982"
-           height="20.203047"
+           width="275.60553"
+           height="35.91732"
            x="672.7616"
            y="-357.75159"
            style="fill:#ff0000" /></flowRegion><flowPara
-         id="flowPara3026">Arena state visualization</flowPara></flowRoot>    <flowRoot
+         id="flowPara3026"
+         style="font-size:24px">Arena state visualization</flowPara></flowRoot>    <flowRoot
        xml:space="preserve"
        id="flowRoot3020-7"
        style="font-size:12px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:start;line-height:125%;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:start;fill:#ff0000;fill-opacity:1;stroke:none;font-family:FreeSans;-inkscape-font-specification:FreeSans"
-       transform="matrix(0,-1,1,0,958.2962,1540.9592)"><flowRegion
+       transform="matrix(0,-1,1,0,818.2962,1686.6735)"><flowRegion
          id="flowRegion3022-7"><rect
            id="rect3024-2"
-           width="131.31982"
-           height="20.203047"
+           width="129.89127"
+           height="45.917328"
            x="672.7616"
            y="-357.75159"
            style="fill:#ff0000" /></flowRegion><flowPara
-         id="flowPara3026-2">Menu pane</flowPara></flowRoot>    <flowRoot
+         id="flowPara3026-2"
+         style="font-size:24px">Menu pane</flowPara></flowRoot>    <flowRoot
        xml:space="preserve"
        id="flowRoot3020-7-2"
        style="font-size:12px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:start;line-height:125%;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:start;fill:#ff0000;fill-opacity:1;stroke:none;font-family:FreeSans;-inkscape-font-specification:FreeSans"
-       transform="translate(306.99203,967.68818)"><flowRegion
+       transform="translate(711.992,784.11676)"><flowRegion
          id="flowRegion3022-7-7"><rect
            id="rect3024-2-9"
-           width="103.46268"
-           height="16.631605"
+           width="195.76645"
+           height="33.334995"
            x="672.7616"
            y="-357.75159"
            style="fill:#ff0000" /></flowRegion><flowPara
-         id="flowPara3026-2-1">Configuration tabs</flowPara></flowRoot>    <flowRoot
+         style="font-size:24px"
+         id="flowPara3019">Configuration tabs</flowPara></flowRoot>    <flowRoot
        xml:space="preserve"
        id="flowRoot3020-7-2-9"
        style="font-size:12px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:start;line-height:125%;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:start;fill:#ff0000;fill-opacity:1;stroke:none;font-family:FreeSans;-inkscape-font-specification:FreeSans"
-       transform="translate(310.0328,1142.5002)"><flowRegion
+       transform="translate(890.0328,1122.5002)"><flowRegion
          id="flowRegion3022-7-7-4"><rect
            id="rect3024-2-9-7"
-           width="114.89122"
-           height="15.20302"
+           width="158.5432"
+           height="38.161709"
            x="672.7616"
            y="-357.75159"
            style="fill:#ff0000" /></flowRegion><flowPara
-         id="flowPara3026-2-1-4">CASU state treeview</flowPara></flowRoot>  </g>
+         id="flowPara3026-2-1-4"
+         style="font-size:24px">CASU state treeview</flowPara></flowRoot>  </g>
 </svg>

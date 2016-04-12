@@ -10,6 +10,8 @@ Add the ASSISI ppa, update and install:
 
 ```
 sudo add-apt-repository ppa:damjan-miklic-larics/assisi
+sudo apt-get update
+sudo apt-get install assisi-arena-ui
 ```
 
 Developer instructions
