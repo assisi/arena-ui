@@ -9,7 +9,7 @@ installation is as simple as:
 
 ::
 
-   sudo add-apt-repository ppa:damjan-milic-larics/assisi
+   sudo add-apt-repository ppa:damjan-miklic-larics/assisi
    sudo apt-get update
    sudo apt-get install assisi-arena-ui
 

@@ -39,4 +39,20 @@ Monitoring and manipulating data trends
 ---------------------------------------
 
 Once you have created some trends, you can view an manipulate them
-from the **Trend graphs Configuration tab**. 
+from the **Trend graphs Configuration tab**. *Zooming in/out* along
+both axes is done using the scroll wheel of the mouse. Holding down
+the *Ctrl* button while scrolling zooms along the y-axis and holding down the
+*Shift* button while scrolling zooms along the x-axis.
+
+*Right-clicking* on one
+of the trends brings up a context menu with the following options:
+
+* **(Un)Dock from main window** - Depending on the current docking
+  state, the trend can either be docked or undocked;
+* **Hide/Show legend** - Allows toggling of legend display;
+* **Remove selected graphs** - The graph that is selected (by
+  *left-click* in the current axis) is removed from the axis;
+* **Add graphs (selected in tree)** - Data that is currently selected
+  in the **Casu data Configuration tab** is added to the current axis;
+* **Save to pdf** - The current view is saved to a pdf document;
+* **Close trend** - Closes the trend;
