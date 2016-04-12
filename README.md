@@ -3,6 +3,28 @@ assisi-arena-ui
 
 Bee arena user interface for the ASSISI|bf project.
 
+Instructions for users
+----------------------
+
+Add the ASSISI ppa, update and install:
+
+```
+sudo add-apt-repository ppa:damjan-miklic-larics/assisi
+```
+
+Developer instructions
+----------------------
+
+Prerequisites
+~~~~~~~~~~~~~
+
+qt5-dev...
+
+Building the code
+~~~~~~~~~~~~~~~~~
+
+From Qt Creator ...
+
 Debian packaging
 ----------------
 
@@ -51,7 +73,7 @@ mkdir -p ../debs/assisi-arena-ui-x.y.z
 git archive master | tar -x -C ../debs/assisi-arena-ui-x.y.z
 cd ../debs/assisi-arena-ui-x.y.z
 tar cvf - * | gzip > ../debs/assisi-arena-ui_x.y.z.orig.tar.gz
-dh_make -e your@email.domain -f ../assisi-arena-ui_x.y.z.orig.tar.gz -s -Cc lgpl3
+dh_make -e your@email.domain -f ../assisi-arena-ui_x.y.z.orig.tar.gz -s -c lgpl3
 pdebuild --debbuildopts -sa
 ```
 
@@ -59,3 +81,7 @@ Uploading to the PPA
 ~~~~~~~~~~~~~~~~~~~~
 
 Official Launchpad instructions are here: https://developer.ubuntu.com/en/publish/other-forms-of-submitting-apps/ppa/
+
+```
+dput ppa:damjan-miklic-larics/assisi assisi-arena-ui_x.y.z-1ubuntu_source.changes
+```
