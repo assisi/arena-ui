@@ -15,15 +15,17 @@ sudo add-apt-repository ppa:damjan-miklic-larics/assisi
 Developer instructions
 ----------------------
 
+Instructions for developers.
+
 Prerequisites
 ~~~~~~~~~~~~~
 
-qt5-dev...
+qt5-dev
 
 Building the code
 ~~~~~~~~~~~~~~~~~
 
-From Qt Creator ...
+From Qt Creator 
 
 Debian packaging
 ----------------
@@ -75,6 +77,12 @@ cd ../debs/assisi-arena-ui-x.y.z
 tar cvf - * | gzip > ../debs/assisi-arena-ui_x.y.z.orig.tar.gz
 dh_make -e your@email.domain -f ../assisi-arena-ui_x.y.z.orig.tar.gz -s -c lgpl3
 pdebuild --debbuildopts -sa
+```
+
+It's good form to run a lintian check on the generated source package:
+
+```
+lintian ../assisi-arena-ui_x.y.z.
 ```
 
 Uploading to the PPA
