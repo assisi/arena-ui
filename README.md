@@ -51,6 +51,6 @@ mkdir -p ../debs/assisi-arena-ui-x.y.z
 git archive master | tar -x -C ../debs/assisi-arena-ui-x.y.z
 cd ../debs/assisi-arena-ui-x.y.z
 tar cvf - * | gzip > ../debs/assisi-arena-ui_x.y.z.orig.tar.gz
-dh_make -e your@email.domain -f ../assisi-arena-ui_x.y.z.orig.tar.gz -s
+dh_make -e your@email.domain -f ../assisi-arena-ui_x.y.z.orig.tar.gz -s -Cc lgpl3
 pdebuild --debbuildopts -sa
 ```
