@@ -54,3 +54,8 @@ tar cvf - * | gzip > ../debs/assisi-arena-ui_x.y.z.orig.tar.gz
 dh_make -e your@email.domain -f ../assisi-arena-ui_x.y.z.orig.tar.gz -s -Cc lgpl3
 pdebuild --debbuildopts -sa
 ```
+
+Uploading to the PPA
+~~~~~~~~~~~~~~~~~~~~
+
+Official Launchpad instructions are here: https://developer.ubuntu.com/en/publish/other-forms-of-submitting-apps/ppa/
