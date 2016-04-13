@@ -84,7 +84,7 @@ pdebuild --debbuildopts -sa
 It's good form to run a lintian check on the generated source package:
 
 ```
-lintian ../assisi-arena-ui_x.y.z.
+lintian ../assisi-arena-ui_x.y.z.-?ubuntu?_source.changes
 ```
 
 Uploading to the PPA
