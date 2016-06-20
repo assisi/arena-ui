@@ -29,12 +29,12 @@ QDialogSetpoint::QDialogSetpoint(QString command) : command_(command)
 
     if(command == "Vibration"){
         tempLayout->addWidget(new QLabel("Vibration frequency setpoint:"),1,0);
-        tempLayout->addWidget(new QLabel("Allowed frequency range: [50,500]Hz"),2,0);
+        tempLayout->addWidget(new QLabel("Allowed frequency range: [50,1500]Hz"),2,0);
         tempLayout->addWidget(new QLabel("Vibration amplitude setpoint:"),3,0);
         tempLayout->addWidget(new QLabel("Allowed amplitude range: [0,100]\%"),4,0);
         value1 = new QLineEdit;
         value2 = new QLineEdit;
-        value1->setValidator(new QDoubleValidator(50.0,500.0,2));
+        value1->setValidator(new QDoubleValidator(50.0,1500.0,2));
         value2->setValidator(new QDoubleValidator(0.0,100.0,2));
         tempLayout->addWidget(value1,1,1);
         tempLayout->addWidget(value2,3,1);

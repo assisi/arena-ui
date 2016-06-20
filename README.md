@@ -87,6 +87,11 @@ It's good form to run a lintian check on the generated source package:
 lintian ../assisi-arena-ui_x.y.z.-?ubuntu?_source.changes
 ```
 
+Sign the source package:
+```
+debsign ../assisi-arna-ui_x.y.z.-?ubuntu?_source.changes
+```
+
 Uploading to the PPA
 ~~~~~~~~~~~~~~~~~~~~
 
