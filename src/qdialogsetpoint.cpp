@@ -4,7 +4,7 @@ QDialogSetpoint::QDialogSetpoint(QString command) : command_(command)
 {
     this->setWindowTitle(command + " data to send to CASUs");
 
-    QGroupBox* on_off = new QGroupBox("Select actuator state");
+    QGroupBox* on_off = new QGroupBox("Select device state");
     QGridLayout *tempLayout = new QGridLayout;
 
     radioON = new QRadioButton("ON");
@@ -72,6 +72,11 @@ QDialogSetpoint::QDialogSetpoint(QString command) : command_(command)
         tempLayout->addWidget(buttons,1,0);
     }
 
+    if(command == "IR Proximity"){
+        /* Allows only Activation/Standby of proximity sensors.  */
+        tempLayout->addWidget(buttons,3,0);
+    }
+
     this->setLayout(tempLayout);
 
     QObject::connect(buttons, SIGNAL(accepted()), this, SLOT(prepareMessage()));
@@ -136,6 +141,14 @@ void QDialogSetpoint::prepareMessage()
         message.push_back(QByteArray((char*) buffer,size));
     }
 
+    if(command_ == "IR Proximity"){
+        void *buffer = malloc(sizeof(int));
+        //air.SerializeToArray(buffer, sizeof(int));
+
+        message.push_back(QString("IR").toLocal8Bit());
+        message.push_back(QString(radioON->isChecked() ? "Activate" : "Standby").toLocal8Bit());
+        message.push_back(QByteArray((char*) buffer,sizeof(int)));
+    }
 
     accept();
 }

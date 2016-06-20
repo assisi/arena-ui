@@ -561,6 +561,8 @@ void ArenaUI::customContextMenu(QPoint pos)
     signalMapper->setMapping(temp,"Airflow");
     temp = sendMenu->addAction("LED",signalMapper,SLOT(map()));
     signalMapper->setMapping(temp,"LED");
+    temp = sendMenu->addAction("IR Proximity",signalMapper,SLOT(map()));
+    signalMapper->setMapping(temp,"IR Proximity");
 
     connect(signalMapper,SIGNAL(mapped(QString)),this,SLOT(sendSetpoint(QString)));
 
