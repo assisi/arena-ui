@@ -66,7 +66,7 @@ void QCasuSceneItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *op
     if(settings->value("IR_on").toBool()){
         for(int k = 0; k < 6; k++){
             if(treeItem->connected){
-                double tempGradient = treeItem->widget_IR_children[k]->data(1,Qt::DisplayRole).toDouble() / 2;
+                double tempGradient = treeItem->widget_IR_children[k]->data(1,Qt::DisplayRole).toDouble() / 5000;
                 QColor tempColor;
                 tempColor.setHsvF(0.14, 0,tempGradient);
                 brush.setColor(tempColor);
