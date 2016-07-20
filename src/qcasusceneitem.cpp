@@ -82,8 +82,10 @@ void QCasuSceneItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *op
         for(int k = 0; k < 4; k++){
             if(treeItem->connected){
                 double tempTemp = treeItem->widget_temp_children[k]->data(1,Qt::DisplayRole).toDouble();
-                if (tempTemp > 40) tempTemp = 40;
-                double tempGradient = (tempTemp - 20) / 20;
+                if (tempTemp > 50) tempTemp = 50;
+                if (tempTemp < 20) tempTemp = 20;
+
+                double tempGradient = (tempTemp - 20) / 30;
                 tempGradient = ((240 + (int)(tempGradient * 180)) % 360); // / 360; // calculate color gradiend in HSV space 
                 QColor tempColor;
                 tempColor.setHsv(tempGradient, 255, 255);
