@@ -25,6 +25,11 @@ ArenaUI::ArenaUI(QWidget *parent) :
     ui->setupUi(this);
     ui->actionToggleLog->setChecked(settings->value("log_on").toBool());
 
+    sideLayout = new QSplitter;
+    ui->centralWidget->layout()->addWidget(sideLayout);
+    sideLayout->setOrientation(Qt::Vertical);
+    sideLayout->addWidget(ui->tabWidget);
+
     //CASU TREE TAB
     ui->casuTree->addAction(ui->actionPlot_selected_in_same_trend);
     ui->casuTree->addAction(ui->actionPlot_selected_in_different_trends);
@@ -47,7 +52,6 @@ ArenaUI::ArenaUI(QWidget *parent) :
     //GRAPHICS SCENE
     arena_scene = new QArenaScene(this);
     arena_scene->setSceneRect(0,0,800,800);
-
     ui->arenaSpace->setScene(arena_scene);
     ui->arenaSpace->setDragMode(QGraphicsView::RubberBandDrag);
 
@@ -702,4 +706,14 @@ void ArenaUI::on_actionSave_triggered()
     }
     saveState.endArray();
     saveState.endGroup();
+}
+
+void ArenaUI::on_actionCamera_toggled(bool arg1)
+{
+    if(arg1){
+        videoStream = new QGstreamerView(sideLayout);
+    }
+    if(!arg1){
+        videoStream->deleteLater();
+    }
 }

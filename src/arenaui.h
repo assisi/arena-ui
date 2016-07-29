@@ -4,6 +4,7 @@
 #include <QMainWindow>
 #include <QGraphicsScene>
 #include <QProgressBar>
+#include <QSplitter>
 
 #include <nzmqt/nzmqt.hpp>
 #include <yaml-cpp/yaml.h>
@@ -20,6 +21,7 @@
 #include "qcolorbar.h"
 #include "qtrendplot.h"
 #include "qdeploy.h"
+#include "qgstreamerview.h"
 
 
 
@@ -51,12 +53,14 @@ private:
 
     YAML::Node assisiNode;
 
+    QSplitter* sideLayout;
     QVBoxLayout* trendTab;
     QDeploy* deployWidget;
     QScrollArea* deployScroll;
     QLabel* deployArena;
     QLabel* deployFile;
     QLabel* deployNeighborhood;
+    QGstreamerView* videoStream;
 
     void sortGraphicsScene();
 
@@ -84,6 +88,7 @@ private slots:
     void sendSetpoint(QString actuator);
     void on_actionSave_triggered();
     void on_actionPlot_selected_in_different_trends_triggered();
+    void on_actionCamera_toggled(bool arg1);
 };
 
 // ------------------------------------------------------------------------

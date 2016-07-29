@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1250</width>
+    <width>1252</width>
     <height>850</height>
    </rect>
   </property>
@@ -46,7 +46,7 @@
        <enum>QTabWidget::North</enum>
       </property>
       <property name="currentIndex">
-       <number>2</number>
+       <number>0</number>
       </property>
       <widget class="QWidget" name="tab_casus">
        <property name="enabled">
@@ -141,6 +141,7 @@
    <addaction name="actionUngroup"/>
    <addaction name="actionConnect"/>
    <addaction name="actionToggleLog"/>
+   <addaction name="actionCamera"/>
    <addaction name="actionSettings"/>
   </widget>
   <action name="actionGroup">
@@ -277,10 +278,27 @@
     <string>Ctrl+S</string>
    </property>
   </action>
+  <action name="actionCamera">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="icon">
+    <iconset resource="images.qrc">
+     <normaloff>:/images/icons/camera.png</normaloff>:/images/icons/camera.png</iconset>
+   </property>
+   <property name="text">
+    <string>Camera</string>
+   </property>
+   <property name="toolTip">
+    <string>Toggle video stream (Ctrol + V)</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+V</string>
+   </property>
+  </action>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
  <tabstops>
-  <tabstop>tabWidget</tabstop>
   <tabstop>arenaSpace</tabstop>
  </tabstops>
  <resources>
