@@ -171,18 +171,26 @@ void QCasuTreeItem::messageReceived(const QList<QByteArray>& message){
             if(settings->value("log_on").toBool()) log_file << ";" << value;
         }
     }
-/* TREBA JOS DOKUCITI GDJE KO KOGA
-    if (device == "Acc"){
+
+    if (device == "Speaker"){
         VibrationReading vibr;
         vibr.ParseFromString(data);
-        double value1 = vibr.freq();
-        double value2 = vibr.amplitude();
-        double value3 = vibr.amplitude_stdev();
-        widget_vibr->child(0)->setData(1, Qt::DisplayRole, value1);
-        widget_vibr->child(1)->setData(1, Qt::DisplayRole, value2);
-        widget_vibr->child(2)->setData(1, Qt::DisplayRole, value3);
-        if(settings->value("log_on").toBool()) log_file << ";" << value1 << ";" << value2;
-    }*/
+        //float value1 = vibr.freq();
+        //float value2 = vibr.amplitude();
+        //double value3 = vibr.amplitude_stdev();
+       // widget_vibr->child(0)->setData(1, Qt::DisplayRole, value1);
+       // widget_vibr->child(1)->setData(1, Qt::DisplayRole, value2);
+        if(command == "On"){
+            widget_vibr->setTextColor(1, Qt::green);
+            vibrON = true;
+        }
+        else {
+            widget_vibr->setTextColor(1, Qt::red);
+            vibrON = false;
+        }
+        //widget_vibr->child(2)->setData(1, Qt::DisplayRole, value3);
+       // if(settings->value("log_on").toBool()) log_file << ";" << value1 << ";" << value2;
+    }
 
    if (device == "Peltier"){
        Temperature pelt;

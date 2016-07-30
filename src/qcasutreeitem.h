@@ -44,6 +44,7 @@ public:
     bool led_on;
     bool child_selected;
     bool airflowON;
+    bool vibrON;
 
     QColor led_color;
 

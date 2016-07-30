@@ -4,11 +4,14 @@ QCasuSceneItem::QCasuSceneItem(QObject *parent, int x, int y, int yaw, QCasuTree
     x_center(x),
     y_center(y),
     yaw_(yaw),
-    treeItem(widget),
     //ANIMATION
-    airflowAngle(0)
+    airflowAngle(0),
+    vibrAngle(0),
+    //WIDGET
+    treeItem(widget)
 {
     this->setFlag(QGraphicsItem::ItemIsSelectable);
+    FPScheck = new QElapsedTimer();
 }
 
 
@@ -21,6 +24,8 @@ void QCasuSceneItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *op
 {
     Q_UNUSED(option)
     Q_UNUSED(widget)
+
+    int FPSrepaint = FPScheck->elapsed() < 30 ? 0 : 1;
 
     painter->setRenderHints(QPainter::Antialiasing | QPainter::SmoothPixmapTransform, true);
 
@@ -105,15 +110,31 @@ void QCasuSceneItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *op
         double value = treeItem->widget_setpoints_children[1]->data(1,Qt::DisplayRole).toDouble();
 
         pen.setColor(Qt::transparent);
-        brush.setColor(QColor(250, 218, 94,128));
+        brush.setColor(QColor(250, 218, 94, 96));
         painter->setPen(pen);
         painter->setBrush(brush);
-        airflowAngle += value * 12; // 30 FPS, max_speed = 12 deg/frame -> w = 1 rpm
+        airflowAngle = fmod(airflowAngle + value * 12 * FPSrepaint, 360); // 30 FPS, max_speed = 12 deg/frame -> w = 1 rpm
         painter->drawPath(QPetal(QPointF(x_center,y_center),airflowAngle));       // petal 1
         painter->drawPath(QPetal(QPointF(x_center,y_center),airflowAngle + 120)); // petal 2
         painter->drawPath(QPetal(QPointF(x_center,y_center),airflowAngle - 120)); // petal 3
     }
 
+    //paint vibration marker
+    if(settings->value("vibr_on").toBool() && treeItem->connected && treeItem->vibrON){
+       // float freq = treeItem->widget_vibr->data(1,Qt::DisplayRole).toDouble();
+       // float amplitude = treeItem->widget_vibr->data(2,Qt::DisplayRole).toDouble();
+
+        pen.setColor(QColor(255,255,255,96));
+        pen.setWidth(2);
+        pen.setStyle(Qt::SolidLine);
+        brush.setColor(Qt::transparent);
+        painter->setPen(pen);
+        painter->setBrush(brush);
+        vibrAngle = fmod(vibrAngle - 12 * FPSrepaint, 360); // 30 FPS, max_speed = 12 deg/frame -> w = 1 rpm
+        painter->drawPath(QVibratingCircle(QPointF(x_center,y_center),7,vibrAngle));       // petal 1
+    }
+
+    if(FPSrepaint) FPScheck->start();
 }
 
 void QCasuSceneItem::updateScene(){
@@ -124,8 +145,8 @@ void QCasuSceneItem::updateScene(){
 
 QIRTriangle::QIRTriangle(QPointF center, double angle, double value)
 {
-    double side = 7+8*value; // 10 is the altitude length
-    double offset = 3; // offset from center of CASU
+    double side = 5+18*value; //
+    double offset = 3; // center offset from center of CASU
 
     angle = angle * PI/180;
     center += QPointF(offset*cos(angle), -offset*sin(angle));
@@ -156,4 +177,14 @@ QPetal::QPetal(QPointF center, double angle){
     this->cubicTo(center + QPointF(35*cos(leftAngle),-35*sin(leftAngle)),
                   center + QPointF(35*cos(rightAngle),-35*sin(rightAngle)),
                   center);
+}
+
+QVibratingCircle::QVibratingCircle(QPointF center, int waves, double w){
+    double angle = w * PI/180;
+    this->moveTo(center + QPointF(14+sin(angle),0));
+    for(int k=1; k <= 360; k++){
+        double coordAngle = k*PI/180;
+        double amp = 16 + 2*sin(angle + waves*coordAngle);
+        this->lineTo(center + QPointF(amp*cos(coordAngle),amp*sin(coordAngle)));
+    }
 }

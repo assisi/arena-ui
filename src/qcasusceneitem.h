@@ -19,7 +19,9 @@ private:
     int yaw_;
 
 //ANIMATION
+    QElapsedTimer* FPScheck;
     double airflowAngle;
+    double vibrAngle;
 
 public:
     QCasuTreeItem* treeItem;
@@ -55,6 +57,12 @@ class QPetal : public QPainterPath
 {
 public:
     QPetal(QPointF center, double angle);
+};
+
+class QVibratingCircle : public QPainterPath
+{
+public:
+    QVibratingCircle(QPointF angle, int waves, double w);
 };
 
 #endif // QCASUSCENEITEM_H
