@@ -73,7 +73,6 @@ public:
     void resetSelection();
 
 signals:
-    void updateScene();
 
 private slots:
     void updateSelection();

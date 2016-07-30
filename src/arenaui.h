@@ -49,7 +49,7 @@ public:
 
 private:
     Ui::ArenaUI *ui;
-    QArenaScene *arena_scene;
+    QArenaScene *arenaScene;
 
     YAML::Node assisiNode;
 
@@ -61,6 +61,8 @@ private:
     QLabel* deployFile;
     QLabel* deployNeighborhood;
     QGstreamerView* videoStream;
+
+    QTimer* sceneUpdate;
 
     void sortGraphicsScene();
 

@@ -18,6 +18,9 @@ private:
     int y_center;
     int yaw_;
 
+//ANIMATION
+    double airflowAngle;
+
 public:
     QCasuTreeItem* treeItem;
 
@@ -33,10 +36,10 @@ protected slots:
 
 };
 
-class QIRTriangle : public QPolygonF
+class QIRTriangle : public QRectF
 {
 public:
-    QIRTriangle(QPointF center, double angle);
+    QIRTriangle(QPointF center, double angle, double value);
 };
 
 class QTempArc
@@ -46,6 +49,12 @@ public:
     int start;
     int span;
     QRectF rect;
+};
+
+class QPetal : public QPainterPath
+{
+public:
+    QPetal(QPointF center, double angle);
 };
 
 #endif // QCASUSCENEITEM_H
