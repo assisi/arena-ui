@@ -121,8 +121,8 @@ void QCasuSceneItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *op
 
     //paint vibration marker
     if(settings->value("vibr_on").toBool() && treeItem->connected && treeItem->vibrON){
-       // float freq = treeItem->widget_vibr->data(1,Qt::DisplayRole).toDouble();
-       // float amplitude = treeItem->widget_vibr->data(2,Qt::DisplayRole).toDouble();
+        double freq = treeItem->widget_setpoints_vibr_children[0]->data(1,Qt::DisplayRole).toDouble();
+        double amplitude = treeItem->widget_setpoints_vibr_children[1]->data(1,Qt::DisplayRole).toDouble();
 
         pen.setColor(QColor(255,255,255,96));
         pen.setWidth(2);
@@ -130,8 +130,8 @@ void QCasuSceneItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *op
         brush.setColor(Qt::transparent);
         painter->setPen(pen);
         painter->setBrush(brush);
-        vibrAngle = fmod(vibrAngle - 12 * FPSrepaint, 360); // 30 FPS, max_speed = 12 deg/frame -> w = 1 rpm
-        painter->drawPath(QVibratingCircle(QPointF(x_center,y_center),7,vibrAngle));       // petal 1
+        vibrAngle = fmod(vibrAngle - /*amplitude/100* */12*FPSrepaint, 360); // 30 FPS, max_speed = 12 deg/frame -> w = 1 rpm
+        painter->drawPath(QVibratingCircle(QPointF(x_center,y_center), 6+9*freq/1500, vibrAngle));       // num_waves = [6 .. 15]
     }
 
     if(FPSrepaint) FPScheck->start();

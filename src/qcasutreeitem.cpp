@@ -171,15 +171,14 @@ void QCasuTreeItem::messageReceived(const QList<QByteArray>& message){
             if(settings->value("log_on").toBool()) log_file << ";" << value;
         }
     }
-
+/* duplicirano na pogresan widget
     if (device == "Speaker"){
-        VibrationReading vibr;
+        VibrationSetpoint vibr;
         vibr.ParseFromString(data);
-        //float value1 = vibr.freq();
-        //float value2 = vibr.amplitude();
-        //double value3 = vibr.amplitude_stdev();
-       // widget_vibr->child(0)->setData(1, Qt::DisplayRole, value1);
-       // widget_vibr->child(1)->setData(1, Qt::DisplayRole, value2);
+        double value1 = vibr.freq();
+        double value2 = vibr.amplitude();
+        widget_vibr->child(0)->setData(1, Qt::DisplayRole, value1);
+        widget_vibr->child(1)->setData(1, Qt::DisplayRole, value2);
         if(command == "On"){
             widget_vibr->setTextColor(1, Qt::green);
             vibrON = true;
@@ -188,10 +187,9 @@ void QCasuTreeItem::messageReceived(const QList<QByteArray>& message){
             widget_vibr->setTextColor(1, Qt::red);
             vibrON = false;
         }
-        //widget_vibr->child(2)->setData(1, Qt::DisplayRole, value3);
-       // if(settings->value("log_on").toBool()) log_file << ";" << value1 << ";" << value2;
+        if(settings->value("log_on").toBool()) log_file << ";" << value1 << ";" << value2;
     }
-
+*/
    if (device == "Peltier"){
        Temperature pelt;
        pelt.ParseFromString(data);
@@ -228,10 +226,12 @@ void QCasuTreeItem::messageReceived(const QList<QByteArray>& message){
        if(command == "On"){
            widget_setpoints_vibr_children[0]->setTextColor(1, Qt::green);
            widget_setpoints_vibr_children[1]->setTextColor(1, Qt::green);
+           vibrON = true;
        }
        else {
            widget_setpoints_vibr_children[0]->setTextColor(1, Qt::red);
            widget_setpoints_vibr_children[1]->setTextColor(1, Qt::red);
+           vibrON = false;
        }
        if(settings->value("log_on").toBool()) log_file << ";" << value1 << ";" << value2;
     }
