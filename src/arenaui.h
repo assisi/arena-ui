@@ -82,6 +82,7 @@ private slots:
     void toggleIR();
     void toggleTemp();
     void toggleAir();
+    void toggleVibr();
 
     void updateTreeSelection();
     void customContextMenu(QPoint pos);
