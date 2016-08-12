@@ -320,7 +320,7 @@ void ArenaUI::on_actionOpenArena_triggered()
             QString name = QString::fromStdString(it->first.as<std::string>());
             int xpos = arenaNode[assisiFile.arenaLayer.toStdString()][name.toStdString()]["pose"]["x"].as<int>();
             int ypos = arenaNode[assisiFile.arenaLayer.toStdString()][name.toStdString()]["pose"]["y"].as<int>();
-            int yaw = arenaNode[assisiFile.arenaLayer.toStdString()][name.toStdString()]["pose"]["yaw"].as<int>();
+            double yaw = arenaNode[assisiFile.arenaLayer.toStdString()][name.toStdString()]["pose"]["yaw"].as<double>();
 
             QCasuTreeItem* tempTree = new QCasuTreeItem(ui->casuTree, name);
 
@@ -630,7 +630,7 @@ QList<QGraphicsItem *>* ArenaUI::groupLoad(YAML::Node* arenaNode, QSettings *loa
             QString name = loadState->value("casuName").toString();
             int xpos = (*arenaNode)[assisiFile.arenaLayer.toStdString()][name.toStdString()]["pose"]["x"].as<int>();
             int ypos =(*arenaNode)[assisiFile.arenaLayer.toStdString()][name.toStdString()]["pose"]["y"].as<int>();
-            int yaw = (*arenaNode)[assisiFile.arenaLayer.toStdString()][name.toStdString()]["pose"]["yaw"].as<int>();
+            double yaw = (*arenaNode)[assisiFile.arenaLayer.toStdString()][name.toStdString()]["pose"]["yaw"].as<double>();
 
             QCasuTreeItem* tempTree = new QCasuTreeItem(ui->casuTree, name);
 

@@ -1,9 +1,9 @@
 #include "qcasusceneitem.h"
 
-QCasuSceneItem::QCasuSceneItem(QObject *parent, int x, int y, int yaw, QCasuTreeItem *widget) : QObject(parent),
+QCasuSceneItem::QCasuSceneItem(QObject *parent, int x, int y, double yaw, QCasuTreeItem *widget) : QObject(parent),
     x_center(x),
     y_center(y),
-    yaw_(yaw),
+    yaw_((int)(yaw*180/PI)),
     //ANIMATION
     airflowAngle(0),
     vibrAngle(0),
@@ -83,11 +83,11 @@ void QCasuSceneItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *op
 
 
     if(this->isSelected()){
-        pen.setStyle(Qt::SolidLine);
+        pen.setStyle(Qt::DotLine);
         treeItem->setHidden(false);
     }
     else{
-        pen.setStyle(Qt::DotLine);
+        pen.setStyle(Qt::SolidLine);
         treeItem->setHidden(true);
         treeItem->resetSelection();
     }
@@ -100,10 +100,10 @@ void QCasuSceneItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *op
     painter->setPen(pen);
     painter->setBrush(brush);
     painter->drawEllipse(model);
-    painter->drawLine(x_center + 5*cos(yaw_*PI/180),
-                      y_center + 5*sin(yaw_*PI/180),
-                      x_center + 10*cos(yaw_*PI/180),
-                      y_center + 10*sin(yaw_*PI/180));
+    painter->drawLine(x_center + 5*cos(-yaw_*PI/180),
+                      y_center + 5*sin(-yaw_*PI/180),
+                      x_center + 10*cos(-yaw_*PI/180),
+                      y_center + 10*sin(-yaw_*PI/180));
 
     //paint airflow marker
     if(settings->value("air_on").toBool() && treeItem->connected && treeItem->airflowON){
