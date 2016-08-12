@@ -12,11 +12,11 @@ QCasuTreeItem::QCasuTreeItem(QObject* parent, QString name) : QObject(parent), c
     //zadavanje djece IR grani:
     {
         widget_IR_children.append((QTreeWidgetItem*)new QTreeBuffer(QStringList("F"), name + ": IR - F"));
-        widget_IR_children.append((QTreeWidgetItem*)new QTreeBuffer(QStringList("FR"), name + ": IR - FR"));
-        widget_IR_children.append((QTreeWidgetItem*)new QTreeBuffer(QStringList("BR"), name + ": IR - BR"));
-        widget_IR_children.append((QTreeWidgetItem*)new QTreeBuffer(QStringList("B"), name + ": IR - B"));
-        widget_IR_children.append((QTreeWidgetItem*)new QTreeBuffer(QStringList("BL"), name + ": IR - BL"));
         widget_IR_children.append((QTreeWidgetItem*)new QTreeBuffer(QStringList("FL"), name + ": IR - FL"));
+        widget_IR_children.append((QTreeWidgetItem*)new QTreeBuffer(QStringList("BL"), name + ": IR - BL"));
+        widget_IR_children.append((QTreeWidgetItem*)new QTreeBuffer(QStringList("B"), name + ": IR - B"));
+        widget_IR_children.append((QTreeWidgetItem*)new QTreeBuffer(QStringList("BR"), name + ": IR - BR"));
+        widget_IR_children.append((QTreeWidgetItem*)new QTreeBuffer(QStringList("FR"), name + ": IR - FR"));
         widget_IR->addChildren(widget_IR_children);
     }
 
