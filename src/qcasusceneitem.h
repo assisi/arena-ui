@@ -48,7 +48,7 @@ public:
      */
     QCasuTreeItem* treeItem;
 
-    QCasuSceneItem(QObject *parent, int x, int y, int yaw, QCasuTreeItem *widget);
+    QCasuSceneItem(QObject *parent, int x, int y, double yaw, QCasuTreeItem *widget);
 
     QRectF boundingRect() const;
 
