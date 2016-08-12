@@ -96,6 +96,7 @@ public:
 class QVibratingCircle : public QPainterPath
 {
 public:
+    QPointF points[20];
     QVibratingCircle(QPointF center, int waves, double angle);
 };
 

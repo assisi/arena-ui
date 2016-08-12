@@ -77,6 +77,15 @@ void QCasuSceneItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *op
     //paint main CASU object
     QRectF model = QRectF(x_center-10,y_center-10,20,20);;
 
+    // - WORKAROUND - drawing with white fill so seethrough patter doesnt show underlaying drawings
+    pen.setWidth(0);
+    brush.setColor(Qt::white);
+    brush.setStyle(Qt::SolidPattern);
+    painter->setPen(pen);
+    painter->setBrush(brush);
+    painter->drawEllipse(model);
+
+    // - Configurating pen and brush parameters
     pen.setWidth(2);
     if(treeItem->connected)pen.setColor(Qt::green);
     else pen.setColor(Qt::red);
@@ -91,11 +100,10 @@ void QCasuSceneItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *op
         treeItem->setHidden(true);
         treeItem->resetSelection();
     }
+
     if(treeItem->led_on)brush.setColor(treeItem->led_color);
     else brush.setColor(Qt::gray);
-
     if(treeItem->child_selected)brush.setStyle(Qt::Dense3Pattern);
-    else brush.setStyle(Qt::SolidPattern);
 
     painter->setPen(pen);
     painter->setBrush(brush);
@@ -131,7 +139,12 @@ void QCasuSceneItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *op
         painter->setPen(pen);
         painter->setBrush(brush);
         vibrAngle = fmod(vibrAngle - /*amplitude/100* */12*FPSrepaint, 360); // 30 FPS, max_speed = 12 deg/frame -> w = 1 rpm
-        painter->drawPath(QVibratingCircle(QPointF(x_center,y_center), 6+9*freq/1500, vibrAngle));       // num_waves = [6 .. 15]
+        int wawesNum = 6+9*freq/1500; // wawesNum = [6 .. 15]
+        QVibratingCircle tempItem = QVibratingCircle(QPointF(x_center,y_center), wawesNum,vibrAngle);
+        painter->drawPath(tempItem);
+        pen.setColor(QColor(128,128,128,96));
+        painter->setPen(pen);
+        painter->drawPoints(tempItem.points, 20);
     }
 
     if(FPSrepaint) FPScheck->start();
@@ -176,10 +189,14 @@ QPetal::QPetal(QPointF center, double angle){
 
 QVibratingCircle::QVibratingCircle(QPointF center, int waves, double angle){
     angle = angle * PI/180;
-    this->moveTo(center + QPointF(14+sin(angle),0));
+
+    this->moveTo(center + QPointF(16+2*sin(angle),0));
+
     for(int k=1; k <= 360; k++){
         double coordAngle = k*PI/180;
         double amp = 16 + 2*sin(angle + waves*coordAngle);
         this->lineTo(center + QPointF(amp*cos(coordAngle),amp*sin(coordAngle)));
+        if((k+9)%18 == 0) points[(k+9)/18-1] = center + QPointF(amp*cos(coordAngle),amp*sin(coordAngle));
     }
+
 }
