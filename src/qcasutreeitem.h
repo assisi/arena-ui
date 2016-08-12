@@ -17,6 +17,9 @@ using namespace AssisiMsg;
 using namespace boost;
 using namespace std;
 
+/*!
+ * \brief QTreeWidget element with NZMQt protocol for individual CASU
+ */
 class QCasuTreeItem : public QObject, public QTreeWidgetItem
 {
     Q_OBJECT
@@ -26,15 +29,36 @@ private:
     nzmqt::ZMQSocket* pub_sock_;
     nzmqt::ZMQSocket* sub_sock_;
 
-    QTimer* connection_timer;
+    /*!
+     * \brief If timer runs out without receiving any message, connection is innactive
+     */
+    QTimer* connectionTimer;
 
     // Connect the publisher and subscriber
+    /*!
+     * \brief Connect NZMQt publisher and subscriber
+     */
     void connect_();
 
-    QString log_name;
-    bool log_open;
-    ofstream log_file;
+    /*!
+     * \brief logFile name of this CASU
+     */
+    QString logName;
+    /*!
+     * \brief Status variable if log file is open
+     */
+    bool logOpen;
+    /*!
+     * \brief Ofstream log file
+     */
+    ofstream logFile;
+    /*!
+     * \brief Opens logFile stream if neccesary
+     */
     void openLogFile();
+    /*!
+     * \brief Closes logFile stream when not needed
+     */
     void closeLogFile();
 
 public:
@@ -68,18 +92,41 @@ public:
 
     QCasuTreeItem(QObject *parent, QString name);
 
+    /*!
+     * \brief Change connection parameters
+     * \param sub - subscriber IP address
+     * \param pub - publisher IP address
+     * \param msg - messaging IP address
+     */
     void setAddr(QString sub, QString pub, QString msg);
+    /*!
+     * \brief Sends the setpoint message to this items CASU
+     * \param message - protobuf message
+     */
     bool sendSetpoint(QList<QByteArray> message);
 
+    /*!
+     * \brief Deselects all tree items in treeView
+     */
     void resetSelection();
 
 signals:
 
 private slots:
+    /*!
+     * \brief Updates selected tree items in treeView
+     */
     void updateSelection();
 
+    /*!
+     * \brief Message receiver and parser
+     * \param message - protobuf message
+     */
     void messageReceived(const QList<QByteArray>& message);
 
+    /*!
+     * \brief Resets connection status if connectionTimer runs out
+     */
     void connectionTimeout();
 };
 

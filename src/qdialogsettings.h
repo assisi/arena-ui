@@ -15,6 +15,11 @@
 
 #include "globalHeader.h"
 
+/*!
+ * \brief Subclassed instance of QLabel
+ *
+ * Configured aligmnent options beforehand to use in QDialogSettings
+ */
 class QtempLabel : public QLabel
 {
     Q_OBJECT
@@ -22,6 +27,9 @@ public:
     QtempLabel(QString label);
 };
 
+/*!
+ * \brief Program settings dialog window
+ */
 class QDialogSettings : public QDialog
 {
     Q_OBJECT

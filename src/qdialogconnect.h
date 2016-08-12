@@ -8,6 +8,9 @@
 #include <QLabel>
 #include <QLineEdit>
 
+/*!
+ * \brief Connection settings dialog window for individual CASU
+ */
 class QDialogConnect : public QDialog
 {
     Q_OBJECT

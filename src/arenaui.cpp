@@ -46,8 +46,8 @@ ArenaUI::ArenaUI(QWidget *parent) :
     tempScroll->setWidgetResizable(true);
     trendTab = new QVBoxLayout(tempWidget);
 
-    ui->tab_trend->setLayout(new QVBoxLayout);
-    ui->tab_trend->layout()->addWidget(tempScroll);
+    ui->tabTrend->setLayout(new QVBoxLayout);
+    ui->tabTrend->layout()->addWidget(tempScroll);
 
     //GRAPHICS SCENE
     arenaScene = new QArenaScene(this);
@@ -67,7 +67,7 @@ ArenaUI::ArenaUI(QWidget *parent) :
     sceneUpdate->start(34);
 
     //DEPLOYMENT
-    ui->tab_deploy->setLayout(new QVBoxLayout);
+    ui->tabDeploy->setLayout(new QVBoxLayout);
 
     // - deployment header
     tempWidget = new QWidget;
@@ -101,7 +101,7 @@ ArenaUI::ArenaUI(QWidget *parent) :
     tempLayout->addWidget(deployFile,3,2);
 
     tempWidget->setLayout(tempLayout);
-    ui->tab_deploy->layout()->addWidget(tempWidget);
+    ui->tabDeploy->layout()->addWidget(tempWidget);
 
     // - interaction buttons
     tempWidget = new QWidget;
@@ -135,7 +135,7 @@ ArenaUI::ArenaUI(QWidget *parent) :
     connect(tempButton,SIGNAL(clicked()), deployWidget, SLOT(simulatorStop()));
     tempWidget->layout()->addWidget(tempButton);
 
-    ui->tab_deploy->layout()->addWidget(tempWidget);
+    ui->tabDeploy->layout()->addWidget(tempWidget);
 
     // - text output window
     deployScroll = new QScrollArea;
@@ -144,7 +144,7 @@ ArenaUI::ArenaUI(QWidget *parent) :
     deployScroll->setWidgetResizable(true);
     deployScroll->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 
-    ui->tab_deploy->layout()->addWidget(deployScroll);
+    ui->tabDeploy->layout()->addWidget(deployScroll);
 
     connect(deployScroll->verticalScrollBar(),SIGNAL(rangeChanged(int,int)),this,SLOT(moveDeployScroll(int,int)));
 
@@ -161,7 +161,7 @@ ArenaUI::ArenaUI(QWidget *parent) :
     connect(temCheckBox,SIGNAL(stateChanged(int)), deployWidget, SLOT(toggleOutput(int)));
     tempWidget->layout()->addWidget(temCheckBox);
 
-    ui->tab_deploy->layout()->addWidget(tempWidget);
+    ui->tabDeploy->layout()->addWidget(tempWidget);
 }
 
 ArenaUI::~ArenaUI()
@@ -274,7 +274,7 @@ void QArenaScene::mousePressEvent(QGraphicsSceneMouseEvent *event)
 // -------------------------------------------------------------------------------
 
 
-void ArenaUI::on_actionOpen_Arena_triggered()
+void ArenaUI::on_actionOpenArena_triggered()
 {
     QProgressBar progress;
     progress.setMinimum(0);

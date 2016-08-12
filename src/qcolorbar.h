@@ -8,6 +8,9 @@
 
 #include "globalHeader.h"
 
+/*!
+ * \brief Graphics item which shows temperature color legend
+ */
 class QColorbar : public QObject, public QGraphicsItem
 {
     Q_OBJECT

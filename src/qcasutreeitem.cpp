@@ -66,7 +66,7 @@ QCasuTreeItem::QCasuTreeItem(QObject* parent, QString name) : QObject(parent), c
     this->setFlags(Qt::ItemIsEnabled);
 
     led_on = false;
-    connection_timer = new QTimer(this);
+    connectionTimer = new QTimer(this);
 
     context_ = createDefaultContext(this);
     context_->start();
@@ -75,7 +75,7 @@ QCasuTreeItem::QCasuTreeItem(QObject* parent, QString name) : QObject(parent), c
 
     connect(sub_sock_, SIGNAL(messageReceived(const QList<QByteArray>&)), SLOT(messageReceived(const QList<QByteArray>&)));
 
-    connect(connection_timer, SIGNAL(timeout()),SLOT(connectionTimeout()));
+    connect(connectionTimer, SIGNAL(timeout()),SLOT(connectionTimeout()));
 
     connect(this->QObject::parent(), SIGNAL(itemSelectionChanged()), SLOT(updateSelection()));
 }
@@ -117,7 +117,7 @@ void QCasuTreeItem::connect_()
         sub_sock_->subscribeTo("casu");
         sub_sock_->connectTo(sub_addr);
         connected = true;
-        connection_timer->start(1000);
+        connectionTimer->start(1000);
     }
     catch(zmq::error_t e){
         connected = false;
@@ -136,12 +136,12 @@ void QCasuTreeItem::messageReceived(const QList<QByteArray>& message){
 
     if(!connected) connected = true;
 
-    connection_timer->start(2000);
+    connectionTimer->start(2000);
 
-    if(settings->value("log_on").toBool() & !log_open) openLogFile();
-    if(!settings->value("log_on").toBool() & log_open) closeLogFile();
+    if(settings->value("log_on").toBool() & !logOpen) openLogFile();
+    if(!settings->value("log_on").toBool() & logOpen) closeLogFile();
 
-    log_file << device << ";" << (float) QDateTime::currentDateTime().toMSecsSinceEpoch() / 1000 ;
+    logFile << device << ";" << (float) QDateTime::currentDateTime().toMSecsSinceEpoch() / 1000 ;
 
     if (device == "IR"){
         RangeArray ranges;
@@ -155,7 +155,7 @@ void QCasuTreeItem::messageReceived(const QList<QByteArray>& message){
                 widget_IR_children[k]->setData(1, Qt::DisplayRole, QVariant(value));
             }
             ((QTreeBuffer *)widget_IR_children[k])->addToBuffer(QTime::currentTime(), value);
-            if(settings->value("log_on").toBool()) log_file << ";" << value;
+            if(settings->value("log_on").toBool()) logFile << ";" << value;
         }
     }
 
@@ -168,7 +168,7 @@ void QCasuTreeItem::messageReceived(const QList<QByteArray>& message){
                 widget_temp_children[k]->setData(1, Qt::DisplayRole, QVariant(value));
             }
             ((QTreeBuffer *)widget_temp_children[k])->addToBuffer(QTime::currentTime(), value);
-            if(settings->value("log_on").toBool()) log_file << ";" << value;
+            if(settings->value("log_on").toBool()) logFile << ";" << value;
         }
     }
 /* duplicirano na pogresan widget
@@ -197,7 +197,7 @@ void QCasuTreeItem::messageReceived(const QList<QByteArray>& message){
        widget_setpoints_children[0]->setData(1, Qt::DisplayRole, value);
        if(command == "On")widget_setpoints_children[0]->setTextColor(1, Qt::green);
        else widget_setpoints_children[0]->setTextColor(1, Qt::red);
-       if(settings->value("log_on").toBool()) log_file << ";" << value;
+       if(settings->value("log_on").toBool()) logFile << ";" << value;
     }
 
    if (device == "Airflow"){
@@ -213,7 +213,7 @@ void QCasuTreeItem::messageReceived(const QList<QByteArray>& message){
            widget_setpoints_children[1]->setTextColor(1, Qt::red);
            airflowON = false;
        }
-       if(settings->value("log_on").toBool()) log_file << ";" << value;
+       if(settings->value("log_on").toBool()) logFile << ";" << value;
     }
 
    if (device == "Speaker"){
@@ -233,7 +233,7 @@ void QCasuTreeItem::messageReceived(const QList<QByteArray>& message){
            widget_setpoints_vibr_children[1]->setTextColor(1, Qt::red);
            vibrON = false;
        }
-       if(settings->value("log_on").toBool()) log_file << ";" << value1 << ";" << value2;
+       if(settings->value("log_on").toBool()) logFile << ";" << value1 << ";" << value2;
     }
 
     if (device == "DiagnosticLed")
@@ -259,25 +259,25 @@ void QCasuTreeItem::messageReceived(const QList<QByteArray>& message){
                 widget_LED->setTextColor(1, Qt::black);
             }
         }
-        if(settings->value("log_on").toBool()) log_file << ";" << color.name().toStdString();
+        if(settings->value("log_on").toBool()) logFile << ";" << color.name().toStdString();
     }
 
-    log_file << endl;
+    logFile << endl;
 }
 
 void QCasuTreeItem::connectionTimeout(){
     connected = false;
-    connection_timer->stop();
+    connectionTimer->stop();
 }
 
 void QCasuTreeItem::openLogFile(){
-    log_name = settings->value("logSubFolder").toString() + QDateTime::currentDateTime().toString(date_time_format) + casuName + ".log";
-    log_file.open(log_name.toStdString().c_str(), ofstream::out | ofstream::app);
-    log_open = true;
+    logName = settings->value("logSubFolder").toString() + QDateTime::currentDateTime().toString(date_time_format) + casuName + ".log";
+    logFile.open(logName.toStdString().c_str(), ofstream::out | ofstream::app);
+    logOpen = true;
 }
 
 void QCasuTreeItem::closeLogFile(){
-    log_file.close();
-    log_open = false;
+    logFile.close();
+    logOpen = false;
 }
 

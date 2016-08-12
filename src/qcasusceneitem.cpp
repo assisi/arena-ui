@@ -137,11 +137,6 @@ void QCasuSceneItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *op
     if(FPSrepaint) FPScheck->start();
 }
 
-void QCasuSceneItem::updateScene(){
-    this->scene()->update();
-}
-
-
 
 QIRTriangle::QIRTriangle(QPointF center, double angle, double value)
 {
@@ -179,8 +174,8 @@ QPetal::QPetal(QPointF center, double angle){
                   center);
 }
 
-QVibratingCircle::QVibratingCircle(QPointF center, int waves, double w){
-    double angle = w * PI/180;
+QVibratingCircle::QVibratingCircle(QPointF center, int waves, double angle){
+    angle = angle * PI/180;
     this->moveTo(center + QPointF(14+sin(angle),0));
     for(int k=1; k <= 360; k++){
         double coordAngle = k*PI/180;
