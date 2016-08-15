@@ -21,7 +21,7 @@
 #include "qcolorbar.h"
 #include "qtrendplot.h"
 #include "qdeploy.h"
-//#include "qgstreamerview.h"
+#include "qgstreamerview.h"
 
 
 
@@ -99,7 +99,7 @@ private:
     /*!
      * \brief Custom widget for video streaming
      */
-    //QGstreamerView* videoStream;
+    QGstreamerView* videoStream;
 
     /*!
      * \brief Timer responsible for 30FPS graphics scene refresh rate
