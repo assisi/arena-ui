@@ -26,5 +26,6 @@ Makefile
 
 # Build, and test folders
 test*
-userdoc/build
+doc/user/build
+doc/devel
 build*
