@@ -18,6 +18,11 @@
 
 #include "dev_msgs.pb.h"
 
+/*!
+ * \brief Setpoint configuration dialog window
+ *
+ * Appearance depends on selected actuator from arenaScene context menu
+ */
 class QDialogSetpoint : public QDialog
 {
     Q_OBJECT

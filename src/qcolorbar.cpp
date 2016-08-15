@@ -39,7 +39,7 @@ void QColorbar::paint(QPainter *painter, const QStyleOptionGraphicsItem *option,
     painter->drawLine(190,780,190,785);
 
     painter->drawStaticText(10,783, QStaticText("20 °C"));
-    painter->drawStaticText(100,783, QStaticText("30 °C"));
-    painter->drawStaticText(190,783, QStaticText("40 °C"));
+    painter->drawStaticText(100,783, QStaticText("35 °C"));
+    painter->drawStaticText(190,783, QStaticText("50 °C"));
 
 }

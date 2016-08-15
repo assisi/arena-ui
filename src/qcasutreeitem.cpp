@@ -12,11 +12,11 @@ QCasuTreeItem::QCasuTreeItem(QObject* parent, QString name) : QObject(parent), c
     //zadavanje djece IR grani:
     {
         widget_IR_children.append((QTreeWidgetItem*)new QTreeBuffer(QStringList("F"), name + ": IR - F"));
-        widget_IR_children.append((QTreeWidgetItem*)new QTreeBuffer(QStringList("FR"), name + ": IR - FR"));
-        widget_IR_children.append((QTreeWidgetItem*)new QTreeBuffer(QStringList("BR"), name + ": IR - BR"));
-        widget_IR_children.append((QTreeWidgetItem*)new QTreeBuffer(QStringList("B"), name + ": IR - B"));
-        widget_IR_children.append((QTreeWidgetItem*)new QTreeBuffer(QStringList("BL"), name + ": IR - BL"));
         widget_IR_children.append((QTreeWidgetItem*)new QTreeBuffer(QStringList("FL"), name + ": IR - FL"));
+        widget_IR_children.append((QTreeWidgetItem*)new QTreeBuffer(QStringList("BL"), name + ": IR - BL"));
+        widget_IR_children.append((QTreeWidgetItem*)new QTreeBuffer(QStringList("B"), name + ": IR - B"));
+        widget_IR_children.append((QTreeWidgetItem*)new QTreeBuffer(QStringList("BR"), name + ": IR - BR"));
+        widget_IR_children.append((QTreeWidgetItem*)new QTreeBuffer(QStringList("FR"), name + ": IR - FR"));
         widget_IR->addChildren(widget_IR_children);
     }
 
@@ -66,7 +66,7 @@ QCasuTreeItem::QCasuTreeItem(QObject* parent, QString name) : QObject(parent), c
     this->setFlags(Qt::ItemIsEnabled);
 
     led_on = false;
-    connection_timer = new QTimer(this);
+    connectionTimer = new QTimer(this);
 
     context_ = createDefaultContext(this);
     context_->start();
@@ -75,7 +75,7 @@ QCasuTreeItem::QCasuTreeItem(QObject* parent, QString name) : QObject(parent), c
 
     connect(sub_sock_, SIGNAL(messageReceived(const QList<QByteArray>&)), SLOT(messageReceived(const QList<QByteArray>&)));
 
-    connect(connection_timer, SIGNAL(timeout()),SLOT(connectionTimeout()));
+    connect(connectionTimer, SIGNAL(timeout()),SLOT(connectionTimeout()));
 
     connect(this->QObject::parent(), SIGNAL(itemSelectionChanged()), SLOT(updateSelection()));
 }
@@ -87,12 +87,11 @@ void QCasuTreeItem::resetSelection(){
 }
 
 void QCasuTreeItem::updateSelection(){
-    bool scTemp = child_selected;
+
     child_selected = false;
     for(int k=0;k<this->childCount() - 1;k++) // LAST CHILD ARE SETPOINTS, NO NEED TO CHECK SELECTION
         for(int i=0;i<this->child(k)->childCount();i++) if(this->child(k)->child(i)->isSelected()) child_selected = true;
 
-    if(scTemp != child_selected) emit updateScene();
 }
 
 void QCasuTreeItem::setAddr(QString sub, QString pub, QString msg){
@@ -118,7 +117,7 @@ void QCasuTreeItem::connect_()
         sub_sock_->subscribeTo("casu");
         sub_sock_->connectTo(sub_addr);
         connected = true;
-        connection_timer->start(1000);
+        connectionTimer->start(1000);
     }
     catch(zmq::error_t e){
         connected = false;
@@ -135,23 +134,18 @@ void QCasuTreeItem::messageReceived(const QList<QByteArray>& message){
     string command(message.at(2).constData(), message.at(2).length());
     string data(message.at(3).constData(), message.at(3).length());
 
-    bool emit_update = false;
+    if(!connected) connected = true;
 
-    if(!connected){
-        connected = true;
-        emit_update = true;
-    }
-    connection_timer->start(2000);
+    connectionTimer->start(2000);
 
-    if(settings->value("log_on").toBool() & !log_open) openLogFile();
-    if(!settings->value("log_on").toBool() & log_open) closeLogFile();
+    if(settings->value("log_on").toBool() & !logOpen) openLogFile();
+    if(!settings->value("log_on").toBool() & logOpen) closeLogFile();
 
-    log_file << device << ";" << (float) QDateTime::currentDateTime().toMSecsSinceEpoch() / 1000 ;
+    logFile << device << ";" << (float) QDateTime::currentDateTime().toMSecsSinceEpoch() / 1000 ;
 
     if (device == "IR"){
         RangeArray ranges;
         ranges.ParseFromString(data);
-        bool changes = false;
         //for (int k = 0; k < ranges.range_size()-1; k++){
         for (int k = 0; k < ranges.raw_value_size()-1; k++)
         {
@@ -159,42 +153,43 @@ void QCasuTreeItem::messageReceived(const QList<QByteArray>& message){
             double value = lexical_cast<double>(ranges.raw_value(k));
             if(value != widget_IR_children[k]->data(1,Qt::DisplayRole).toDouble()){
                 widget_IR_children[k]->setData(1, Qt::DisplayRole, QVariant(value));
-                changes = true;
             }
             ((QTreeBuffer *)widget_IR_children[k])->addToBuffer(QTime::currentTime(), value);
-            if(settings->value("log_on").toBool()) log_file << ";" << value;
+            if(settings->value("log_on").toBool()) logFile << ";" << value;
         }
-        if(settings->value("IR_on").toBool() && changes) emit_update = true;
     }
 
     if (device == "Temp"){
         TemperatureArray temperatures;
         temperatures.ParseFromString(data);
-        bool changes = false;
         for (int k = 0; k < temperatures.temp_size()-1; k++){
             double value = lexical_cast <double>(temperatures.temp(k));
             if(value != widget_temp_children[k]->data(1,Qt::DisplayRole).toDouble()){
                 widget_temp_children[k]->setData(1, Qt::DisplayRole, QVariant(value));
-                changes = true;
             }
             ((QTreeBuffer *)widget_temp_children[k])->addToBuffer(QTime::currentTime(), value);
-            if(settings->value("log_on").toBool()) log_file << ";" << value;
+            if(settings->value("log_on").toBool()) logFile << ";" << value;
         }
-        if(settings->value("temp_on").toBool() && changes) emit_update = true;
     }
-/* TREBA JOS DOKUCITI GDJE KO KOGA
-    if (device == "Acc"){
-        VibrationReading vibr;
+/* duplicirano na pogresan widget
+    if (device == "Speaker"){
+        VibrationSetpoint vibr;
         vibr.ParseFromString(data);
         double value1 = vibr.freq();
         double value2 = vibr.amplitude();
-        double value3 = vibr.amplitude_stdev();
         widget_vibr->child(0)->setData(1, Qt::DisplayRole, value1);
         widget_vibr->child(1)->setData(1, Qt::DisplayRole, value2);
-        widget_vibr->child(2)->setData(1, Qt::DisplayRole, value3);
+        if(command == "On"){
+            widget_vibr->setTextColor(1, Qt::green);
+            vibrON = true;
+        }
+        else {
+            widget_vibr->setTextColor(1, Qt::red);
+            vibrON = false;
+        }
         if(settings->value("log_on").toBool()) log_file << ";" << value1 << ";" << value2;
-    }*/
-
+    }
+*/
    if (device == "Peltier"){
        Temperature pelt;
        pelt.ParseFromString(data);
@@ -202,7 +197,7 @@ void QCasuTreeItem::messageReceived(const QList<QByteArray>& message){
        widget_setpoints_children[0]->setData(1, Qt::DisplayRole, value);
        if(command == "On")widget_setpoints_children[0]->setTextColor(1, Qt::green);
        else widget_setpoints_children[0]->setTextColor(1, Qt::red);
-       if(settings->value("log_on").toBool()) log_file << ";" << value;
+       if(settings->value("log_on").toBool()) logFile << ";" << value;
     }
 
    if (device == "Airflow"){
@@ -218,7 +213,7 @@ void QCasuTreeItem::messageReceived(const QList<QByteArray>& message){
            widget_setpoints_children[1]->setTextColor(1, Qt::red);
            airflowON = false;
        }
-       if(settings->value("log_on").toBool()) log_file << ";" << value;
+       if(settings->value("log_on").toBool()) logFile << ";" << value;
     }
 
    if (device == "Speaker"){
@@ -231,12 +226,14 @@ void QCasuTreeItem::messageReceived(const QList<QByteArray>& message){
        if(command == "On"){
            widget_setpoints_vibr_children[0]->setTextColor(1, Qt::green);
            widget_setpoints_vibr_children[1]->setTextColor(1, Qt::green);
+           vibrON = true;
        }
        else {
            widget_setpoints_vibr_children[0]->setTextColor(1, Qt::red);
            widget_setpoints_vibr_children[1]->setTextColor(1, Qt::red);
+           vibrON = false;
        }
-       if(settings->value("log_on").toBool()) log_file << ";" << value1 << ";" << value2;
+       if(settings->value("log_on").toBool()) logFile << ";" << value1 << ";" << value2;
     }
 
     if (device == "DiagnosticLed")
@@ -252,7 +249,6 @@ void QCasuTreeItem::messageReceived(const QList<QByteArray>& message){
             if(!led_on || led_color != color){
                 led_on = true;
                 led_color = color;
-                emit_update = true;
                 widget_LED->setTextColor(1, color);
             }
         }
@@ -260,32 +256,28 @@ void QCasuTreeItem::messageReceived(const QList<QByteArray>& message){
             widget_LED->setData(1 ,Qt::DisplayRole, "");
             if(led_on){
                 led_on = false;
-                emit_update = true;
                 widget_LED->setTextColor(1, Qt::black);
             }
         }
-        if(settings->value("log_on").toBool()) log_file << ";" << color.name().toStdString();
+        if(settings->value("log_on").toBool()) logFile << ";" << color.name().toStdString();
     }
 
-    log_file << endl;
-    if(emit_update) updateScene();
-
+    logFile << endl;
 }
 
 void QCasuTreeItem::connectionTimeout(){
     connected = false;
-    emit updateScene();
-    connection_timer->stop();
+    connectionTimer->stop();
 }
 
 void QCasuTreeItem::openLogFile(){
-    log_name = settings->value("logSubFolder").toString() + QDateTime::currentDateTime().toString(date_time_format) + casuName + ".log";
-    log_file.open(log_name.toStdString().c_str(), ofstream::out | ofstream::app);
-    log_open = true;
+    logName = settings->value("logSubFolder").toString() + QDateTime::currentDateTime().toString(date_time_format) + casuName + ".log";
+    logFile.open(logName.toStdString().c_str(), ofstream::out | ofstream::app);
+    logOpen = true;
 }
 
 void QCasuTreeItem::closeLogFile(){
-    log_file.close();
-    log_open = false;
+    logFile.close();
+    logOpen = false;
 }
 

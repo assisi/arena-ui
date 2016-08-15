@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1250</width>
+    <width>1252</width>
     <height>850</height>
    </rect>
   </property>
@@ -46,9 +46,9 @@
        <enum>QTabWidget::North</enum>
       </property>
       <property name="currentIndex">
-       <number>2</number>
+       <number>1</number>
       </property>
-      <widget class="QWidget" name="tab_casus">
+      <widget class="QWidget" name="tabCasus">
        <property name="enabled">
         <bool>true</bool>
        </property>
@@ -99,12 +99,12 @@
         </item>
        </layout>
       </widget>
-      <widget class="QWidget" name="tab_trend">
+      <widget class="QWidget" name="tabTrend">
        <attribute name="title">
         <string>Trend graphs</string>
        </attribute>
       </widget>
-      <widget class="QWidget" name="tab_deploy">
+      <widget class="QWidget" name="tabDeploy">
        <attribute name="title">
         <string>Deployment</string>
        </attribute>
@@ -135,12 +135,13 @@
    <attribute name="toolBarBreak">
     <bool>false</bool>
    </attribute>
-   <addaction name="actionOpen_Arena"/>
+   <addaction name="actionOpenArena"/>
    <addaction name="actionSave"/>
    <addaction name="actionGroup"/>
    <addaction name="actionUngroup"/>
    <addaction name="actionConnect"/>
    <addaction name="actionToggleLog"/>
+   <addaction name="actionCamera"/>
    <addaction name="actionSettings"/>
   </widget>
   <action name="actionGroup">
@@ -173,7 +174,7 @@
     <string>Ctrl+U</string>
    </property>
   </action>
-  <action name="actionOpen_Arena">
+  <action name="actionOpenArena">
    <property name="icon">
     <iconset resource="images.qrc">
      <normaloff>:/images/icons/open.png</normaloff>:/images/icons/open.png</iconset>
@@ -277,10 +278,27 @@
     <string>Ctrl+S</string>
    </property>
   </action>
+  <action name="actionCamera">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="icon">
+    <iconset resource="images.qrc">
+     <normaloff>:/images/icons/camera.png</normaloff>:/images/icons/camera.png</iconset>
+   </property>
+   <property name="text">
+    <string>Camera</string>
+   </property>
+   <property name="toolTip">
+    <string>Toggle video stream (Ctrol + V)</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+V</string>
+   </property>
+  </action>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
  <tabstops>
-  <tabstop>tabWidget</tabstop>
   <tabstop>arenaSpace</tabstop>
  </tabstops>
  <resources>

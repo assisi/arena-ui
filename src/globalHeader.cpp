@@ -22,6 +22,7 @@ void loadConfig(){
         settings->setValue("IR_on", true);
         settings->setValue("temp_on", true);
         settings->setValue("air_on", true);
+        settings->setValue("vibr_on",true);
         settings->setValue("forceLog", true);
         settings->setValue("forceScene", true);
 
@@ -41,5 +42,6 @@ void loadConfig(){
         settings->setValue("IR_on", true);
         settings->setValue("temp_on", true);
         settings->setValue("air_on", true);
+        settings->setValue("vibr_on",true);
     }
 }

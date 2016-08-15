@@ -149,7 +149,7 @@ void QTrendPlot::selectionChanged(){
       }
 }
 
-void QTrendPlot::showContextMenu(QPoint pos){
+void QTrendPlot::showContextMenu(QPoint position){
     QMenu *menu = new QMenu(this);
     QAction* temp;
 
@@ -171,7 +171,7 @@ void QTrendPlot::showContextMenu(QPoint pos){
 
 
 
-    menu->popup(this->mapToGlobal(pos));
+    menu->popup(this->mapToGlobal(position));
 }
 
 void QTrendPlot::toggleLegend(){

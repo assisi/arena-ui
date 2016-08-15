@@ -10,5 +10,6 @@
         <file>images/icons/log_on.png</file>
         <file>images/icons/settings.png</file>
         <file>images/icons/save.png</file>
+        <file>images/icons/camera.png</file>
     </qresource>
 </RCC>

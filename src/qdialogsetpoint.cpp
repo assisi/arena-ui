@@ -20,9 +20,9 @@ QDialogSetpoint::QDialogSetpoint(QString command) : command_(command)
 
     if(command == "Temperature"){
         tempLayout->addWidget(new QLabel("Temperature setpoint:"),1,0);
-        tempLayout->addWidget(new QLabel("Allowed temperature range: [20,42]°C"),2,0);
+        tempLayout->addWidget(new QLabel("Allowed temperature range: [26,45]°C"),2,0);
         value1 = new QLineEdit;
-        value1->setValidator(new QDoubleValidator(20.0,42.0,2));
+        value1->setValidator(new QDoubleValidator(26.0,45.0,2));
         tempLayout->addWidget(value1,1,1);
         tempLayout->addWidget(buttons,3,0);
     }
