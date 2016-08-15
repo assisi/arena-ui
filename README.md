@@ -1,10 +1,9 @@
-assisi-arena-ui
-===============
+# assisi-arena-ui #
 
 Bee arena user interface for the ASSISI|bf project.
 
-Instructions for users
-----------------------
+## Instructions for users ##
+
 
 Add the ASSISI ppa, update and install:
 
@@ -14,28 +13,28 @@ sudo apt-get update
 sudo apt-get install assisi-arena-ui
 ```
 
-Developer instructions
-----------------------
+## Developer instructions ##
 
 Instructions for developers.
 
-Prerequisites
-~~~~~~~~~~~~~
+### Prerequisites ###
 
+
+```
 qt5-dev
+```
 
-Building the code
-~~~~~~~~~~~~~~~~~
+### Building the code ###
 
-From Qt Creator 
+From Qt Creator ...
 
-Debian packaging
-----------------
+## Debian packaging ##
+
 
 Instructions for making a Debian package have been taken from here: https://bhavyanshu.me/how-to-make-debian-packages-for-qt-c-based-applications/11/10/2014
 
-Environment setup
-~~~~~~~~~~~~~~~~~
+### Environment setup ###
+
 
 Install the necessary tools:
 
@@ -67,8 +66,8 @@ sudo pbuilder --create
 
 After making any changes to `.pbuilderrc` you might need to `sudo pbuilder update --override-config`
 
-Building the package
-~~~~~~~~~~~~~~~~~~~~
+### Building the package ###
+
 
 Switch to the folder where you have cloned the git repo, and export the source. All changes need to be committed! Pay special attention to `-` and `_` signs, they are different in different commands. This is a bit convoluted but supposedly necessary. (TODO: try using git-buildpackage, it should be simpler).
 
@@ -92,8 +91,7 @@ Sign the source package:
 debsign ../assisi-arna-ui_x.y.z.-?ubuntu?_source.changes
 ```
 
-Uploading to the PPA
-~~~~~~~~~~~~~~~~~~~~
+### Uploading to the PPA ###
 
 Official Launchpad instructions are here: https://developer.ubuntu.com/en/publish/other-forms-of-submitting-apps/ppa/
 
