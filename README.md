@@ -15,13 +15,17 @@ sudo apt-get install assisi-arena-ui
 
 ## Developer instructions ##
 
-Instructions for developers.
+The current officially supported development platform is Ubuntu 14.04 Trusty Thar. 
 
 ### Prerequisites ###
 
 
 ```
 qt5-dev
+libzmq-dev
+libzmqpp-dev
+libyaml-cpp-dev
+libprotobuf-dev
 ```
 
 ### Building the code ###
