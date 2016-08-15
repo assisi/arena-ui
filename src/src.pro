@@ -19,7 +19,6 @@ UI_DIR = ../build/ui
 OBJECTS_DIR = ../build/o
 
 INCLUDEPATH += msg \
-            /usr/local/include/Qt5Gstreamer
 
 SOURCES += main.cpp\
         arenaui.cpp\
