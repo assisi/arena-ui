@@ -21,6 +21,8 @@ ArenaUI::ArenaUI(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::ArenaUI)
 {
+    QLocale::setDefault(QLocale::C); //override for localization to use C locale
+
     loadConfig();
     ui->setupUi(this);
     ui->actionToggleLog->setChecked(settings->value("log_on").toBool());

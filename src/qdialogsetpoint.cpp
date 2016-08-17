@@ -7,6 +7,11 @@ QDialogSetpoint::QDialogSetpoint(QString command) : command_(command)
     QGroupBox* on_off = new QGroupBox("Select device state");
     QGridLayout *tempLayout = new QGridLayout;
 
+    QDoubleValidator* validator1 = new QDoubleValidator;
+    validator1->setNotation(QDoubleValidator::StandardNotation);
+    QDoubleValidator* validator2 = new QDoubleValidator;
+    validator2->setNotation(QDoubleValidator::StandardNotation);
+
     radioON = new QRadioButton("ON");
     radioON->setChecked(true);
     tempLayout->addWidget(radioON,0,0);
@@ -22,7 +27,8 @@ QDialogSetpoint::QDialogSetpoint(QString command) : command_(command)
         tempLayout->addWidget(new QLabel("Temperature setpoint:"),1,0);
         tempLayout->addWidget(new QLabel("Allowed temperature range: [26,45]°C"),2,0);
         value1 = new QLineEdit;
-        value1->setValidator(new QDoubleValidator(26.0,45.0,2));
+        validator1->setRange(26.0,45.0,2);
+        value1->setValidator(validator1);
         tempLayout->addWidget(value1,1,1);
         tempLayout->addWidget(buttons,3,0);
     }
@@ -34,8 +40,10 @@ QDialogSetpoint::QDialogSetpoint(QString command) : command_(command)
         tempLayout->addWidget(new QLabel("Allowed amplitude range: [0,50]\%"),4,0);
         value1 = new QLineEdit;
         value2 = new QLineEdit;
-        value1->setValidator(new QDoubleValidator(50.0,1500.0,2));
-        value2->setValidator(new QDoubleValidator(0.0,50.0,2));
+        validator1->setRange(50.0,1500.0,2);
+        value1->setValidator(validator1);
+        validator2->setRange(0.0,50.0,2);
+        value2->setValidator(validator2);
         tempLayout->addWidget(value1,1,1);
         tempLayout->addWidget(value2,3,1);
         tempLayout->addWidget(buttons,5,0);
@@ -63,7 +71,8 @@ QDialogSetpoint::QDialogSetpoint(QString command) : command_(command)
         tempLayout->addWidget(new QLabel("Intensity setpoint:"),1,0);
         tempLayout->addWidget(new QLabel("Allowed intensity range: 1 (value is discarded)"),2,0);
         value1 = new QLineEdit;
-        value1->setValidator(new QDoubleValidator(1.0,1.0,2));
+        validator1->setRange(1.0,1.0,2);
+        value1->setValidator(validator1);
         tempLayout->addWidget(value1,1,1);
         tempLayout->addWidget(buttons,3,0);
     }
@@ -87,6 +96,16 @@ QDialogSetpoint::QDialogSetpoint(QString command) : command_(command)
 void QDialogSetpoint::prepareMessage()
 {
     using namespace AssisiMsg;
+
+    if (!value1->hasAcceptableInput()){
+        reject();
+        return;
+    }
+    if(value2)
+        if (!value2->hasAcceptableInput()){
+                reject();
+                return;
+            }
 
     if(command_ == "Temperature"){
         Temperature temp;
