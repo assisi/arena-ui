@@ -70,9 +70,10 @@ QDialogSetpoint::QDialogSetpoint(QString command) : command_(command)
     if(command == "Airflow"){
         tempLayout->addWidget(new QLabel("Intensity setpoint:"),1,0);
         tempLayout->addWidget(new QLabel("Allowed intensity range: 1 (value is discarded)"),2,0);
-        value1 = new QLineEdit;
+        value1 = new QLineEdit("1.0");
         validator1->setRange(1.0,1.0,2);
         value1->setValidator(validator1);
+        value1->setDisabled(true); // DISABLED FOR FUTURE UPDATES; CURENTLY THERE IS ONLY ONE INTESITY (1)
         tempLayout->addWidget(value1,1,1);
         tempLayout->addWidget(buttons,3,0);
     }
@@ -101,11 +102,8 @@ void QDialogSetpoint::prepareMessage()
         reject();
         return;
     }
-    if(value2)
-        if (!value2->hasAcceptableInput()){
-                reject();
-                return;
-            }
+
+    // value2 is checked only in place where it used
 
     if(command_ == "Temperature"){
         Temperature temp;
@@ -120,6 +118,10 @@ void QDialogSetpoint::prepareMessage()
         message.push_back(QByteArray((char*)buffer, size));
     }
     if(command_ == "Vibration"){
+        if (!value2->hasAcceptableInput()){
+                reject();
+                return;
+            }
         VibrationSetpoint vibr;
         vibr.set_freq(value1->text().toDouble());
         vibr.set_amplitude(value2->text().toDouble());

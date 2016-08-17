@@ -121,7 +121,7 @@ void QCasuSceneItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *op
         brush.setColor(QColor(250, 218, 94, 96));
         painter->setPen(pen);
         painter->setBrush(brush);
-        airflowAngle = fmod(airflowAngle + value * 12 * FPSrepaint, 360); // 30 FPS, max_speed = 12 deg/frame -> w = 1 rpm
+        airflowAngle = fmod(airflowAngle + value * 6 * FPSrepaint, 360); // 30 FPS, max_speed = 6 deg/frame -> w = 0.5 rpm __ CURRENTLY THERE IS ONLY ONE INTENSITY, WHEN INTESITY RANGE WILL BE ENABLED, MAX_SPEED SHOULD BE 12
         painter->drawPath(QPetal(QPointF(x_center,y_center),airflowAngle));       // petal 1
         painter->drawPath(QPetal(QPointF(x_center,y_center),airflowAngle + 120)); // petal 2
         painter->drawPath(QPetal(QPointF(x_center,y_center),airflowAngle - 120)); // petal 3
