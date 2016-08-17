@@ -170,11 +170,11 @@ QIRTriangle::QIRTriangle(QPointF center, double angle, double value)
 
 QTempArc::QTempArc(QPointF center, double angle)
 {
-    double offset = settings->value("IR_on").toBool()? 42 : 30; // offset from center of CASU
+    double offset = 17.5; // offset from center of CASU
 
     span = 50 * 16; //Qt angles are in increments of 1°/16
     start = (angle - 25) * 16;
-    rect = QRectF(center.x()-offset/2, center.y()-offset/2, offset, offset);
+    rect = QRectF(center.x()-offset, center.y()-offset, offset*2, offset*2);
 }
 
 QPetal::QPetal(QPointF center, double angle){
