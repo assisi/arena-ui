@@ -595,7 +595,7 @@ void ArenaUI::moveDeployScroll(int min, int max)
 
 void ArenaUI::sendSetpoint(QString actuator)
 {
-    QDialogSetpoint* dialog = new QDialogSetpoint(actuator);
+    QDialogSetpoint* dialog = new QDialogSetpoint(actuator,arenaScene->selectedItems());
     if(dialog->exec())
         groupSendSetpoint(arenaScene->selectedItems(),dialog->message);
 }

@@ -2,6 +2,7 @@
 #define QDIALOGSETPOINT_H
 
 #include <QDialogButtonBox>
+#include <QGraphicsItem>
 #include <QDialog>
 #include <QString>
 #include <QRadioButton>
@@ -16,6 +17,8 @@
 
 #include <iostream>
 
+#include "qcasusceneitem.h"
+#include "qcasutreeitem.h"
 #include "dev_msgs.pb.h"
 
 /*!
@@ -35,7 +38,7 @@ private:
 public:
     QList<QByteArray> message;
 
-    QDialogSetpoint(QString command);
+    QDialogSetpoint(QString command, QList<QGraphicsItem *> group);
 
 private slots:
     void prepareMessage();
