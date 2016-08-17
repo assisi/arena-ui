@@ -37,7 +37,12 @@ ArenaUI::ArenaUI(QWidget *parent) :
     ui->casuTree->addAction(ui->actionPlot_selected_in_different_trends);
     ui->casuTree->header()->setSortIndicator(0,Qt::AscendingOrder);
 
+    ui->groupTree->addAction(ui->actionPlot_selected_in_same_trend);
+    ui->groupTree->addAction(ui->actionPlot_selected_in_different_trends);
+
     connect(ui->casuTree,SIGNAL(itemSelectionChanged()),this,SLOT(updateTreeSelection()));
+    connect(ui->groupTree,SIGNAL(itemSelectionChanged()),this,SLOT(updateTreeSelection()));
+
 
     //TREND TAB SCROLLABLE LAYOUT
 
@@ -255,12 +260,30 @@ bool MouseClickHandler::eventFilter(QObject* obj, QEvent* event)
 //-------------------------------------------------------------------------------
 // Subclassed QGraphicsScene for a BUG [QTBUG-10138]
 // http://www.qtcentre.org/threads/36953-QGraphicsItem-deselected-on-contextMenuEvent
-QArenaScene::QArenaScene(QWidget *parent) : QGraphicsScene(parent){}
+QArenaScene::QArenaScene(QWidget *parent) : QGraphicsScene(parent){
+    connect(this,SIGNAL(selectionChanged()),SLOT(checkSelection()));
+}
 
 void QArenaScene::mousePressEvent(QGraphicsSceneMouseEvent *event)
 {
     if (event->button() == Qt::RightButton) event->accept();
     else QGraphicsScene::mousePressEvent(event);
+}
+
+void QArenaScene::checkSelection()
+{
+    QList<QGraphicsItem*> tempList = this->selectedItems();
+    if(tempList.size()>1) selectionTreeWidget->setHidden(false);
+    else selectionTreeWidget->setHidden(true);
+
+    int color = 13;
+
+    foreach(QGraphicsItem* item, tempList){
+        if(item->childItems().size()){
+            ((QCasuSceneGroup*)item)->groupColor = (Qt::GlobalColor) color;
+            ((QCasuSceneGroup*)item)->treeItem->setTextColor(0,(Qt::GlobalColor) color++);
+        }
+    }
 }
 // -------------------------------------------------------------------------------
 
@@ -279,6 +302,10 @@ void ArenaUI::on_actionOpenArena_triggered()
 
     arenaScene->clear();
     ui->casuTree->clear();
+    ui->groupTree->clear();
+    arenaScene->selectionTreeWidget = new QCasuTreeItem(ui->groupTree,"Selected CASUs");
+    ui->groupTree->addTopLevelItem(arenaScene->selectionTreeWidget);
+    arenaScene->selectionTreeWidget->setHidden(true);
 
 
 
@@ -413,12 +440,18 @@ void ArenaUI::on_actionGroup_triggered()
 {
     QList<QGraphicsItem *> temp_itemList= arenaScene->selectedItems();
     arenaScene->clearSelection();
-    QCasuSceneGroup* tempGroup = new QCasuSceneGroup;
+
+    QCasuTreeItem* tempTreeWidget = new QCasuTreeItem(ui->groupTree, QString("CASU group"));
+    QCasuSceneGroup* tempGroup = new QCasuSceneGroup(0, tempTreeWidget);
+
     foreach(QGraphicsItem* item, temp_itemList){
         tempGroup->addToGroup(item);
         if(item->childItems().size())((QCasuSceneGroup*)item)->isTopLevel=false;
     }
+
+    ui->groupTree->addTopLevelItem(tempTreeWidget);
     arenaScene->addItem(tempGroup);
+
     tempGroup->setFlag(QGraphicsItem::ItemIsSelectable, true);
     tempGroup->setSelected(1);
     this->sortGraphicsScene();
@@ -439,7 +472,10 @@ void ArenaUI::on_actionUngroup_triggered()
                 if(tempChildList[i]->childItems().size())((QCasuSceneGroup*)tempChildList[i])->isTopLevel=true;
                 tempIsGroup = true;
             }
-            if(tempIsGroup)delete item;
+            if(tempIsGroup){
+                delete ((QCasuSceneGroup*)item)->treeItem;
+                delete item;
+            }
         }
     this->sortGraphicsScene();
 }
@@ -525,7 +561,7 @@ void ArenaUI::toggleVibr()
 
 void ArenaUI::updateTreeSelection()
 {
-    if(ui->casuTree->selectedItems().size()){
+    if(ui->casuTree->selectedItems().size() || ui->groupTree->selectedItems().size()){
         ui->actionPlot_selected_in_same_trend->setEnabled(true);
         ui->actionPlot_selected_in_different_trends->setEnabled(true);
     }

@@ -39,8 +39,11 @@ class QArenaScene : public QGraphicsScene
 {
     Q_OBJECT
 public:
+    QCasuTreeItem *selectionTreeWidget;
     QArenaScene(QWidget *parent);
     void mousePressEvent(QGraphicsSceneMouseEvent *event);
+private slots:
+    void checkSelection();
 };
 
 /*!

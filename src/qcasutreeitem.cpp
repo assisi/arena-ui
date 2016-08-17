@@ -3,11 +3,12 @@
 QCasuTreeItem::QCasuTreeItem(QObject* parent, QString name) : QObject(parent), casuName(name), child_selected(false)
 {
     this->setData(0,Qt::DisplayRole,QStringList(casuName));
+    widget_setpoints = new QTreeWidgetItem(QStringList("Current setpoints"));
     widget_IR = new QTreeWidgetItem(QStringList("IR - Proximity"));
     widget_LED= new QTreeWidgetItem(QStringList("LED"));
     widget_temp = new QTreeWidgetItem(QStringList("Temperature"));
     widget_vibr = new QTreeWidgetItem(QStringList("Vibration"));
-    widget_setpoints = new QTreeWidgetItem(QStringList("Current setpoints"));
+
 
     //zadavanje djece IR grani:
     {
@@ -53,11 +54,13 @@ QCasuTreeItem::QCasuTreeItem(QObject* parent, QString name) : QObject(parent), c
     }
 
     QList<QTreeWidgetItem *> temp;{
+        if(QString::compare(casuName,QString("Selected CASUs")) && QString::compare(casuName,QString("CASU group"))){ // don't show this widgets for CASU groups
+            temp.push_back(widget_setpoints);
+            temp.push_back(widget_LED);
+        }
         temp.push_back(widget_IR);
-        temp.push_back(widget_LED);
         temp.push_back(widget_temp);
         temp.push_back(widget_vibr);
-        temp.push_back(widget_setpoints);
     }
 
     this->addChildren(temp);
@@ -65,7 +68,7 @@ QCasuTreeItem::QCasuTreeItem(QObject* parent, QString name) : QObject(parent), c
     for(int k = 0; k < widget_setpoints->childCount(); k++)widget_setpoints->child(k)->setFlags(Qt::ItemIsEnabled);
     this->setFlags(Qt::ItemIsEnabled);
 
-    led_on = false;
+    ledON = false;
     connectionTimer = new QTimer(this);
 
     context_ = createDefaultContext(this);
@@ -87,11 +90,9 @@ void QCasuTreeItem::resetSelection(){
 }
 
 void QCasuTreeItem::updateSelection(){
-
     child_selected = false;
     for(int k=0;k<this->childCount() - 1;k++) // LAST CHILD ARE SETPOINTS, NO NEED TO CHECK SELECTION
         for(int i=0;i<this->child(k)->childCount();i++) if(this->child(k)->child(i)->isSelected()) child_selected = true;
-
 }
 
 void QCasuTreeItem::setAddr(QString sub, QString pub, QString msg){
@@ -246,16 +247,16 @@ void QCasuTreeItem::messageReceived(const QList<QByteArray>& message){
 
         if(command == "On"){
             widget_LED->setData(1 ,Qt::DisplayRole, color.name());
-            if(!led_on || led_color != color){
-                led_on = true;
-                led_color = color;
+            if(!ledON || ledColor != color){
+                ledON = true;
+                ledColor = color;
                 widget_LED->setTextColor(1, color);
             }
         }
         else{
             widget_LED->setData(1 ,Qt::DisplayRole, "");
-            if(led_on){
-                led_on = false;
+            if(ledON){
+                ledON = false;
                 widget_LED->setTextColor(1, Qt::black);
             }
         }

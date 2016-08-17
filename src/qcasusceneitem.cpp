@@ -101,7 +101,7 @@ void QCasuSceneItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *op
         treeItem->resetSelection();
     }
 
-    if(treeItem->led_on)brush.setColor(treeItem->led_color);
+    if(treeItem->ledON)brush.setColor(treeItem->ledColor);
     else brush.setColor(Qt::gray);
     if(treeItem->child_selected)brush.setStyle(Qt::Dense3Pattern);
 
