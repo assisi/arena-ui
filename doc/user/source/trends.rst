@@ -39,10 +39,15 @@ Monitoring and manipulating data trends
 ---------------------------------------
 
 Once you have created some trends, you can view an manipulate them
-from the **Trend graphs Configuration tab**. *Zooming in/out* along
-both axes is done using the scroll wheel of the mouse. Holding down
-the *Ctrl* button while scrolling zooms along the y-axis and holding down the
-*Shift* button while scrolling zooms along the x-axis.
+from the **Trend graphs Configuration tab**. The following *mouse
+controls* are available for manipulating the trend graphs
+
+* **Click + mouse drag** - reposition graph and stop realtime graph
+  adjusting (so you can study an area of interest)
+* **Ctrl + mouse scroll** - y-axis zoom
+* **Shift + mouse scroll** - x-axis zoom
+* **mouse scroll** - x-axis & y-axis zoom
+* **double click** - resume realtime graph adjusting
 
 *Right-clicking* on one
 of the trends brings up a context menu with the following options:

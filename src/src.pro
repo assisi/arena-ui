@@ -19,7 +19,6 @@ UI_DIR = ../build/ui
 OBJECTS_DIR = ../build/o
 
 INCLUDEPATH += msg \
-            /usr/local/include/Qt5Gstreamer
 
 SOURCES += main.cpp\
         arenaui.cpp\
@@ -39,7 +38,7 @@ SOURCES += main.cpp\
         flowlayout.cpp \
         qdeploy.cpp \
         qcolorbar.cpp \
-        qgstreamerview.cpp
+#        qgstreamerview.cpp
 
 
 HEADERS  += arenaui.h\
@@ -56,7 +55,7 @@ HEADERS  += arenaui.h\
         flowlayout.h \
         qdeploy.h \
         qcolorbar.h \
-        qgstreamerview.h
+#        qgstreamerview.h
 
 
 FORMS    += arenaui.ui
@@ -66,8 +65,8 @@ LIBS += -lzmq\
         -lyaml-cpp
 
 
-CONFIG += link_pkgconfig
-PKGCONFIG += Qt5GStreamer-1.0 Qt5GStreamerUi-1.0
+#CONFIG += link_pkgconfig
+#PKGCONFIG += Qt5GStreamer-1.0 Qt5GStreamerUi-1.0
 
 RESOURCES += \
     images.qrc
