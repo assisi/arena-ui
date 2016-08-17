@@ -173,15 +173,10 @@ ArenaUI::~ArenaUI()
 
 void ArenaUI::sortGraphicsScene()
 {
-    QList<QGraphicsItem*> tempSelection = arenaScene->selectedItems(); // save active selection
-    QPainterPath pp;
-    pp.addRect(arenaScene->sceneRect()); // select all -- selectedItems() doesnt return group children which is a case with items()
-    arenaScene->setSelectionArea(pp);
-
-    for(int k = 0; k+1 < arenaScene->selectedItems().size(); k++)
-        for(int i = k+1; i < arenaScene->selectedItems().size(); i++){
-            QGraphicsItem* item1 = arenaScene->selectedItems()[k];
-            QGraphicsItem* item2 = arenaScene->selectedItems()[i];
+    for(int k = 0; k+1 < arenaScene->items().size(); k++)
+        for(int i = k+1; i < arenaScene->items().size(); i++){
+            QGraphicsItem* item1 = arenaScene->items()[k];
+            QGraphicsItem* item2 = arenaScene->items()[i];
             if(item1->boundingRect().intersects(item2->boundingRect())){
                 int z1 = item1->zValue();
                 int z2 = item2->zValue();
@@ -199,12 +194,6 @@ void ArenaUI::sortGraphicsScene()
                 //cout << area1 << " " << item1->zValue() << " - " << area2 << " " << item2->zValue() << endl;
             }
         }
-
-    pp = pp.subtracted(pp);
-    pp.addRect(0,0,0,0);
-    arenaScene->setSelectionArea(pp);
-    foreach(QGraphicsItem* item, tempSelection) item->setSelected(true); // after saving items and groups, return selection as was before
-
 }
 
 // -------------------------------------------------------------------------------
@@ -424,7 +413,12 @@ void ArenaUI::on_actionGroup_triggered()
 {
     QList<QGraphicsItem *> temp_itemList= arenaScene->selectedItems();
     arenaScene->clearSelection();
-    QGraphicsItemGroup *tempGroup = arenaScene->createItemGroup(temp_itemList);
+    QCasuSceneGroup* tempGroup = new QCasuSceneGroup;
+    foreach(QGraphicsItem* item, temp_itemList){
+        tempGroup->addToGroup(item);
+        if(item->childItems().size())((QCasuSceneGroup*)item)->isTopLevel=false;
+    }
+    arenaScene->addItem(tempGroup);
     tempGroup->setFlag(QGraphicsItem::ItemIsSelectable, true);
     tempGroup->setSelected(1);
     this->sortGraphicsScene();
@@ -436,13 +430,16 @@ void ArenaUI::on_actionUngroup_triggered()
     QList<QGraphicsItem *> temp_itemList= arenaScene->selectedItems();
     foreach(QGraphicsItem* item, temp_itemList)
         if(item->childItems().size()){
+            bool tempIsGroup = false;
             QList<QGraphicsItem *> tempChildList = item->childItems();
-            if(!item->childItems().size())item->setZValue(1);
-            arenaScene->destroyItemGroup((QGraphicsItemGroup*)item);
-            for(int i=0;i<tempChildList.size();i++){;
+            for(int i=0;i<tempChildList.size();i++){
+                ((QCasuSceneGroup*)item)->removeFromGroup(tempChildList[i]);
                 tempChildList[i]->setSelected(0);
                 tempChildList[i]->setSelected(1);
+                if(tempChildList[i]->childItems().size())((QCasuSceneGroup*)tempChildList[i])->isTopLevel=true;
+                tempIsGroup = true;
             }
+            if(tempIsGroup)delete item;
         }
     this->sortGraphicsScene();
 }
