@@ -1,0 +1,22 @@
+#ifndef BOUNDINGHULL_H
+#define BOUNDINGHULL_H
+
+#include<QList>
+#include<QPointF>
+#include<QLineF>
+
+class BoundingHull
+{
+private:
+    QList<QPointF> pointList;
+
+    int orientation(QPointF a, QPointF b, QPointF c);
+    
+public:
+    BoundingHull(QList<QPointF> list);
+    QList<QLineF> convexHull();
+    QList<QLineF> convexHull();
+    
+};
+
+#endif // BOUNDINGHULL_H
