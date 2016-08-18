@@ -39,8 +39,7 @@ SOURCES += main.cpp\
         qdeploy.cpp \
         qcolorbar.cpp \
 #        qgstreamerview.cpp
-    qcasuscenegroup.cpp \
-    boundinghull.cpp
+        qcasuscenegroup.cpp \
 
 
 HEADERS  += arenaui.h\
@@ -59,7 +58,8 @@ HEADERS  += arenaui.h\
         qcolorbar.h \
 #        qgstreamerview.h
     qcasuscenegroup.h \
-    boundinghull.h
+    boundinghull.h \
+    kruskal.h
 
 
 FORMS    += arenaui.ui

@@ -178,25 +178,24 @@ ArenaUI::~ArenaUI()
 
 void ArenaUI::sortGraphicsScene()
 {
+    for(int k = 0; k < arenaScene->items().size(); k++)arenaScene->items()[k]->setZValue(k+1);
+
     for(int k = 0; k+1 < arenaScene->items().size(); k++)
         for(int i = k+1; i < arenaScene->items().size(); i++){
             QGraphicsItem* item1 = arenaScene->items()[k];
             QGraphicsItem* item2 = arenaScene->items()[i];
-            if(item1->boundingRect().intersects(item2->boundingRect())){
+
+            QPainterPath path1 = item1->childItems().size()? ((QCasuSceneGroup*)item1)->completeShape() : item1->shape();
+            QPainterPath path2 = item2->childItems().size()? ((QCasuSceneGroup*)item2)->completeShape() : item2->shape();
+
+            if(path1.intersects(path2)){
                 int z1 = item1->zValue();
                 int z2 = item2->zValue();
                 if(z1 > z2) swap(z1,z2);
 
-                double area1 = item1->boundingRect().height() * item1->boundingRect().width();
-                double area2 = item2->boundingRect().height() * item2->boundingRect().width();
-
-                if(z1 == z2)
-                    (area1 > area2 ? item2 : item1)->setZValue(++z1);
-                else{
-                    (area1 > area2 ? item1 : item2)->setZValue(z1);
-                    (area1 > area2 ? item2 : item1)->setZValue(z2);
-                }
-                //cout << area1 << " " << item1->zValue() << " - " << area2 << " " << item2->zValue() << endl;
+                bool check = path1.intersects(item2->shape());
+                (check ? item1 : item2)->setZValue(z1);
+                (check ? item2 : item1)->setZValue(z2);
             }
         }
 }
@@ -279,8 +278,9 @@ void QArenaScene::checkSelection()
     int color = 13;
 
     foreach(QGraphicsItem* item, tempList){
+       // qDebug() << item->zValue();
         if(item->childItems().size()){
-            ((QCasuSceneGroup*)item)->groupColor = (Qt::GlobalColor) color;
+            ((QCasuSceneGroup*)item)->setGroupColor((Qt::GlobalColor) color);
             ((QCasuSceneGroup*)item)->treeItem->setTextColor(0,(Qt::GlobalColor) color++);
         }
     }
@@ -438,15 +438,18 @@ void ArenaUI::on_actionOpenArena_triggered()
 
 void ArenaUI::on_actionGroup_triggered()
 {
-    QList<QGraphicsItem *> temp_itemList= arenaScene->selectedItems();
+
+    QList<QGraphicsItem *> itemList= arenaScene->selectedItems();
+    if(itemList.size()<2) return;
     arenaScene->clearSelection();
 
     QCasuTreeItem* tempTreeWidget = new QCasuTreeItem(ui->groupTree, QString("CASU group"));
     QCasuSceneGroup* tempGroup = new QCasuSceneGroup(0, tempTreeWidget);
 
-    foreach(QGraphicsItem* item, temp_itemList){
+    foreach(QGraphicsItem* item, itemList){
         tempGroup->addToGroup(item);
         if(item->childItems().size())((QCasuSceneGroup*)item)->isTopLevel=false;
+        else ((QCasuSceneItem*)item)->inGroup=true;
     }
 
     ui->groupTree->addTopLevelItem(tempTreeWidget);
@@ -454,29 +457,27 @@ void ArenaUI::on_actionGroup_triggered()
 
     tempGroup->setFlag(QGraphicsItem::ItemIsSelectable, true);
     tempGroup->setSelected(1);
+
     this->sortGraphicsScene();
 }
 
 
 void ArenaUI::on_actionUngroup_triggered()
 {
-    QList<QGraphicsItem *> temp_itemList= arenaScene->selectedItems();
-    foreach(QGraphicsItem* item, temp_itemList)
+    QList<QGraphicsItem *> itemList= arenaScene->selectedItems();
+    foreach(QGraphicsItem* item, itemList)
         if(item->childItems().size()){
-            bool tempIsGroup = false;
-            QList<QGraphicsItem *> tempChildList = item->childItems();
-            for(int i=0;i<tempChildList.size();i++){
-                ((QCasuSceneGroup*)item)->removeFromGroup(tempChildList[i]);
-                tempChildList[i]->setSelected(0);
-                tempChildList[i]->setSelected(1);
-                if(tempChildList[i]->childItems().size())((QCasuSceneGroup*)tempChildList[i])->isTopLevel=true;
-                tempIsGroup = true;
+            QList<QGraphicsItem *> subItemList= item->childItems();
+            foreach(QGraphicsItem* subItem, subItemList){
+                ((QCasuSceneGroup*)item)->removeFromGroup(subItem);
+                subItem->setSelected(0);
+                subItem->setSelected(1);
+                if(subItem->childItems().size())((QCasuSceneGroup*)subItem)->isTopLevel=true;
+                else ((QCasuSceneItem*)subItem)->inGroup=false;
             }
-            if(tempIsGroup){
-                delete ((QCasuSceneGroup*)item)->treeItem;
-                delete item;
-            }
+            ((QCasuSceneGroup*)item)->~QCasuSceneGroup();
         }
+
     this->sortGraphicsScene();
 }
 

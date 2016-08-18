@@ -1,12 +1,14 @@
 #include "qcasusceneitem.h"
 
 QCasuSceneItem::QCasuSceneItem(QObject *parent, int x, int y, double yaw, QCasuTreeItem *widget) : QObject(parent),
-    x_center(x),
-    y_center(y),
-    yaw_((int)(yaw*180/PI)),
     //ANIMATION
     airflowAngle(0),
     vibrAngle(0),
+    //CASU PARAMETERS
+    x_center(x),
+    y_center(y),
+    yaw_((int)(yaw*180/PI)),
+    inGroup(false),
     //WIDGET
     treeItem(widget)
 {
@@ -87,7 +89,8 @@ void QCasuSceneItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *op
 
     // - Configurating pen and brush parameters
     pen.setWidth(2);
-    if(treeItem->connected)pen.setColor(Qt::green);
+    if(this->isSelected() && inGroup)pen.setColor(groupColor);
+    else if(treeItem->connected)pen.setColor(Qt::green);
     else pen.setColor(Qt::red);
 
 
