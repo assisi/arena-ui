@@ -545,11 +545,14 @@ void ArenaUI::on_actionPlot_selected_in_different_trends_triggered()
         while(parent->parent()) parent = parent->parent();
         QColor color = parent->textColor(0);
         QString name = item->text(0);
+        QString parentName = parent->text(0);
 
         foreach (QGraphicsItem* casuItem, arenaScene->items()) {
             if(casuItem->childItems().size()) continue;
-            if(((QCasuSceneItem*)casuItem)->groupColor != color) continue;
+            if(((QCasuSceneItem*)casuItem)->groupColor != color && !QString::compare(parentName, "CASU group")) continue;
+            if(!casuItem->isSelected() && !QString::compare(parentName, "Selected CASUs")) continue;
             selectedList.append(((QCasuSceneItem*)casuItem)->treeItem->widgetMap[name]);
+
         }
     }
 
