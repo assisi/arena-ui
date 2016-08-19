@@ -151,9 +151,8 @@ void QCasuTreeItem::messageReceived(const QList<QByteArray>& message){
     if (device == "IR"){
         RangeArray ranges;
         ranges.ParseFromString(data);
-        for (int k = 0; k < ranges.range_size()-1; k++){
-        //for (int k = 0; k < ranges.raw_value_size(); k++){
-            //double value = lexical_cast<double>(ranges.range(k));
+        for (int k = 0; k < ranges.raw_value_size(); k++){
+            if( k == widget_IR_children.size()) break;
             double value = lexical_cast<double>(ranges.raw_value(k));
             if(value != widget_IR_children[k]->data(1,Qt::DisplayRole).toDouble()){
                 widget_IR_children[k]->setData(1, Qt::DisplayRole, QVariant(value));
@@ -167,6 +166,7 @@ void QCasuTreeItem::messageReceived(const QList<QByteArray>& message){
         TemperatureArray temperatures;
         temperatures.ParseFromString(data);
         for (int k = 0; k < temperatures.temp_size(); k++){
+            if( k == widget_temp_children.size()) break;
             double value = lexical_cast <double>(temperatures.temp(k));
             if(value != widget_temp_children[k]->data(1,Qt::DisplayRole).toDouble()){
                 widget_temp_children[k]->setData(1, Qt::DisplayRole, QVariant(value));
