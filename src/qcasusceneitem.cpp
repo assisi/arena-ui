@@ -47,7 +47,8 @@ void QCasuSceneItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *op
             brush.setColor(Qt::black);
             painter->setBrush(brush);
             double value;
-            if(treeItem->connected) value = treeItem->widget_IR_children[k]->data(1,Qt::DisplayRole).toDouble() / 5000;
+            // Scale sensor reading pie to be ~18cm (~3x the edge of CASU ring) at maximum reading value (2^16)
+            if(treeItem->connected) value = treeItem->widget_IR_children[k]->data(1,Qt::DisplayRole).toDouble() / 65536 * 1.8;
             else value = 0;
             painter->drawPie(QIRTriangle(QPointF(x_center, y_center),yaw_ + k*60, value), (yaw_ + k*60 - 25)*16, 50*16); // 0° is at 3 o'clock, ccw direction
         }
@@ -133,7 +134,7 @@ void QCasuSceneItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *op
     //paint vibration marker
     if(settings->value("vibr_on").toBool() && treeItem->connected && treeItem->vibrON){
         double freq = treeItem->widget_setpoints_vibr_children[0]->data(1,Qt::DisplayRole).toDouble();
-        double amplitude = treeItem->widget_setpoints_vibr_children[1]->data(1,Qt::DisplayRole).toDouble();
+        //double amplitude = treeItem->widget_setpoints_vibr_children[1]->data(1,Qt::DisplayRole).toDouble();
 
         pen.setColor(QColor(255,255,255,96));
         pen.setWidth(2);

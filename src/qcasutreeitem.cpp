@@ -25,11 +25,12 @@ QCasuTreeItem::QCasuTreeItem(QObject* parent, QString name) : QObject(parent), c
     //zadavanje djece temp grani:
     {
         widget_temp_children.append((QTreeWidgetItem*)new QTreeBuffer(QStringList("Temp - F"), name + ": Temp - F"));
-        widget_temp_children.append((QTreeWidgetItem*)new QTreeBuffer(QStringList("Temp - R"), name + ": Temp - R"));
-        widget_temp_children.append((QTreeWidgetItem*)new QTreeBuffer(QStringList("Temp - B"), name + ": Temp - B"));
         widget_temp_children.append((QTreeWidgetItem*)new QTreeBuffer(QStringList("Temp - L"), name + ": Temp - L"));
-        widget_temp_children.append((QTreeWidgetItem*)new QTreeBuffer(QStringList("Temp - PCB"), name + ": Temp - PCB"));
+        widget_temp_children.append((QTreeWidgetItem*)new QTreeBuffer(QStringList("Temp - B"), name + ": Temp - B"));
+        widget_temp_children.append((QTreeWidgetItem*)new QTreeBuffer(QStringList("Temp - R"), name + ": Temp - R"));
         widget_temp_children.append((QTreeWidgetItem*)new QTreeBuffer(QStringList("Temp - TOP"), name + ": Temp - TOP"));
+        widget_temp_children.append((QTreeWidgetItem*)new QTreeBuffer(QStringList("Temp - PCB"), name + ": Temp - PCB"));
+        widget_temp_children.append((QTreeWidgetItem*)new QTreeBuffer(QStringList("Temp - RING"), name + ": Temp - RING"));
         widget_temp_children.append((QTreeWidgetItem*)new QTreeBuffer(QStringList("Temp - WAX"), name + ": Temp - WAX"));
         foreach (QTreeWidgetItem* item, widget_temp_children) widgetMap.insert(item->text(0),item);
         widget_temp->addChildren(widget_temp_children);
@@ -150,9 +151,8 @@ void QCasuTreeItem::messageReceived(const QList<QByteArray>& message){
     if (device == "IR"){
         RangeArray ranges;
         ranges.ParseFromString(data);
-        //for (int k = 0; k < ranges.range_size()-1; k++){
-        for (int k = 0; k < ranges.raw_value_size()-1; k++)
-        {
+        for (int k = 0; k < ranges.range_size()-1; k++){
+        //for (int k = 0; k < ranges.raw_value_size(); k++){
             //double value = lexical_cast<double>(ranges.range(k));
             double value = lexical_cast<double>(ranges.raw_value(k));
             if(value != widget_IR_children[k]->data(1,Qt::DisplayRole).toDouble()){
@@ -166,7 +166,7 @@ void QCasuTreeItem::messageReceived(const QList<QByteArray>& message){
     if (device == "Temp"){
         TemperatureArray temperatures;
         temperatures.ParseFromString(data);
-        for (int k = 0; k < temperatures.temp_size()-1; k++){
+        for (int k = 0; k < temperatures.temp_size(); k++){
             double value = lexical_cast <double>(temperatures.temp(k));
             if(value != widget_temp_children[k]->data(1,Qt::DisplayRole).toDouble()){
                 widget_temp_children[k]->setData(1, Qt::DisplayRole, QVariant(value));

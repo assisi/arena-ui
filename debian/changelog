@@ -1,3 +1,10 @@
+assisi-arena-ui (0.15.0-1ubuntu1) trusty; urgency=high
+
+  * Calibrated raw IR reading visualization for real hardware
+  * Temperature sensor readings are now properly ordered and named
+
+ -- Damjan Miklic (LARICS Lab) <damjan.miklic@fer.hr>  Thu, 18 Aug 2016 22:00:00 +0200
+
 assisi-arena-ui (0.13.1-1ubuntu1) trusty; urgency=high
 
   * New markers for airflow and vibration
