@@ -78,6 +78,8 @@ public:
 
     //pointers to tree objects needs to be saved because sorting changes children order
 
+    QMap<QString, QTreeWidgetItem*> widgetMap;
+
     QTreeWidgetItem *widget_IR;
     QTreeWidgetItem *widget_LED;
     QTreeWidgetItem *widget_temp;

@@ -12,24 +12,26 @@ QCasuTreeItem::QCasuTreeItem(QObject* parent, QString name) : QObject(parent), c
 
     //zadavanje djece IR grani:
     {
-        widget_IR_children.append((QTreeWidgetItem*)new QTreeBuffer(QStringList("F"), name + ": IR - F"));
-        widget_IR_children.append((QTreeWidgetItem*)new QTreeBuffer(QStringList("FL"), name + ": IR - FL"));
-        widget_IR_children.append((QTreeWidgetItem*)new QTreeBuffer(QStringList("BL"), name + ": IR - BL"));
-        widget_IR_children.append((QTreeWidgetItem*)new QTreeBuffer(QStringList("B"), name + ": IR - B"));
-        widget_IR_children.append((QTreeWidgetItem*)new QTreeBuffer(QStringList("BR"), name + ": IR - BR"));
-        widget_IR_children.append((QTreeWidgetItem*)new QTreeBuffer(QStringList("FR"), name + ": IR - FR"));
+        widget_IR_children.append((QTreeWidgetItem*)new QTreeBuffer(QStringList("IR - F"), name + ": IR - F"));
+        widget_IR_children.append((QTreeWidgetItem*)new QTreeBuffer(QStringList("IR - FL"), name + ": IR - FL"));
+        widget_IR_children.append((QTreeWidgetItem*)new QTreeBuffer(QStringList("IR - BL"), name + ": IR - BL"));
+        widget_IR_children.append((QTreeWidgetItem*)new QTreeBuffer(QStringList("IR - B"), name + ": IR - B"));
+        widget_IR_children.append((QTreeWidgetItem*)new QTreeBuffer(QStringList("IR - BR"), name + ": IR - BR"));
+        widget_IR_children.append((QTreeWidgetItem*)new QTreeBuffer(QStringList("IR - FR"), name + ": IR - FR"));
+        foreach (QTreeWidgetItem* item, widget_IR_children) widgetMap.insert(item->text(0),item);
         widget_IR->addChildren(widget_IR_children);
     }
 
     //zadavanje djece temp grani:
     {
-        widget_temp_children.append((QTreeWidgetItem*)new QTreeBuffer(QStringList("F"), name + ": Temp - F"));
-        widget_temp_children.append((QTreeWidgetItem*)new QTreeBuffer(QStringList("R"), name + ": Temp - R"));
-        widget_temp_children.append((QTreeWidgetItem*)new QTreeBuffer(QStringList("B"), name + ": Temp - B"));
-        widget_temp_children.append((QTreeWidgetItem*)new QTreeBuffer(QStringList("L"), name + ": Temp - L"));
-        widget_temp_children.append((QTreeWidgetItem*)new QTreeBuffer(QStringList("PCB"), name + ": Temp - PCB"));
-        widget_temp_children.append((QTreeWidgetItem*)new QTreeBuffer(QStringList("TOP"), name + ": Temp - TOP"));
-        widget_temp_children.append((QTreeWidgetItem*)new QTreeBuffer(QStringList("WAX"), name + ": Temp - WAX"));
+        widget_temp_children.append((QTreeWidgetItem*)new QTreeBuffer(QStringList("Temp - F"), name + ": Temp - F"));
+        widget_temp_children.append((QTreeWidgetItem*)new QTreeBuffer(QStringList("Temp - R"), name + ": Temp - R"));
+        widget_temp_children.append((QTreeWidgetItem*)new QTreeBuffer(QStringList("Temp - B"), name + ": Temp - B"));
+        widget_temp_children.append((QTreeWidgetItem*)new QTreeBuffer(QStringList("Temp - L"), name + ": Temp - L"));
+        widget_temp_children.append((QTreeWidgetItem*)new QTreeBuffer(QStringList("Temp - PCB"), name + ": Temp - PCB"));
+        widget_temp_children.append((QTreeWidgetItem*)new QTreeBuffer(QStringList("Temp - TOP"), name + ": Temp - TOP"));
+        widget_temp_children.append((QTreeWidgetItem*)new QTreeBuffer(QStringList("Temp - WAX"), name + ": Temp - WAX"));
+        foreach (QTreeWidgetItem* item, widget_temp_children) widgetMap.insert(item->text(0),item);
         widget_temp->addChildren(widget_temp_children);
     }
     //zadavanje djece vibr grani:
@@ -38,6 +40,7 @@ QCasuTreeItem::QCasuTreeItem(QObject* parent, QString name) : QObject(parent), c
         widget_vibr_children.append((QTreeWidgetItem*)new QTreeBuffer(QStringList("Amplitude"), name + ": Vibration - amp"));
         widget_vibr_children.append((QTreeWidgetItem*)new QTreeBuffer(QStringList("StdDev"), name + ": Vibration - stdDev"));
         widget_vibr_children[2]->setDisabled(true);
+        foreach (QTreeWidgetItem* item, widget_vibr_children) widgetMap.insert(item->text(0),item);
         widget_vibr->addChildren(widget_vibr_children);
     }
     //zadavanje djece setpoint grani:
@@ -54,7 +57,7 @@ QCasuTreeItem::QCasuTreeItem(QObject* parent, QString name) : QObject(parent), c
     }
 
     QList<QTreeWidgetItem *> temp;{
-        if(QString::compare(casuName,QString("Selected CASUs")) && QString::compare(casuName,QString("CASU group"))){ // don't show this widgets for CASU groups
+        if(QString::compare(casuName,"Selected CASUs") && QString::compare(casuName,"CASU group")){ // don't show this widgets for CASU groups
             temp.push_back(widget_setpoints);
             temp.push_back(widget_LED);
         }
