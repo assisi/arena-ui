@@ -57,9 +57,7 @@ HEADERS  += arenaui.h\
         qdeploy.h \
         qcolorbar.h \
 #        qgstreamerview.h
-    qcasuscenegroup.h \
-    boundinghull.h \
-    kruskal.h
+    qcasuscenegroup.h
 
 
 FORMS    += arenaui.ui

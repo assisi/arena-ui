@@ -3,8 +3,6 @@
 QVariant QCasuSceneGroup::itemChange(QGraphicsItem::GraphicsItemChange change, const QVariant &value)
 {
     if(change==QGraphicsItem::ItemChildAddedChange || change==QGraphicsItem::ItemChildRemovedChange){
-        prepareGeometryChange();
-
         QPainterPath newLine, newShape;
 
         childCoords.clear();
@@ -29,6 +27,7 @@ QVariant QCasuSceneGroup::itemChange(QGraphicsItem::GraphicsItemChange change, c
         groupLine = newLine;
         groupShape = newShape;
     }
+
     return QGraphicsItem::itemChange(change, value);
 }
 

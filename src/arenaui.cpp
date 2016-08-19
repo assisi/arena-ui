@@ -178,12 +178,17 @@ ArenaUI::~ArenaUI()
 
 void ArenaUI::sortGraphicsScene()
 {
-    for(int k = 0; k < arenaScene->items().size(); k++)arenaScene->items()[k]->setZValue(k+1);
+    QList<QGraphicsItem*> tempSelection = arenaScene->selectedItems(); // save active selection
+    QPainterPath pp;
+    pp.addRect(arenaScene->sceneRect()); // select all -- selectedItems() doesnt return group children which is a case with items()
+    arenaScene->setSelectionArea(pp);
 
-    for(int k = 0; k+1 < arenaScene->items().size(); k++)
-        for(int i = k+1; i < arenaScene->items().size(); i++){
-            QGraphicsItem* item1 = arenaScene->items()[k];
-            QGraphicsItem* item2 = arenaScene->items()[i];
+    for(int k = 0; k < arenaScene->selectedItems().size(); k++)arenaScene->selectedItems()[k]->setZValue(k+1);
+
+    for(int k = 0; k+1 < arenaScene->selectedItems().size(); k++)
+        for(int i = k+1; i < arenaScene->selectedItems().size(); i++){
+            QGraphicsItem* item1 = arenaScene->selectedItems()[k];
+            QGraphicsItem* item2 = arenaScene->selectedItems()[i];
 
             QPainterPath path1 = item1->childItems().size()? ((QCasuSceneGroup*)item1)->completeShape() : item1->shape();
             QPainterPath path2 = item2->childItems().size()? ((QCasuSceneGroup*)item2)->completeShape() : item2->shape();
@@ -193,11 +198,22 @@ void ArenaUI::sortGraphicsScene()
                 int z2 = item2->zValue();
                 if(z1 > z2) swap(z1,z2);
 
-                bool check = path1.intersects(item2->shape());
-                (check ? item1 : item2)->setZValue(z1);
-                (check ? item2 : item1)->setZValue(z2);
+                if(path1.intersects(item2->shape())){
+                    item1->setZValue(z1);
+                    item2->setZValue(z2);
+                }
+                if(path2.intersects(item1->shape())){
+                    item1->setZValue(z2);
+                    item2->setZValue(z1);
+                }
             }
         }
+
+    pp = pp.subtracted(pp);
+    pp.addRect(0,0,0,0);
+    arenaScene->setSelectionArea(pp);
+    foreach(QGraphicsItem* item, tempSelection) item->setSelected(true); // after saving items and groups, return selection as was before
+
 }
 
 // -------------------------------------------------------------------------------
@@ -260,6 +276,7 @@ bool MouseClickHandler::eventFilter(QObject* obj, QEvent* event)
 // Subclassed QGraphicsScene for a BUG [QTBUG-10138]
 // http://www.qtcentre.org/threads/36953-QGraphicsItem-deselected-on-contextMenuEvent
 QArenaScene::QArenaScene(QWidget *parent) : QGraphicsScene(parent){
+    this->setItemIndexMethod(QGraphicsScene::NoIndex);
     connect(this,SIGNAL(selectionChanged()),SLOT(checkSelection()));
 }
 
@@ -275,10 +292,9 @@ void QArenaScene::checkSelection()
     if(tempList.size()>1) selectionTreeWidget->setHidden(false);
     else selectionTreeWidget->setHidden(true);
 
-    int color = 13;
+    int color = 14;
 
     foreach(QGraphicsItem* item, tempList){
-       // qDebug() << item->zValue();
         if(item->childItems().size()){
             ((QCasuSceneGroup*)item)->setGroupColor((Qt::GlobalColor) color);
             ((QCasuSceneGroup*)item)->treeItem->setTextColor(0,(Qt::GlobalColor) color++);
@@ -475,9 +491,9 @@ void ArenaUI::on_actionUngroup_triggered()
                 if(subItem->childItems().size())((QCasuSceneGroup*)subItem)->isTopLevel=true;
                 else ((QCasuSceneItem*)subItem)->inGroup=false;
             }
-            ((QCasuSceneGroup*)item)->~QCasuSceneGroup();
+        arenaScene->removeItem(item);
+        delete item;
         }
-
     this->sortGraphicsScene();
 }
 

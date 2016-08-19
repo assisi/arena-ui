@@ -11,15 +11,13 @@
 /*!
  * \brief Graphics item which shows temperature color legend
  */
-class QColorbar : public QObject, public QGraphicsItem
+class QColorbar : public QGraphicsItem
 {
-    Q_OBJECT
-
 private:
 
 public:
 
-    QColorbar(QObject *parent = 0);
+    QColorbar(QGraphicsItem *parent = 0);
 
     QRectF boundingRect() const;
 

@@ -1,6 +1,6 @@
 #include "qcolorbar.h"
 
-QColorbar::QColorbar(QObject* parent) : QObject(parent)
+QColorbar::QColorbar(QGraphicsItem* parent) : QGraphicsItem(parent)
 {
 }
 
