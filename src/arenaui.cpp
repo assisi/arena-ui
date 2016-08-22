@@ -27,11 +27,6 @@ ArenaUI::ArenaUI(QWidget *parent) :
     ui->setupUi(this);
     ui->actionToggleLog->setChecked(settings->value("log_on").toBool());
 
-    sideLayout = new QSplitter;
-    ui->centralWidget->layout()->addWidget(sideLayout);
-    sideLayout->setOrientation(Qt::Vertical);
-    sideLayout->addWidget(ui->tabWidget);
-
     //CASU TREE TAB
     ui->casuTree->addAction(ui->actionPlot_selected_in_same_trend);
     ui->casuTree->addAction(ui->actionPlot_selected_in_different_trends);
@@ -61,9 +56,7 @@ ArenaUI::ArenaUI(QWidget *parent) :
     arenaScene->setSceneRect(0,0,800,800);
     ui->arenaSpace->setScene(arenaScene);
     ui->arenaSpace->setDragMode(QGraphicsView::RubberBandDrag);
-
-    QGraphicsViewZoom* zoom = new QGraphicsViewZoom(ui->arenaSpace);
-    zoom->set_modifiers(Qt::NoModifier);
+    new QGraphicsViewZoom(ui->arenaSpace);
 
 
     MouseClickHandler* click_handler = new MouseClickHandler(arenaScene, this);

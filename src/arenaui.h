@@ -74,10 +74,6 @@ private:
     YAML::Node assisiNode;
 
     /*!
-     * \brief Main widget which carries tabWidget and videoStream widget, and enables configurable size ratio between them
-     */
-    QSplitter* sideLayout;
-    /*!
      * \brief Tab in which trend plots are docked
      */
     QVBoxLayout* trendTab;
