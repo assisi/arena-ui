@@ -39,6 +39,8 @@ class ArenaUI;
 class QArenaScene : public QGraphicsScene
 {
     Q_OBJECT
+protected:
+    void drawBackground(QPainter *painter, const QRectF &rect);
 public:
     QCasuTreeItem *selectionTreeWidget;
     QArenaScene(QWidget *parent);

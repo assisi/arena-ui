@@ -59,6 +59,8 @@ void QCasuSceneGroup::paint(QPainter *painter, const QStyleOptionGraphicsItem *o
 
     if(!this->isSelected() || !isTopLevel)return;
 
+    painter->setRenderHints(QPainter::Antialiasing | QPainter::SmoothPixmapTransform, true);
+
     QPen pen;
     pen.setStyle(Qt::DashLine);
     pen.setColor(groupColor);

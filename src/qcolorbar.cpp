@@ -18,6 +18,8 @@ void QColorbar::paint(QPainter *painter, const QStyleOptionGraphicsItem *option,
 
     if(!settings->value("temp_on").toBool()) return; //don't draw when not showing temp sensors
 
+    painter->setRenderHints(QPainter::Antialiasing | QPainter::SmoothPixmapTransform, true);
+
     QGraphicsView* _view = this->scene()->views().first();
     double scale = _view->transform().m11();
 

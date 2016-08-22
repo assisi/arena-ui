@@ -15,7 +15,7 @@ QGraphicsViewZoom::QGraphicsViewZoom(QGraphicsView* view)
 }
 
 void QGraphicsViewZoom::gentle_zoom(double factor) {
-  if (_view->transform().m11() * factor < 1 && !qFuzzyIsNull(_view->transform().m11() * factor - 1)) return; // you cant zoom out from default view
+  if (_view->transform().m11() * factor < 1.0/3 ) return; // zoom x1/3 is minimum
   if (_view->transform().m11() * factor > 3) return; // zoom x3 is maximum
   _view->scale(factor, factor);
   _view->centerOn(target_scene_pos);

@@ -272,6 +272,21 @@ bool MouseClickHandler::eventFilter(QObject* obj, QEvent* event)
 //-------------------------------------------------------------------------------
 // Subclassed QGraphicsScene for a BUG [QTBUG-10138]
 // http://www.qtcentre.org/threads/36953-QGraphicsItem-deselected-on-contextMenuEvent
+void QArenaScene::drawBackground(QPainter *painter, const QRectF &rect)
+{
+    painter->setRenderHints(QPainter::Antialiasing | QPainter::SmoothPixmapTransform, true);
+
+    QPen pen;
+    QBrush brush;
+    pen.setColor(Qt::transparent);
+    brush.setColor(Qt::lightGray);
+    brush.setStyle(Qt::SolidPattern);
+
+    painter->setPen(pen);
+    painter->setBrush(brush);
+    painter->drawEllipse(0,0,800,800);
+}
+
 QArenaScene::QArenaScene(QWidget *parent) : QGraphicsScene(parent){
     this->setItemIndexMethod(QGraphicsScene::NoIndex);
     connect(this,SIGNAL(selectionChanged()),SLOT(checkSelection()));
