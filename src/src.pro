@@ -37,7 +37,6 @@ SOURCES += main.cpp\
         qdialogsetpoint.cpp \
         flowlayout.cpp \
         qdeploy.cpp \
-        qcolorbar.cpp \
 #        qgstreamerview.cpp
         qcasuscenegroup.cpp \
     qgraphicsviewzoom.cpp
@@ -56,7 +55,6 @@ HEADERS  += arenaui.h\
         qdialogsetpoint.h \
         flowlayout.h \
         qdeploy.h \
-        qcolorbar.h \
 #        qgstreamerview.h
     qcasuscenegroup.h \
     qgraphicsviewzoom.h

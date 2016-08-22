@@ -19,7 +19,6 @@
 #include "qdialogsetpoint.h"
 #include "qcasuscenegroup.h"
 #include "qcasusceneitem.h"
-#include "qcolorbar.h"
 #include "qtrendplot.h"
 #include "qdeploy.h"
 #include "qgraphicsviewzoom.h"
@@ -41,6 +40,7 @@ class QArenaScene : public QGraphicsScene
     Q_OBJECT
 protected:
     void drawBackground(QPainter *painter, const QRectF &rect);
+    void drawForeground(QPainter *painter, const QRectF &rect);
 public:
     QCasuTreeItem *selectionTreeWidget;
     QArenaScene(QWidget *parent);

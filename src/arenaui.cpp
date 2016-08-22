@@ -288,6 +288,47 @@ void QArenaScene::drawBackground(QPainter *painter, const QRectF &rect)
     painter->drawEllipse(0,0,800,800);
 }
 
+void QArenaScene::drawForeground(QPainter *painter, const QRectF &rect)
+{
+    if(!settings->value("temp_on").toBool()) return; //don't draw when not showing temp sensors
+
+    painter->setRenderHints(QPainter::Antialiasing | QPainter::SmoothPixmapTransform, true);
+
+    QGraphicsView* _view = this->views().first();
+    double scale = _view->transform().m11();
+
+    QRectF model(_view->mapToScene(QPoint(10,10)),QSizeF(180,15)/scale);
+
+    QLinearGradient heatmap(_view->mapToScene(QPoint(10,10)),_view->mapToScene(QPoint(190,10)));
+    heatmap.setColorAt(0, Qt::blue);
+    heatmap.setColorAt(0.33, Qt::magenta);
+    heatmap.setColorAt(0.66, Qt::red);
+    heatmap.setColorAt(1, Qt::yellow);
+    QPen pen(Qt::transparent);
+    QBrush brush(heatmap);
+
+    pen.setColor(Qt::transparent);
+
+    painter->setPen(pen);
+    painter->setBrush(brush);
+    painter->drawRect(model);
+
+    pen.setColor(Qt::black);
+    pen.setWidth(0);
+    painter->setPen(pen);
+
+    painter->drawLine(_view->mapToScene(QPoint(10,25)),_view->mapToScene(QPoint(10,30)));
+    painter->drawLine(_view->mapToScene(QPoint(100,25)),_view->mapToScene(QPoint(100,30)));
+    painter->drawLine(_view->mapToScene(QPoint(190,25)),_view->mapToScene(QPoint(190,30)));
+
+    QFont font = painter->font();
+    font.setPointSizeF(11 / scale);
+    painter->setFont(font);
+    painter->drawText(_view->mapToScene(QPoint(11,36)), "20 °C");
+    painter->drawText(_view->mapToScene(QPoint(101,36)), "35 °C");
+    painter->drawText(_view->mapToScene(QPoint(191,36)), "50 °C");
+}
+
 QArenaScene::QArenaScene(QWidget *parent) : QGraphicsScene(parent){
     this->setItemIndexMethod(QGraphicsScene::NoIndex);
     connect(this,SIGNAL(selectionChanged()),SLOT(checkSelection()));
@@ -464,7 +505,6 @@ void ArenaUI::on_actionOpenArena_triggered()
 
 
     this->setWindowTitle("ASSISI - " + loadFile.mid(loadFile.lastIndexOf("/")) + ": " + assisiFile.arenaLayer);
-    arenaScene->addItem(new QColorbar());
 }
 
 void ArenaUI::on_actionGroup_triggered()
