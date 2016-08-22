@@ -62,6 +62,10 @@ ArenaUI::ArenaUI(QWidget *parent) :
     ui->arenaSpace->setScene(arenaScene);
     ui->arenaSpace->setDragMode(QGraphicsView::RubberBandDrag);
 
+    QGraphicsViewZoom* zoom = new QGraphicsViewZoom(ui->arenaSpace);
+    zoom->set_modifiers(Qt::NoModifier);
+
+
     MouseClickHandler* click_handler = new MouseClickHandler(arenaScene, this);
     arenaScene->installEventFilter(click_handler);
 

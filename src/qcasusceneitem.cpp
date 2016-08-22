@@ -114,8 +114,8 @@ void QCasuSceneItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *op
     painter->drawEllipse(model);
     painter->drawLine(x_center + 5*cos(-yaw_*PI/180),
                       y_center + 5*sin(-yaw_*PI/180),
-                      x_center + 10*cos(-yaw_*PI/180),
-                      y_center + 10*sin(-yaw_*PI/180));
+                      x_center + 9*cos(-yaw_*PI/180),
+                      y_center + 9*sin(-yaw_*PI/180));
 
     //paint airflow marker
     if(settings->value("air_on").toBool() && treeItem->connected && treeItem->airflowON){

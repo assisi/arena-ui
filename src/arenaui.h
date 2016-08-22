@@ -22,6 +22,7 @@
 #include "qcolorbar.h"
 #include "qtrendplot.h"
 #include "qdeploy.h"
+#include "qgraphicsviewzoom.h"
 //#include "qgstreamerview.h"
 
 
