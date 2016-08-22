@@ -23,8 +23,6 @@ void QColorbar::paint(QPainter *painter, const QStyleOptionGraphicsItem *option,
     QGraphicsView* _view = this->scene()->views().first();
     double scale = _view->transform().m11();
 
-    QRectF model = boundingRect();
-
     QLinearGradient heatmap(_view->mapToScene(QPoint(10,10)),_view->mapToScene(QPoint(190,10)));
     heatmap.setColorAt(0, Qt::blue);
     heatmap.setColorAt(0.33, Qt::magenta);

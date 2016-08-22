@@ -274,6 +274,7 @@ bool MouseClickHandler::eventFilter(QObject* obj, QEvent* event)
 // http://www.qtcentre.org/threads/36953-QGraphicsItem-deselected-on-contextMenuEvent
 void QArenaScene::drawBackground(QPainter *painter, const QRectF &rect)
 {
+    Q_UNUSED(rect);
     painter->setRenderHints(QPainter::Antialiasing | QPainter::SmoothPixmapTransform, true);
 
     QPen pen;
