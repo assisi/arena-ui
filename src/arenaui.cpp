@@ -462,6 +462,8 @@ void ArenaUI::on_actionOpenArena_triggered()
         loadSession.endGroup();
     }
 
+
+    this->setWindowTitle("ASSISI - " + loadFile.mid(loadFile.lastIndexOf("/")) + ": " + assisiFile.arenaLayer);
     arenaScene->addItem(new QColorbar());
 }
 
