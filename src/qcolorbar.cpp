@@ -6,7 +6,9 @@ QColorbar::QColorbar(QGraphicsItem* parent) : QGraphicsItem(parent)
 
 QRectF QColorbar::boundingRect() const
 {
-    return QRectF(10,750,180,30);
+    QGraphicsView* _view = this->scene()->views().first();
+    // QSizeF is divided by transfromation factor so it remains the same size
+    return QRectF(_view->mapToScene(QPoint(10,750)),QSizeF(180,15)/_view->transform().m11());
 }
 
 void QColorbar::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
@@ -16,9 +18,9 @@ void QColorbar::paint(QPainter *painter, const QStyleOptionGraphicsItem *option,
 
     if(!settings->value("temp_on").toBool()) return; //don't draw when not showing temp sensors
 
-    QRectF model = this->boundingRect();
+    QGraphicsView* _view = this->scene()->views().first();
 
-    QLinearGradient heatmap(10,770,190,770);
+    QLinearGradient heatmap(_view->mapToScene(QPoint(10,770)),_view->mapToScene(QPoint(190,770)));
     heatmap.setColorAt(0, Qt::blue);
     heatmap.setColorAt(0.33, Qt::magenta);
     heatmap.setColorAt(0.66, Qt::red);
@@ -30,16 +32,20 @@ void QColorbar::paint(QPainter *painter, const QStyleOptionGraphicsItem *option,
 
     painter->setPen(pen);
     painter->setBrush(brush);
-    painter->drawRect(model);
+    painter->drawRect(boundingRect());
 
     pen.setColor(Qt::black);
+    pen.setWidth(0);
     painter->setPen(pen);
-    painter->drawLine(10,780,10,785);
-    painter->drawLine(100,780,100,785);
-    painter->drawLine(190,780,190,785);
+    painter->drawLine(_view->mapToScene(QPoint(10,765)),_view->mapToScene(QPoint(10,770)));
+    painter->drawLine(_view->mapToScene(QPoint(100,765)),_view->mapToScene(QPoint(100,770)));
+    painter->drawLine(_view->mapToScene(QPoint(190,765)),_view->mapToScene(QPoint(190,770)));
 
-    painter->drawStaticText(10,783, QStaticText("20 °C"));
-    painter->drawStaticText(100,783, QStaticText("35 °C"));
-    painter->drawStaticText(190,783, QStaticText("50 °C"));
+    QFont font = painter->font();
+    font.setPointSizeF(11 / _view->transform().m11());
+    painter->setFont(font);
+    painter->drawText(_view->mapToScene(QPoint(11,776)), "20 °C");
+    painter->drawText(_view->mapToScene(QPoint(101,776)), "35 °C");
+    painter->drawText(_view->mapToScene(QPoint(191,776)), "50 °C");
 
 }
