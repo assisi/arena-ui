@@ -1,8 +1,10 @@
 #include "qtrendplot.h"
 
-QTrendPlot::QTrendPlot(QTreeWidget* tree, QWidget *parent) :
+QTrendPlot::QTrendPlot(QGraphicsScene* scene, QTreeWidget* tree1,QTreeWidget* tree2 , QWidget *parent) :
     QCustomPlot(parent),
-    casuTree(tree),
+    casuTree(tree1),
+    groupTree(tree2),
+    arenaScene(scene),
     autoPosition(true),
     showLegend(true),
     docked(true)
@@ -33,6 +35,9 @@ QTrendPlot::QTrendPlot(QTreeWidget* tree, QWidget *parent) :
 }
 
 void QTrendPlot::addGraph(QTreeBuffer* treeItem){
+    for(int k=0; k<this->graphCount(); k++){
+        if (!QString::compare(this->graph(k)->name(), treeItem->legendName)) return;
+    }
     this->QCustomPlot::addGraph();
     this->graph()->setData(treeItem->buffer);
     this->graph()->setName(treeItem->legendName);
@@ -52,12 +57,18 @@ void QTrendPlot::addGraph(QTreeBuffer* treeItem){
     connectionMap[this->graph()] = treeItem;
 }
 
+bool sortQTreeWidgetItem(QTreeWidgetItem* item1,QTreeWidgetItem* item2){
+    return QString::compare(((QTreeBuffer*)item1)->legendName,((QTreeBuffer*)item2)->legendName) < 0;
+}
 void QTrendPlot::addGraphList(QList<QTreeWidgetItem*> itemList)
 {    
     bool new_trend = true;
     if(this->graphCount()) new_trend = false;
 
-    for(int k = 0; k < itemList.count(); k++) this->addGraph((QTreeBuffer*)itemList[k]);
+    itemList = itemList.toSet().toList(); //remove duplicates
+    qSort(itemList.begin(),itemList.end(),sortQTreeWidgetItem); //sort by legend name
+
+    foreach (QTreeWidgetItem* item, itemList) this->addGraph((QTreeBuffer*)item);
 
     if(new_trend){
         this->rescaleAxes();
@@ -78,7 +89,25 @@ void QTrendPlot::removeSelectedGraphs(){
 }
 
 void QTrendPlot::addSelectedGraphs(){
-    this->addGraphList(casuTree->selectedItems());
+    QList<QTreeWidgetItem*> selectedList = casuTree->selectedItems();
+
+    foreach(QTreeWidgetItem* item, groupTree->selectedItems()){
+        QTreeWidgetItem* parent = item->parent();
+        while(parent->parent()) parent = parent->parent();
+        QColor color = parent->textColor(0);
+        QString name = item->text(0);
+        QString parentName = parent->text(0);
+
+        foreach (QGraphicsItem* casuItem, arenaScene->items()) {
+            if(casuItem->childItems().size()) continue;
+            if(((QCasuSceneItem*)casuItem)->groupColor != color && !QString::compare(parentName, "CASU group")) continue;
+            if(!casuItem->isSelected() && !QString::compare(parentName, "Selected CASUs")) continue;
+            selectedList.append(((QCasuSceneItem*)casuItem)->treeItem->widgetMap[name]);
+        }
+    }
+    this->addGraphList(selectedList);
+
+    this->replot();
 }
 
 void QTrendPlot::saveToPDF()
@@ -163,13 +192,11 @@ void QTrendPlot::showContextMenu(QPoint position){
     if(!this->selectedGraphs().count()) temp->setEnabled(false);
 
     temp=menu->addAction("Add graphs (selected in tree)",this,SLOT(addSelectedGraphs()));
-    if(!casuTree->selectedItems().count()) temp->setEnabled(false);
+    if(!casuTree->selectedItems().count() && !groupTree->selectedItems().size()) temp->setEnabled(false);
 
     menu->addAction("Save to pdf",this,SLOT(saveToPDF()));
 
     menu->addAction("Close trend",this,SLOT(close()));
-
-
 
     menu->popup(this->mapToGlobal(position));
 }

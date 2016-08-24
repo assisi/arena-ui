@@ -29,3 +29,4 @@ test*
 doc/user/build
 doc/devel
 build*
+Doxygen

@@ -3,6 +3,8 @@
 
 #include "QCustomPlot/qcustomplot.h"
 #include "qtreebuffer.h"
+#include "qcasutreeitem.h"
+#include "qcasusceneitem.h"
 
 /*!
  * \brief Custom QCustomPlot class which defines behavior of trend plotting
@@ -17,6 +19,18 @@ private:
      * \brief Pointer to casuTree for reading selected QTreeBuffers
      */
     QTreeWidget* casuTree;
+    /*!
+     * \brief Pointer to casuTree for reading selected QTreeBuffers
+     */
+
+    QTreeWidget* groupTree;
+    /*!
+     * \brief Pointer to arenaScene for finding grouped CASU items
+     *
+     * This is workaround for the context menu action because group functionality was added late
+     */
+    QGraphicsScene* arenaScene;
+
     bool autoPosition;
     bool showLegend;
     bool docked;
@@ -27,7 +41,7 @@ public:
      */
     QMap<QCPGraph*,QTreeBuffer*> connectionMap;
 
-    explicit QTrendPlot(QTreeWidget* tree, QWidget *parent = 0);
+    explicit QTrendPlot(QGraphicsScene* scene, QTreeWidget* tree1, QTreeWidget *tree2, QWidget *parent = 0);
     ~QTrendPlot(){}
 
     /*!

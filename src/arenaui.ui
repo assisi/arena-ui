@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1252</width>
+    <width>1253</width>
     <height>850</height>
    </rect>
   </property>
@@ -14,100 +14,180 @@
    <string>Assisi|bf Arena UI</string>
   </property>
   <widget class="QWidget" name="centralWidget">
-   <layout class="QHBoxLayout" name="horizontalLayout" stretch="0,0">
+   <property name="sizePolicy">
+    <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+     <horstretch>0</horstretch>
+     <verstretch>0</verstretch>
+    </sizepolicy>
+   </property>
+   <layout class="QHBoxLayout" name="horizontalLayout">
     <item>
-     <widget class="QGraphicsView" name="arenaSpace">
-      <property name="minimumSize">
-       <size>
-        <width>800</width>
-        <height>800</height>
-       </size>
+     <widget class="QSplitter" name="splitter_3">
+      <property name="orientation">
+       <enum>Qt::Horizontal</enum>
       </property>
-      <property name="maximumSize">
-       <size>
-        <width>800</width>
-        <height>800</height>
-       </size>
-      </property>
-      <property name="contextMenuPolicy">
-       <enum>Qt::CustomContextMenu</enum>
-      </property>
-      <property name="styleSheet">
-       <string notr="true">border-image: url(:/images/arena_sw.png)</string>
-      </property>
-     </widget>
-    </item>
-    <item>
-     <widget class="QTabWidget" name="tabWidget">
-      <property name="enabled">
-       <bool>true</bool>
-      </property>
-      <property name="tabPosition">
-       <enum>QTabWidget::North</enum>
-      </property>
-      <property name="currentIndex">
-       <number>1</number>
-      </property>
-      <widget class="QWidget" name="tabCasus">
-       <property name="enabled">
-        <bool>true</bool>
+      <widget class="QGraphicsView" name="arenaSpace">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
        </property>
-       <attribute name="title">
-        <string>Casu data</string>
-       </attribute>
-       <layout class="QVBoxLayout" name="verticalLayout_2">
-        <item>
-         <widget class="QTreeWidget" name="casuTree">
-          <property name="minimumSize">
-           <size>
-            <width>340</width>
-            <height>0</height>
-           </size>
-          </property>
-          <property name="contextMenuPolicy">
-           <enum>Qt::ActionsContextMenu</enum>
-          </property>
-          <property name="alternatingRowColors">
-           <bool>false</bool>
-          </property>
-          <property name="selectionMode">
-           <enum>QAbstractItemView::ExtendedSelection</enum>
-          </property>
-          <property name="sortingEnabled">
-           <bool>true</bool>
-          </property>
-          <attribute name="headerVisible">
-           <bool>false</bool>
-          </attribute>
-          <attribute name="headerDefaultSectionSize">
-           <number>200</number>
-          </attribute>
-          <column>
-           <property name="text">
-            <string>Name</string>
-           </property>
-          </column>
-          <column>
-           <property name="text">
-            <string>Value</string>
-           </property>
-           <property name="textAlignment">
-            <set>AlignRight|AlignVCenter</set>
-           </property>
-          </column>
-         </widget>
-        </item>
-       </layout>
+       <property name="minimumSize">
+        <size>
+         <width>400</width>
+         <height>400</height>
+        </size>
+       </property>
+       <property name="maximumSize">
+        <size>
+         <width>16777215</width>
+         <height>16777215</height>
+        </size>
+       </property>
+       <property name="contextMenuPolicy">
+        <enum>Qt::CustomContextMenu</enum>
+       </property>
+       <property name="styleSheet">
+        <string notr="true"/>
+       </property>
+       <property name="verticalScrollBarPolicy">
+        <enum>Qt::ScrollBarAsNeeded</enum>
+       </property>
+       <property name="horizontalScrollBarPolicy">
+        <enum>Qt::ScrollBarAsNeeded</enum>
+       </property>
       </widget>
-      <widget class="QWidget" name="tabTrend">
-       <attribute name="title">
-        <string>Trend graphs</string>
-       </attribute>
-      </widget>
-      <widget class="QWidget" name="tabDeploy">
-       <attribute name="title">
-        <string>Deployment</string>
-       </attribute>
+      <widget class="QSplitter" name="sideLayout">
+       <property name="orientation">
+        <enum>Qt::Vertical</enum>
+       </property>
+       <widget class="QTabWidget" name="tabWidget">
+        <property name="enabled">
+         <bool>true</bool>
+        </property>
+        <property name="tabPosition">
+         <enum>QTabWidget::North</enum>
+        </property>
+        <property name="currentIndex">
+         <number>0</number>
+        </property>
+        <widget class="QWidget" name="tabCasus">
+         <property name="enabled">
+          <bool>true</bool>
+         </property>
+         <attribute name="title">
+          <string>Casu data</string>
+         </attribute>
+         <layout class="QVBoxLayout" name="verticalLayout">
+          <item>
+           <widget class="QSplitter" name="splitter">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="minimumSize">
+             <size>
+              <width>0</width>
+              <height>0</height>
+             </size>
+            </property>
+            <property name="sizeIncrement">
+             <size>
+              <width>0</width>
+              <height>0</height>
+             </size>
+            </property>
+            <property name="autoFillBackground">
+             <bool>false</bool>
+            </property>
+            <property name="orientation">
+             <enum>Qt::Vertical</enum>
+            </property>
+            <property name="opaqueResize">
+             <bool>true</bool>
+            </property>
+            <widget class="QTreeWidget" name="casuTree">
+             <property name="minimumSize">
+              <size>
+               <width>300</width>
+               <height>0</height>
+              </size>
+             </property>
+             <property name="contextMenuPolicy">
+              <enum>Qt::ActionsContextMenu</enum>
+             </property>
+             <property name="alternatingRowColors">
+              <bool>false</bool>
+             </property>
+             <property name="selectionMode">
+              <enum>QAbstractItemView::ExtendedSelection</enum>
+             </property>
+             <property name="sortingEnabled">
+              <bool>true</bool>
+             </property>
+             <attribute name="headerVisible">
+              <bool>false</bool>
+             </attribute>
+             <attribute name="headerDefaultSectionSize">
+              <number>200</number>
+             </attribute>
+             <column>
+              <property name="text">
+               <string>Name</string>
+              </property>
+             </column>
+             <column>
+              <property name="text">
+               <string>Value</string>
+              </property>
+              <property name="textAlignment">
+               <set>AlignRight|AlignVCenter</set>
+              </property>
+             </column>
+            </widget>
+            <widget class="QTreeWidget" name="groupTree">
+             <property name="minimumSize">
+              <size>
+               <width>300</width>
+               <height>0</height>
+              </size>
+             </property>
+             <property name="contextMenuPolicy">
+              <enum>Qt::ActionsContextMenu</enum>
+             </property>
+             <property name="selectionMode">
+              <enum>QAbstractItemView::ExtendedSelection</enum>
+             </property>
+             <property name="sortingEnabled">
+              <bool>false</bool>
+             </property>
+             <attribute name="headerVisible">
+              <bool>false</bool>
+             </attribute>
+             <column>
+              <property name="text">
+               <string notr="true">1</string>
+              </property>
+             </column>
+            </widget>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+        <widget class="QWidget" name="tabTrend">
+         <attribute name="title">
+          <string>Trend graphs</string>
+         </attribute>
+        </widget>
+        <widget class="QWidget" name="tabDeploy">
+         <attribute name="title">
+          <string>Deployment</string>
+         </attribute>
+        </widget>
+       </widget>
       </widget>
      </widget>
     </item>

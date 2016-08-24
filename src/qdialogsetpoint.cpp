@@ -1,17 +1,31 @@
 #include "qdialogsetpoint.h"
 
-QDialogSetpoint::QDialogSetpoint(QString command) : command_(command)
+QDialogSetpoint::QDialogSetpoint(QString command, QList<QGraphicsItem *> group) : command_(command)
 {
+    bool groupSelected;
+
+    QCasuTreeItem* treeItem = ((QCasuSceneItem*)group[0])->treeItem;
+
+    if(group.size() > 1) groupSelected = true;
+    else if(group[0]->childItems().size()) groupSelected = true;
+    else groupSelected = false;
+
     this->setWindowTitle(command + " data to send to CASUs");
 
     QGroupBox* on_off = new QGroupBox("Select device state");
     QGridLayout *tempLayout = new QGridLayout;
+
+    QDoubleValidator* validator1 = new QDoubleValidator;
+    validator1->setNotation(QDoubleValidator::StandardNotation);
+    QDoubleValidator* validator2 = new QDoubleValidator;
+    validator2->setNotation(QDoubleValidator::StandardNotation);
 
     radioON = new QRadioButton("ON");
     radioON->setChecked(true);
     tempLayout->addWidget(radioON,0,0);
     tempLayout->addWidget(new QRadioButton("OFF"),0,1);
     on_off->setLayout(tempLayout);
+
 
     tempLayout = new QGridLayout;
     tempLayout->addWidget(on_off,0,0,1,2);
@@ -22,9 +36,19 @@ QDialogSetpoint::QDialogSetpoint(QString command) : command_(command)
         tempLayout->addWidget(new QLabel("Temperature setpoint:"),1,0);
         tempLayout->addWidget(new QLabel("Allowed temperature range: [26,45]°C"),2,0);
         value1 = new QLineEdit;
-        value1->setValidator(new QDoubleValidator(26.0,45.0,2));
+        validator1->setRange(26.0,45.0,2);
+        value1->setValidator(validator1);
         tempLayout->addWidget(value1,1,1);
         tempLayout->addWidget(buttons,3,0);
+
+        if(groupSelected) value1->setText("26.00");
+        if(!groupSelected){
+            double temp = treeItem->widget_setpoints_children[0]->data(1,Qt::DisplayRole).toDouble();
+            if(temp > 26)
+                value1->setText(QString::number(temp,'f',2));
+            else
+                value1->setText("26.00");
+        }
     }
 
     if(command == "Vibration"){
@@ -34,11 +58,31 @@ QDialogSetpoint::QDialogSetpoint(QString command) : command_(command)
         tempLayout->addWidget(new QLabel("Allowed amplitude range: [0,50]\%"),4,0);
         value1 = new QLineEdit;
         value2 = new QLineEdit;
-        value1->setValidator(new QDoubleValidator(50.0,1500.0,2));
-        value2->setValidator(new QDoubleValidator(0.0,50.0,2));
+        validator1->setRange(50.0,1500.0,2);
+        value1->setValidator(validator1);
+        validator2->setRange(0.0,50.0,2);
+        value2->setValidator(validator2);
         tempLayout->addWidget(value1,1,1);
         tempLayout->addWidget(value2,3,1);
         tempLayout->addWidget(buttons,5,0);
+
+        if(groupSelected){
+            value1->setText("500.00");
+            value2->setText("50.00");
+        }
+        if(!groupSelected){
+            double temp1 = treeItem->widget_setpoints_vibr_children[0]->data(1,Qt::DisplayRole).toDouble();
+            double temp2 = treeItem->widget_setpoints_vibr_children[1]->data(1,Qt::DisplayRole).toDouble();
+
+            if(temp1 >= 50){
+                value1->setText(QString::number(temp1,'f',2));
+                value1->setText(QString::number(temp2,'f',2));
+            }
+            else{
+                value1->setText("500.00");
+                value2->setText("50.00");
+            }
+        }
     }
 
     if(command == "LED"){
@@ -57,15 +101,27 @@ QDialogSetpoint::QDialogSetpoint(QString command) : command_(command)
 
         tempLayout->addWidget(chooseColor,1,2);
         tempLayout->addWidget(buttons,2,0);
+
     }
 
     if(command == "Airflow"){
         tempLayout->addWidget(new QLabel("Intensity setpoint:"),1,0);
         tempLayout->addWidget(new QLabel("Allowed intensity range: 1 (value is discarded)"),2,0);
         value1 = new QLineEdit;
-        value1->setValidator(new QDoubleValidator(1.0,1.0,2));
+        validator1->setRange(0.0,1.0,2);
+        value1->setValidator(validator1);
+        value1->setDisabled(true); // DISABLED FOR FUTURE UPDATES; CURENTLY THERE IS ONLY ONE INTESITY (1)
         tempLayout->addWidget(value1,1,1);
         tempLayout->addWidget(buttons,3,0);
+
+        if(groupSelected) value1->setText("1.00");
+        if(!groupSelected){
+            double temp = treeItem->widget_setpoints_children[1]->data(1,Qt::DisplayRole).toDouble();
+            if(temp > 1)
+                value1->setText(QString::number(temp,'f',2));
+            else
+                value1->setText("1.00");
+        }
     }
 
     if(command == "LED"){
@@ -88,6 +144,13 @@ void QDialogSetpoint::prepareMessage()
 {
     using namespace AssisiMsg;
 
+    if (!value1->hasAcceptableInput()){
+        reject();
+        return;
+    }
+
+    // value2 is checked only in place where it is used
+
     if(command_ == "Temperature"){
         Temperature temp;
         temp.set_temp(value1->text().toFloat());
@@ -101,6 +164,10 @@ void QDialogSetpoint::prepareMessage()
         message.push_back(QByteArray((char*)buffer, size));
     }
     if(command_ == "Vibration"){
+        if (!value2->hasAcceptableInput()){
+                reject();
+                return;
+            }
         VibrationSetpoint vibr;
         vibr.set_freq(value1->text().toDouble());
         vibr.set_amplitude(value2->text().toDouble());

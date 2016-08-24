@@ -20,10 +20,6 @@ class QCasuSceneItem : public QObject, public QGraphicsItem
     Q_OBJECT
 
 private:
-    int x_center;
-    int y_center;
-    int yaw_;
-
 //ANIMATION
     /*!
      * \brief Timer that checks if graphics scene update was called with animation timer or some other event
@@ -43,6 +39,13 @@ private:
     double vibrAngle;
 
 public:
+    int x_center;
+    int y_center;
+    int yaw_;
+
+    bool inGroup;
+    QColor groupColor;
+
     /*!
      * \brief Pointer to corresponding QCasuTreeItem for same CASU
      */

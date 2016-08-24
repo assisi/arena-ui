@@ -14,13 +14,15 @@
 //3rd party class implementations
 #include "flowlayout.h"
 
+#include "qarenascene.h"
 #include "qdialogconnect.h"
 #include "qdialogsettings.h"
 #include "qdialogsetpoint.h"
+#include "qcasuscenegroup.h"
 #include "qcasusceneitem.h"
-#include "qcolorbar.h"
 #include "qtrendplot.h"
 #include "qdeploy.h"
+#include "qgraphicsviewzoom.h"
 //#include "qgstreamerview.h"
 
 
@@ -28,20 +30,6 @@
 namespace Ui {
 class ArenaUI;
 }
-
-/*!
- * \brief Subclassed QGraphicsScene with overloaded \b mousePressEvent function as a bug workaround.
- *
- * BUG [QTBUG-10138] - http://www.qtcentre.org/threads/36953-QGraphicsItem-deselected-on-contextMenuEvent
- */
-class QArenaScene : public QGraphicsScene
-{
-    Q_OBJECT
-public:
-    QArenaScene(QWidget *parent);
-    void mousePressEvent(QGraphicsSceneMouseEvent *event);
-};
-
 /*!
  * \brief Main window class
  *
@@ -68,10 +56,6 @@ private:
      */
     YAML::Node assisiNode;
 
-    /*!
-     * \brief Main widget which carries tabWidget and videoStream widget, and enables configurable size ratio between them
-     */
-    QSplitter* sideLayout;
     /*!
      * \brief Tab in which trend plots are docked
      */

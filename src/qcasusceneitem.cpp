@@ -1,12 +1,14 @@
 #include "qcasusceneitem.h"
 
 QCasuSceneItem::QCasuSceneItem(QObject *parent, int x, int y, double yaw, QCasuTreeItem *widget) : QObject(parent),
-    x_center(x),
-    y_center(y),
-    yaw_((int)(yaw*180/PI)),
     //ANIMATION
     airflowAngle(0),
     vibrAngle(0),
+    //CASU PARAMETERS
+    x_center(x),
+    y_center(y),
+    yaw_((int)(yaw*180/PI)),
+    inGroup(false),
     //WIDGET
     treeItem(widget)
 {
@@ -88,7 +90,8 @@ void QCasuSceneItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *op
 
     // - Configurating pen and brush parameters
     pen.setWidth(2);
-    if(treeItem->connected)pen.setColor(Qt::green);
+    if(this->isSelected() && inGroup)pen.setColor(groupColor);
+    else if(treeItem->connected)pen.setColor(Qt::green);
     else pen.setColor(Qt::red);
 
 
@@ -102,17 +105,17 @@ void QCasuSceneItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *op
         treeItem->resetSelection();
     }
 
-    if(treeItem->led_on)brush.setColor(treeItem->led_color);
+    if(treeItem->ledON)brush.setColor(treeItem->ledColor);
     else brush.setColor(Qt::gray);
-    if(treeItem->child_selected)brush.setStyle(Qt::Dense3Pattern);
+    if(treeItem->child_selected)brush.setStyle(Qt::Dense2Pattern);
 
     painter->setPen(pen);
     painter->setBrush(brush);
     painter->drawEllipse(model);
     painter->drawLine(x_center + 5*cos(-yaw_*PI/180),
                       y_center + 5*sin(-yaw_*PI/180),
-                      x_center + 10*cos(-yaw_*PI/180),
-                      y_center + 10*sin(-yaw_*PI/180));
+                      x_center + 9*cos(-yaw_*PI/180),
+                      y_center + 9*sin(-yaw_*PI/180));
 
     //paint airflow marker
     if(settings->value("air_on").toBool() && treeItem->connected && treeItem->airflowON){
@@ -122,7 +125,7 @@ void QCasuSceneItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *op
         brush.setColor(QColor(250, 218, 94, 96));
         painter->setPen(pen);
         painter->setBrush(brush);
-        airflowAngle = fmod(airflowAngle + value * 12 * FPSrepaint, 360); // 30 FPS, max_speed = 12 deg/frame -> w = 1 rpm
+        airflowAngle = fmod(airflowAngle + value * 6 * FPSrepaint, 360); // 30 FPS, max_speed = 6 deg/frame -> w = 0.5 rpm __ CURRENTLY THERE IS ONLY ONE INTENSITY, WHEN INTESITY RANGE WILL BE ENABLED, MAX_SPEED SHOULD BE 12
         painter->drawPath(QPetal(QPointF(x_center,y_center),airflowAngle));       // petal 1
         painter->drawPath(QPetal(QPointF(x_center,y_center),airflowAngle + 120)); // petal 2
         painter->drawPath(QPetal(QPointF(x_center,y_center),airflowAngle - 120)); // petal 3
@@ -171,11 +174,11 @@ QIRTriangle::QIRTriangle(QPointF center, double angle, double value)
 
 QTempArc::QTempArc(QPointF center, double angle)
 {
-    double offset = settings->value("IR_on").toBool()? 42 : 30; // offset from center of CASU
+    double offset = 17.5; // offset from center of CASU
 
     span = 50 * 16; //Qt angles are in increments of 1°/16
     start = (angle - 25) * 16;
-    rect = QRectF(center.x()-offset/2, center.y()-offset/2, offset, offset);
+    rect = QRectF(center.x()-offset, center.y()-offset, offset*2, offset*2);
 }
 
 QPetal::QPetal(QPointF center, double angle){

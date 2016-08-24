@@ -1,6 +1,5 @@
 <RCC>
     <qresource prefix="/">
-        <file>images/arena_sw.png</file>
         <file>images/icons/group.png</file>
         <file>images/icons/ungroup.png</file>
         <file>images/icons/open.png</file>

@@ -65,18 +65,20 @@ public:
     QString casuName;
 
     bool connected;
-    bool led_on;
+    bool ledON;
     bool child_selected;
     bool airflowON;
     bool vibrON;
 
-    QColor led_color;
+    QColor ledColor;
 
     QString sub_addr;
     QString pub_addr;
     QString msg_addr;
 
     //pointers to tree objects needs to be saved because sorting changes children order
+
+    QMap<QString, QTreeWidgetItem*> widgetMap;
 
     QTreeWidgetItem *widget_IR;
     QTreeWidgetItem *widget_LED;
