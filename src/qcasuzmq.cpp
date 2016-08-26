@@ -12,22 +12,15 @@ QCPDataMap *QCasuZMQ::getBuffer(QCasuZMQ::dataType key)
     return _buffers[key];
 }
 
-QCPDataMap *QCasuZMQ::getValue(QCasuZMQ::dataType key)
+QCPData *QCasuZMQ::getValue(QCasuZMQ::dataType key)
 {
-    return _buffers[key]
+    return _buffers[key]->last().value;
 }
 
-void QCasuZMQ::addToBuffer(dataType key, QCPData value)
+void QCasuZMQ::addToBuffer(dataType key, QCPData data)
 {
-    if(lastDataTime.msecsTo(key) < settings->value("trendSampleTime_ms").toInt()) return;
-    else lastDataTime = key;
+    _buffers[key]->insert(data.key, data);
+    while(data.key - _buffers->begin()->key > QTime(0,0,0).secsTo(settings->value("trendTimeSpan").toTime())) _buffers->erase(_buffers->begin()); //Delete data older than $timeSpan
 
-    QCPData newData;
-    newData.key = (double) QTime(0,0,0).msecsTo(key)/1000;
-    newData.value = Value;
-
-    buffer->insert(newData.key, newData);
-    while(newData.key - buffer->begin()->key > QTime(0,0,0).secsTo(settings->value("trendTimeSpan").toTime())) buffer->erase(buffer->begin()); //Delete data older than $timeSpan
-
-    emit update();
+    emit updated(key);
 }

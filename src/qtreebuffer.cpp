@@ -16,8 +16,10 @@ QTreeBuffer::~QTreeBuffer(){
 
 void QTreeBuffer::addToBuffer(QTime time, double value)
 {
-    if(lastDataTime.msecsTo(time) < settings->value("trendSampleTime_ms").toInt()) return;
-    else lastDataTime = time;
+    qDebug() << lastDataTime.msecsTo(time);
+    //if(lastDataTime.msecsTo(time) < settings->value("trendSampleTime_ms").toInt()) return;
+    //else
+    lastDataTime = time;
 
     QCPData newData;
     newData.key = (double) QTime(0,0,0).msecsTo(time)/1000;

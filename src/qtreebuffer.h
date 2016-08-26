@@ -1,7 +1,7 @@
 #ifndef QTREEBUFFER_H
 #define QTREEBUFFER_H
 
-
+#include <QDebug>
 #include <QTreeWidgetItem>
 #include "QCustomPlot/qcustomplot.h"
 #include "globalHeader.h"

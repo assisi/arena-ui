@@ -16,7 +16,7 @@ public:
 
     explicit QCasuZMQ(QObject *parent = 0);
     QCPDataMap* getBuffer(dataType key);
-    QCPDataMap* getValue(dataType key);
+    QCPData* getValue(dataType key);
 
 
 private:
@@ -26,10 +26,10 @@ private:
 
     void insertValue(dataType key);
 
-    void addToBuffer(dataType key, QCPData value);
+    void addToBuffer(dataType key, QCPData data);
 
 signals:
-    void updated();
+    void updated(dataType key);
 
 public slots:
 
