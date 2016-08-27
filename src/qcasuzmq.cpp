@@ -5,10 +5,8 @@ QCasuZMQ::QCasuZMQ(QObject *parent, QString casuName) :
     _name(casuName)
 {
     for(int k = 0; k < _IR_num + _Temp_num; k++) _buffers.insert(static_cast<dataType>(k), new QCPDataMap());
-    for(int k = _IR_num + _Temp_num; k < _dataType_num; k++){
-        _values.insert(static_cast<dataType>(k), 0.0);
-        _state.insert(static_cast<dataType>(k), false)
-    }
+    for(int k = _IR_num + _Temp_num; k < _dataType_num; k++)_state.insert(static_cast<dataType>(k), false);
+
     _connectionTimer = new QTimer(this);
 
     _context = createDefaultContext(this);
@@ -26,11 +24,20 @@ QCPDataMap *QCasuZMQ::getBuffer(QCasuZMQ::dataType key)
     return 0;
 }
 
-QCasuZMQ::getValue(QCasuZMQ::dataType key)
+double QCasuZMQ::getValue(QCasuZMQ::dataType key)
 {
     if (key < _IR_num + _Temp_num) return _buffers[key]->last().value;
-    if (key == LED) return _ledColor;
-    return _values[key];
+    return _values[key].value;
+}
+
+QColor QCasuZMQ::getLedColor()
+{
+    return _ledColor;
+}
+
+bool QCasuZMQ::getState(QCasuZMQ::dataType key)
+{
+    return _state[key];
 }
 
 double QCasuZMQ::getAvgSamplingTime()
@@ -38,26 +45,26 @@ double QCasuZMQ::getAvgSamplingTime()
     double result = 0;
     double itemNum = 0;
 
-    foreach(QCPData* data, _values){
-        dataType key = _values.key(data, LED);
+    foreach(double data, _lastDataTime){
+        dataType key = _lastDataTime.key(data, LED);
         if(key == LED) continue;
-        result += data->key - _lastDataTime[key];
+        result += _values[key].key - data;
         itemNum++;
     }
     /*check IR sampling time*/
     if(_lastDataTime.contains(static_cast<dataType>(0))){
-        result += _buffers[static_cast<dataType>(0)]->lastKey - _lastDataTime[static_cast<dataType>(0)];
+        result += _buffers[static_cast<dataType>(0)]->lastKey() - _lastDataTime[static_cast<dataType>(0)];
         itemNum++;
     }
     /*check Temp sampling time*/{}
     if(_lastDataTime.contains(static_cast<dataType>(_IR_num))){
-        result += _buffers[static_cast<dataType>(_IR_num)]->lastKey - _lastDataTime[static_cast<dataType>(_IR_num)];
+        result += _buffers[static_cast<dataType>(_IR_num)]->lastKey() - _lastDataTime[static_cast<dataType>(_IR_num)];
         itemNum++;
     }
     return itemNum && _connected ? result/itemNum : 0;
 }
 
-void QCasuZMQ::setAddr(QString sub, QString pub, QString msg)
+void QCasuZMQ::setAddress(QString sub, QString pub, QString msg)
 {
     _subAddr = sub;
     _pubAddr = pub;
@@ -129,7 +136,7 @@ void QCasuZMQ::messageReceived(const QList<QByteArray> &message)
     string data(message.at(3).constData(), message.at(3).length());
 
     QCPData newData;
-    newData.key = (double) QTime(0,0,0).msecsTo(time)/1000;
+    newData.key = (double) QTime(0,0,0).msecsTo(QTime::currentTime())/1000;
 
     _logFile << device << ";" << (float) QDateTime::currentDateTime().toMSecsSinceEpoch() / 1000 ;
 
@@ -159,7 +166,7 @@ void QCasuZMQ::messageReceived(const QList<QByteArray> &message)
         AssisiMsg::Temperature pelt;
         pelt.ParseFromString(data);
         newData.value = pelt.temp();
-        _lastDataTime[Peltier] == _values[Peltier].key;
+        _lastDataTime[Peltier] = _values[Peltier].key;
         _values[Peltier] = newData;
         _state[Peltier] = command == "On";
         if(settings->value("log_on").toBool()) _logFile << ";" << _values[Peltier].value
@@ -169,7 +176,7 @@ void QCasuZMQ::messageReceived(const QList<QByteArray> &message)
         AssisiMsg::Airflow air;
         air.ParseFromString(data);
         newData.value = air.intensity();
-        _lastDataTime[Airflow] == _values[Airflow].key;
+        _lastDataTime[Airflow] = _values[Airflow].key;
         _values[Airflow] = newData;
         _state[Airflow] = command == "On";
         if(settings->value("log_on").toBool()) _logFile << ";" << _values[Airflow].value
@@ -177,9 +184,9 @@ void QCasuZMQ::messageReceived(const QList<QByteArray> &message)
 
      }
     if (device == "Speaker"){
-        VibrationSetpoint vibr;
+        AssisiMsg::VibrationSetpoint vibr;
         vibr.ParseFromString(data);
-         _lastDataTime[Freq] == _values[Freq].key;
+         _lastDataTime[Freq] = _values[Freq].key;
         newData.value = vibr.freq();
         _values[Freq] = newData;
         newData.value = vibr.amplitude();
@@ -191,13 +198,13 @@ void QCasuZMQ::messageReceived(const QList<QByteArray> &message)
     }
     if (device == "DiagnosticLed")
     {
-        ColorStamped LEDcolor;
+        AssisiMsg::ColorStamped LEDcolor;
         LEDcolor.ParseFromString(data);
         _ledColor.setRgbF(LEDcolor.color().red(),
                           LEDcolor.color().green(),
                           LEDcolor.color().blue());
         _state[LED] = command == "On";
-        if(settings->value("log_on").toBool()) _logFile << ";" << color.name().toStdString()
+        if(settings->value("log_on").toBool()) _logFile << ";" << _ledColor.name().toStdString()
                                                        << ";" << _state[LED];
     }
 

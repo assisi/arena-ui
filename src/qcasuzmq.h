@@ -2,6 +2,7 @@
 #define QCASUZMQ_H
 
 #include <QObject>
+#include <QTime>
 
 #include <fstream>
 #include <boost/lexical_cast.hpp>
@@ -28,13 +29,16 @@ public:
 
     explicit QCasuZMQ(QObject *parent = 0, QString casuName = QString());
     QCPDataMap* getBuffer(dataType key);
-    auto getValue(dataType key);
-    double getAvgSampleTime();
+    double getValue(dataType key);
+    QColor getLedColor();
+    bool getState(dataType key);
+    double getAvgSamplingTime();
 
-    void setAddr(QString sub, QString pub, QString msg);
+    void setAddress(QString sub, QString pub, QString msg);
     bool sendSetpoint(QList<QByteArray> message);
 
     bool isConnected();
+
 
 private:
     nzmqt::ZMQContext* _context;
@@ -63,9 +67,6 @@ private:
     bool _logOpen;
 
     bool _connected = false;
-    bool _ledON = false;
-    bool _airflowON = false;
-    bool _vibrON = false;
 
     void openLogFile();
     void closeLogFile();
