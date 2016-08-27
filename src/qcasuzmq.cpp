@@ -4,7 +4,7 @@ QCasuZMQ::QCasuZMQ(QObject *parent, QString casuName) :
     QObject(parent),
     _name(casuName)
 {
-    for(int k = 0; k < _IR_num + _Temp_num; k++) _buffers.insert(static_cast<dataType>(k), new QCPDataMap());
+    for(int k = 0; k < _IR_num + _Temp_num; k++) _buffers.insert(static_cast<dataType>(k), new zmqBuffer());
     for(int k = _IR_num + _Temp_num; k < _dataType_num; k++)_state.insert(static_cast<dataType>(k), false);
 
     _connectionTimer = new QTimer(this);
@@ -18,7 +18,7 @@ QCasuZMQ::QCasuZMQ(QObject *parent, QString casuName) :
     connect(_connectionTimer, SIGNAL(timeout()),SLOT(connectionTimeout()));
 }
 
-QCPDataMap *QCasuZMQ::getBuffer(QCasuZMQ::dataType key)
+zmqBuffer *QCasuZMQ::getBuffer(QCasuZMQ::dataType key)
 {
     if (key < _IR_num + _Temp_num) return _buffers[key];
     return 0;
@@ -235,4 +235,33 @@ void QCasuZMQ::connectionTimeout()
 {
     _connected = false;
     _connectionTimer->stop();
+}
+
+// ----------------------------------------------------------------
+
+zmqBuffer::zmqBuffer(QString casuName, QCasuZMQ::dataType key) :
+    _trendName(casuName)
+{
+    switch(key){
+    case QCasuZMQ::IR_F  : _trendName += ": IR - F";  break;
+    case QCasuZMQ::IR_FL : _trendName += ": IR - FL"; break;
+    case QCasuZMQ::IR_FR : _trendName += ": IR - FR"; break;
+    case QCasuZMQ::IR_B  : _trendName += ": IR - B";  break;
+    case QCasuZMQ::IR_BR : _trendName += ": IR - BR"; break;
+    case QCasuZMQ::IR_BL : _trendName += ": IR - BL"; break;
+
+    case QCasuZMQ::Temp_F : _trendName += ": Temp - F"; break;
+    case QCasuZMQ::Temp_R : _trendName += ": Temp - R"; break;
+    case QCasuZMQ::Temp_B : _trendName += ": Temp - B"; break;
+    case QCasuZMQ::Temp_L : _trendName += ": Temp - L"; break;
+    case QCasuZMQ::Temp_Top : _trendName += ": Temp - F"; break;
+    case QCasuZMQ::Temp_Pcb : _trendName += ": Temp - R"; break;
+    case QCasuZMQ::Temp_Ring : _trendName += ": Temp - B"; break;
+    case QCasuZMQ::Temp_Wax : _trendName += ": Temp - L"; break;
+    }
+}
+
+QString zmqBuffer::getTrendName()
+{
+    return _trendName;
 }

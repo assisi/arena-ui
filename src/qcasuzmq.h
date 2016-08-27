@@ -15,6 +15,8 @@
 using namespace nzmqt;
 using namespace std;
 
+class zmqBuffer;
+
 class QCasuZMQ : public QObject
 {
     Q_OBJECT
@@ -25,7 +27,7 @@ public:
             Peltier, Airflow, Speaker, LED};
 
     explicit QCasuZMQ(QObject *parent = 0, QString casuName = QString());
-    QCPDataMap* getBuffer(dataType key);
+    zmqBuffer* getBuffer(dataType key);
     double getValue(dataType key);
     QColor getLedColor();
     bool getState(dataType key);
@@ -50,7 +52,7 @@ private:
 
     QTimer* _connectionTimer;
 
-    QMap<dataType, QCPDataMap*> _buffers;
+    QMap<dataType, zmqBuffer*> _buffers;
     QMap<dataType, QCPData> _values;
     QMap<dataType, double> _lastDataTime;
     QMap<dataType, bool> _state;
@@ -78,6 +80,15 @@ signals:
 private slots:
     void messageReceived(const QList<QByteArray>& message);
     void connectionTimeout();
+};
+
+class zmqBuffer : public QCPDataMap
+{
+private:
+    QString _trendName;
+public:
+    zmqBuffer(QString casuName, QCasuZMQ::dataType key);
+    QString getTrendName();
 };
 
 #endif // QCASUZMQ_H

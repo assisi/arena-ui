@@ -5,9 +5,9 @@ bool QCasuSceneItem::isGroup() const
     return false;
 }
 
-QList<QCPDataMap *> QCasuSceneItem::getBuffers(QCasuZMQ::dataType key)
+QList<zmqBuffer *> QCasuSceneItem::getBuffers(QCasuZMQ::dataType key)
 {
-    QList<QCPDataMap *> out;
+    QList<zmqBuffer *> out;
     out.append(_zmqObject->getBuffer(key));
 }
 

@@ -38,9 +38,9 @@ bool QCasuSceneGroup::isGroup() const
     return true;
 }
 
-QList<QCPDataMap *> QCasuSceneGroup::getBuffers(QCasuZMQ::dataType key)
+QList<zmqBuffer *> QCasuSceneGroup::getBuffers(QCasuZMQ::dataType key)
 {
-    QList<QCPDataMap *> out;
+    QList<zmqBuffer *> out;
     foreach (QGraphicsItem *item, childItems()) {
         out.append(((QAbstractSceneItem*) item)->getBuffers(key));
     }

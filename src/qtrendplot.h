@@ -2,7 +2,6 @@
 #define QTRENDPLOT_H
 
 #include "QCustomPlot/qcustomplot.h"
-#include "qtreebuffer.h"
 #include "qcasutreeitem.h"
 #include "qcasusceneitem.h"
 

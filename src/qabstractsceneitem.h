@@ -30,7 +30,7 @@ public:
 
     // Public pure virtual methods
     virtual bool isGroup() const = 0;
-    virtual QList<QCPDataMap*> getBuffers(QCasuZMQ::dataType key) = 0;
+    virtual QList<zmqBuffer *> getBuffers(QCasuZMQ::dataType key) = 0;
 
     // Public virtual methods
     virtual void setGroupColor(QColor color){

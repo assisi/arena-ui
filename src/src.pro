@@ -31,7 +31,6 @@ SOURCES += main.cpp\
         qcasusceneitem.cpp \
         qcasutreeitem.cpp \
         qtrendplot.cpp \
-        qtreebuffer.cpp \
         qdialogsettings.cpp \
         qdialogconnect.cpp \
         globalHeader.cpp \
@@ -51,7 +50,6 @@ HEADERS  += arenaui.h\
         qcasusceneitem.h \
         qcasutreeitem.h \
         qtrendplot.h \
-        qtreebuffer.h \
         qdialogsettings.h \
         qdialogconnect.h \
         globalHeader.h \
