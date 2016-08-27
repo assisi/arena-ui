@@ -2,62 +2,73 @@
 
 QVariant QCasuSceneGroup::itemChange(QGraphicsItem::GraphicsItemChange change, const QVariant &value)
 {
+    QAbstractSceneItem::itemChange(change,value);
+
     if(change==QGraphicsItem::ItemChildAddedChange || change==QGraphicsItem::ItemChildRemovedChange){
         QPainterPath newLine, newShape;
 
-        childCoords.clear();
+        _childCoords.clear();
 
-        foreach (QGraphicsItem* item, childItems()) {
+        foreach (QGraphicsItem *item, childItems()) {
             if(item->childItems().size())
-                foreach (QPointF subItem, ((QCasuSceneGroup*)item)->childCoords)
-                    childCoords.append(subItem);
-            else childCoords.append(QPointF(((QCasuSceneItem*)item)->x_center,((QCasuSceneItem*)item)->y_center));
+                foreach (QPointF subItem, ((QCasuSceneGroup*)item)->_childCoords)
+                    _childCoords.append(subItem);
+            else _childCoords.append(QPointF(((QCasuSceneItem*)item)->x_center,((QCasuSceneItem*)item)->y_center));
             newShape.addPath(item->shape());
         }
 
-        if(childCoords.size()<2)return QGraphicsItem::itemChange(change, value);
+        if(_childCoords.size()<2)return QGraphicsItem::itemChange(change, value);
 
-        QVector<QLineF> mst = Prim(childCoords);
+        QVector<QLineF> mst = Prim(_childCoords);
 
         foreach (QLineF line, mst) {
             newLine.moveTo(line.p1());
             newLine.lineTo(line.p2());
         }
 
-        groupLine = newLine;
-        groupShape = newShape;
+        _groupLine = newLine;
+        _groupShape = newShape;
     }
 
     return QGraphicsItem::itemChange(change, value);
 }
 
-QCasuSceneGroup::QCasuSceneGroup(QGraphicsItem* parent, QCasuTreeItem* widget) : QGraphicsItemGroup(parent),
+bool QCasuSceneGroup::isGroup() const
+{
+    return true;
+}
+
+QList<QCPDataMap *> QCasuSceneGroup::getBuffers(QCasuZMQ::dataType key)
+{
+    QList<QCPDataMap *> out;
+    foreach (QGraphicsItem *item, childItems()) {
+        out.append(((QAbstractSceneItem*) item)->getBuffers(key));
+    }
+    return out;
+}
+
+void QCasuSceneGroup::setGroupColor(QColor color)
+{
+    groupColor = color;
+    foreach (QGraphicsItem *item, childItems())
+        if(item->childItems().size()) ((QCasuSceneGroup*)item)->setGroupColor(color);
+        else ((QCasuSceneItem*)item)->groupColor = color;
+
+}
+
+QCasuSceneGroup::QCasuSceneGroup(QCasuTreeItem *treeItem) :
     groupColor(Qt::black),
     isTopLevel(true),
-    treeItem(widget)
+    _treeItem(treeItem)
 {
 }
-
-QCasuSceneGroup::~QCasuSceneGroup()
-{
-    delete treeItem;
-}
-
-QRectF QCasuSceneGroup::boundingRect() const
-{
-    return childrenBoundingRect();
-}
-
 
 void QCasuSceneGroup::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
 {
     Q_UNUSED(option)
     Q_UNUSED(widget)
 
-    if(this->isSelected() && isTopLevel)treeItem->setHidden(false);
-    else treeItem->setHidden(true);
-
-    if(!this->isSelected() || !isTopLevel)return;
+    if(!isSelected() || _inGroup)return;
 
     painter->setRenderHints(QPainter::Antialiasing | QPainter::SmoothPixmapTransform, true);
 
@@ -66,27 +77,18 @@ void QCasuSceneGroup::paint(QPainter *painter, const QStyleOptionGraphicsItem *o
     pen.setColor(groupColor);
     pen.setWidth(2);
     painter->setPen(pen);
-    painter->drawPath(groupLine);
+    painter->drawPath(_groupLine);
 }
 
-void QCasuSceneGroup::setGroupColor(QColor color)
+QPainterPath QCasuSceneGroup::shape()
 {
-    groupColor = color;
-    foreach (QGraphicsItem* item, childItems())
-        if(item->childItems().size()) ((QCasuSceneGroup*)item)->setGroupColor(color);
-        else ((QCasuSceneItem*)item)->groupColor = color;
-
+    return _groupShape;
 }
 
-QPainterPath QCasuSceneGroup::shape() const
+QPainterPath QCasuSceneGroup::completeShape()
 {
-    return groupShape;
-}
-
-QPainterPath QCasuSceneGroup::completeShape() const
-{
-    QPainterPath tempShape = groupShape;
-    tempShape.addPath(groupLine);
+    QPainterPath tempShape = _groupShape;
+    tempShape.addPath(_groupLine);
     return tempShape;
 }
 

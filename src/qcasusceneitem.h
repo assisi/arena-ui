@@ -5,7 +5,7 @@
 #include <QGraphicsItem>
 #include <QGraphicsScene>
 
-#include "qcasutreeitem.h"
+#include "qabstractsceneitem.h"
 
 #define PI 3.14159265
 
@@ -15,43 +15,23 @@
  * All graphical elements for individual CASU are drawn with this item
  */
 
-class QCasuSceneItem : public QObject, public QGraphicsItem
+class QCasuSceneItem : public QAbstractSceneItem
 {
-    Q_OBJECT
-
 private:
-//ANIMATION
-    /*!
-     * \brief Timer that checks if graphics scene update was called with animation timer or some other event
-     */
-    QElapsedTimer* FPScheck;
-    /*!
-     * \brief Current angle of rotation animation
-     *
-     * Increment during scene update depends on sensor values
-     */
-    double airflowAngle;
-    /*!
-     * \brief Current angle of rotation animation
-     *
-     * Increment during scene update depends on sensor values
-     */
-    double vibrAngle;
+    QPointF _coord;
+    int _yaw;
+    QElapsedTimer *FPScheck;
+
+    double _airflowAngle;
+    double _vibrAngle;
+
+    QCasuZMQ *_zmqObject;
 
 public:
-    int x_center;
-    int y_center;
-    int yaw_;
+    bool isGroup() const;
+    QList<QCPDataMap *> getBuffers(QCasuZMQ::dataType key);
 
-    bool inGroup;
-    QColor groupColor;
-
-    /*!
-     * \brief Pointer to corresponding QCasuTreeItem for same CASU
-     */
-    QCasuTreeItem* treeItem;
-
-    QCasuSceneItem(QObject *parent, int x, int y, double yaw, QCasuTreeItem *widget);
+    QCasuSceneItem(QPointF coordinates, double yaw, QCasuTreeItem *treeItem, QCasuZMQ *zmqObject);
 
     QRectF boundingRect() const;
 
@@ -61,9 +41,6 @@ public:
      * All graphical elements are implemented in this
      */
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
-
-protected slots:
-
 };
 
 /*!
