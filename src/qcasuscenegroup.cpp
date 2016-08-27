@@ -56,7 +56,7 @@ void QCasuSceneGroup::setGroupColor(QColor color)
 
 }
 
-QCasuSceneGroup::QCasuSceneGroup(QCasuTreeItem *treeItem) :
+QCasuSceneGroup::QCasuSceneGroup(QAbstractTreeItem *treeItem) :
     groupColor(Qt::black),
     isTopLevel(true),
     _treeItem(treeItem)

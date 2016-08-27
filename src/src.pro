@@ -42,8 +42,7 @@ SOURCES += main.cpp\
         qcasuscenegroup.cpp \
     qgraphicsviewzoom.cpp \
     qarenascene.cpp \
-    qcasuzmq.cpp \
-    treeiteminterface.cpp
+    qcasuzmq.cpp
 
 
 HEADERS  += arenaui.h\
@@ -64,8 +63,8 @@ HEADERS  += arenaui.h\
     qgraphicsviewzoom.h \
     qarenascene.h \
     qcasuzmq.h \
-    treeiteminterface.h \
-    qabstractsceneitem.h
+    qabstractsceneitem.h \
+    qabstracttreeitem.h
 
 
 FORMS    += arenaui.ui

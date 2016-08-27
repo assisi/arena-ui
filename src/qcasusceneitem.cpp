@@ -99,19 +99,8 @@ void QCasuSceneItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *op
     else if(_zmqObject->isConnected())pen.setColor(Qt::green);
     else pen.setColor(Qt::red);
 
-
-    if(isSelected()){
-        pen.setStyle(Qt::DotLine);
-        _treeItem->setHidden(false);
-    }
-    else{
-        pen.setStyle(Qt::SolidLine);
-        _treeItem->setHidden(true);
-        _treeItem->resetSelection();
-    }
-
     brush.setColor(_zmqObject->getState(QCasuZMQ::LED) ? brush.setColor(_zmqObject->getLedColor()) : Qt::gray);
-    if(_treeItem->isChildSelected()) brush.setStyle(Qt::Dense2Pattern);
+    if(((QAbstractTreeItem*)_treeItem)->isChildSelected()) brush.setStyle(Qt::Dense2Pattern);
 
     painter->setPen(pen);
     painter->setBrush(brush);
@@ -139,7 +128,7 @@ void QCasuSceneItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *op
 
     //paint vibration marker
     if(settings->value("vibr_on").toBool() && _zmqObject->isConnected() && _zmqObject->getState(QCasuZMQ::Speaker)){
-        double freq = _zmqObject->getValue(QCasuZMQ::Freq);
+        double freq = _zmqObject->getValue(QCasuZMQ::Frequency);
         double amplitude = _zmqObject->getValue(QCasuZMQ::Amplitude);
 
         pen.setColor(QColor(255,255,255,96));

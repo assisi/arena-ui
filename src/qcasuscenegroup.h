@@ -26,7 +26,7 @@ public:
     QList<QCPDataMap *> getBuffers(QCasuZMQ::dataType key);
     void setGroupColor(QColor color);
 
-    QCasuSceneGroup(QCasuTreeItem *treeItem);
+    QCasuSceneGroup(QAbstractTreeItem *treeItem);
 
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
 

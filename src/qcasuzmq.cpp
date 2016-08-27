@@ -64,6 +64,11 @@ double QCasuZMQ::getAvgSamplingTime()
     return itemNum && _connected ? result/itemNum : 0;
 }
 
+string QCasuZMQ::getName()
+{
+    return _name;
+}
+
 void QCasuZMQ::setAddress(QString sub, QString pub, QString msg)
 {
     _subAddr = sub;
@@ -148,6 +153,7 @@ void QCasuZMQ::messageReceived(const QList<QByteArray> &message)
             if( k == _IR_num) break;
             newData.value = lexical_cast<double>(ranges.raw_value(k));
             this->addToBuffer(static_cast<dataType>(k), newData);
+            emit updated(static_cast<dataType>(k));
             if(settings->value("log_on").toBool()) _logFile << ";" << newData.value;
         }
     }
@@ -158,10 +164,18 @@ void QCasuZMQ::messageReceived(const QList<QByteArray> &message)
         for (int k = 0; k < temperatures.temp_size(); k++){
             if( k == _Temp_num) break;
             newData.value = lexical_cast <double>(temperatures.temp(k));
-            this->addToBuffer(static_cast<dataType>(k), newData);
+            this->addToBuffer(static_cast<dataType>(k+_IR_num), newData);
+            emit updated(static_cast<dataType>(k+_IR_num));
             if(settings->value("log_on").toBool()) _logFile << ";" << newData.value;
         }
     }
+
+/*
+-----
+Vibration measurements?
+freq, ampl, stdDev ---> currently setpoints are stored on those values
+-----
+*/
     if (device == "Peltier"){
         AssisiMsg::Temperature pelt;
         pelt.ParseFromString(data);
@@ -169,16 +183,18 @@ void QCasuZMQ::messageReceived(const QList<QByteArray> &message)
         _lastDataTime[Peltier] = _values[Peltier].key;
         _values[Peltier] = newData;
         _state[Peltier] = command == "On";
+        emit updated(Peltier);
         if(settings->value("log_on").toBool()) _logFile << ";" << _values[Peltier].value
                                                        << ";" << _state[Peltier];
      }
     if (device == "Airflow"){
         AssisiMsg::Airflow air;
         air.ParseFromString(data);
-        newData.value = air.intensity();
         _lastDataTime[Airflow] = _values[Airflow].key;
+        newData.value = air.intensity();
         _values[Airflow] = newData;
         _state[Airflow] = command == "On";
+        emit updated(Airflow);
         if(settings->value("log_on").toBool()) _logFile << ";" << _values[Airflow].value
                                                        << ";" << _state[Airflow];
 
@@ -186,13 +202,17 @@ void QCasuZMQ::messageReceived(const QList<QByteArray> &message)
     if (device == "Speaker"){
         AssisiMsg::VibrationSetpoint vibr;
         vibr.ParseFromString(data);
-         _lastDataTime[Freq] = _values[Freq].key;
+         _lastDataTime[Frequency] = _values[Frequency].key;
         newData.value = vibr.freq();
-        _values[Freq] = newData;
+        _values[Frequency] = newData;
         newData.value = vibr.amplitude();
         _values[Amplitude] = newData;
         _state[Speaker] = command == "On";
-        if(settings->value("log_on").toBool()) _logFile << ";" << _values[Freq].value
+        _state[Frequency] = command == "On";
+        _state[Amplitude] = command == "On";
+        emit updated(Frequency);
+        emit updated(Amplitude);
+        if(settings->value("log_on").toBool()) _logFile << ";" << _values[Frequency].value
                                                        << ";" << _values[Amplitude].value
                                                        << ";" << _state[Speaker];
     }

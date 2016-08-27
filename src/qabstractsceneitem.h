@@ -5,19 +5,20 @@
 #include <QVariant>
 
 #include "qcasuzmq.h"
-#include "qcasutreeitem.h"
+#include "qabstracttreeitem.h"
 
 class QAbstractSceneItem : public QGraphicsItemGroup
 {
 protected:
     bool _inGroup;
     QColor _groupColor;
-    QCasuTreeItem* _treeItem;
+    QTreeWidgetItem* _treeItem;
 
     //Protected virtual methods
     virtual QVariant itemChange(GraphicsItemChange change, const QVariant &value){
         if(change == QGraphicsItem::ItemSelectedHasChanged){
             _treeItem->setHidden(!value.toBool());
+            if(!value.toBool()) ((QAbstractTreeItem*) _treeItem)->resetSelection();
         }
         return QGraphicsItem::itemChange(change, value);
     }
