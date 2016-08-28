@@ -14,7 +14,7 @@ class QCasuSceneGroup : public QAbstractSceneItem
 private:
     QPainterPath _groupLine;
     QPainterPath _groupShape;
-    QVector<QPointF> _childCoords;
+    QVector<QPointF> _childCoordinates;
 
     QVector<QLineF> Prim(QVector<QPointF> list);
 
@@ -24,9 +24,11 @@ protected:
 public:
     bool isGroup() const;
     QList<zmqBuffer *> getBuffers(dataType key);
+    QVector<QPointF> getCoordinateVector();
+    void sendSetpoint(QList<QByteArray> message);
     void setGroupColor(QColor color);
 
-    QCasuSceneGroup(QAbstractTreeItem *treeItem);
+    QCasuSceneGroup();
 
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
 

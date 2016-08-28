@@ -14,6 +14,11 @@ void QAbstractSceneItem::setInGroup(bool state){
     _inGroup = state;
 }
 
+void QAbstractSceneItem::setTreeItem(QTreeWidgetItem *treeItem)
+{
+    _treeItem = treeItem;
+}
+
 void QAbstractSceneItem::setGroupColor(QColor color){
     _groupColor = color;
 }

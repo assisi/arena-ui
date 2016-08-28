@@ -18,8 +18,12 @@
 #include "qdialogconnect.h"
 #include "qdialogsettings.h"
 #include "qdialogsetpoint.h"
+
 #include "qcasuscenegroup.h"
 #include "qcasusceneitem.h"
+#include "qcasutreeitem.h"
+#include "qcasutreegroup.h"
+
 #include "qtrendplot.h"
 #include "qdeploy.h"
 #include "qgraphicsviewzoom.h"
@@ -50,7 +54,7 @@ private:
     /*!
      * \brief Pointer to main graphics scene
      */
-    QArenaScene *arenaScene;
+    QArenaScene *_arenaScene;
     /*!
      * \brief YAML node to parse associated project files
      */
@@ -106,7 +110,7 @@ private:
     /*!
      * \brief Recursive function which loads grouping hieararchy of arenaScene items when loading a session
      */
-    QList<QGraphicsItem *> *groupLoad(YAML::Node *arenaNode, QSettings *loadState, int groupSize, QMap<QString, QCasuTreeItem *> *linker, QProgressBar *progress);
+    QList<QGraphicsItem *> *groupLoad(YAML::Node *arenaNode, QSettings *loadState, int groupSize, QMap<QString, QCasuZMQ*>* linkMap, QProgressBar *progress);
 
 private slots:
     /*!

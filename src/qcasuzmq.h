@@ -40,6 +40,7 @@ using namespace zmqData;
 class QCasuZMQ : public QObject
 {
     Q_OBJECT
+    friend class QCasuSceneItem;
 public:
     explicit QCasuZMQ(QObject *parent = 0, QString casuName = QString());
     zmqBuffer* getBuffer(dataType key);
@@ -47,9 +48,12 @@ public:
     QColor getLedColor();
     bool getState(dataType key);
     double getAvgSamplingTime();
-    string getName();
+    QString getName();
 
-    void setAddress(QString sub, QString pub, QString msg);
+    void setAddresses(QString sub, QString pub, QString msg);
+    void setAddresses(QStringList addresses);
+
+    QStringList getAddresses();
     bool sendSetpoint(QList<QByteArray> message);
 
     bool isConnected();

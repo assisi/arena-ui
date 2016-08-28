@@ -73,16 +73,13 @@ void QArenaScene::mousePressEvent(QGraphicsSceneMouseEvent *event)
 
 void QArenaScene::checkSelection()
 {
-    QList<QGraphicsItem*> tempList = this->selectedItems();
+    QList<QGraphicsItem *> tempList = this->selectedItems();
     if(tempList.size()>1) selectionTreeWidget->setHidden(false);
     else selectionTreeWidget->setHidden(true);
 
     int color = 14;
 
-    foreach(QGraphicsItem* item, tempList){
-        if(item->childItems().size()){
-            ((QCasuSceneGroup*)item)->setGroupColor((Qt::GlobalColor) color);
-            ((QCasuSceneGroup*)item)->treeItem->setTextColor(0,(Qt::GlobalColor) color++);
-        }
-    }
+    foreach(QGraphicsItem *item, tempList)
+        if(dynamic_cast<QAbstractSceneItem *>(item)->isGroup())
+            dynamic_cast<QAbstractSceneItem *>(item)->setGroupColor(static_cast<Qt::GlobalColor>(color++));
 }

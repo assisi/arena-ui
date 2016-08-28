@@ -1,8 +1,8 @@
 #include "qcasutreegroup.h"
+#include "qabstractsceneitem.h"
 
-QCasuTreeGroup::QCasuTreeGroup(QGraphicsItem *sceneItem) :
-    QAbstractTreeItem(sceneItem),
-    _name("CASU group")
+QCasuTreeGroup::QCasuTreeGroup(QString name) :
+    _name(name)
 {
     this->setData(0,Qt::DisplayRole,QStringList(_name));
     QTreeWidgetItem* tempWidget;
@@ -17,7 +17,7 @@ QCasuTreeGroup::QCasuTreeGroup(QGraphicsItem *sceneItem) :
         tempWidget->addChild(new QTreeWidgetItem(QStringList("IR - BR")));
         tempWidget->addChild(new QTreeWidgetItem(QStringList("IR - FR")));
         for(int k = 0; k < 6; k++){
-            _widgetMap.insert(static_cast<QCasuZMQ::dataType>(k), tempWidget->child(k));
+            _widgetMap.insert(static_cast<dataType>(k), tempWidget->child(k));
             tempWidget->child(k)->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled);
         }
         tempWidget->setFlags(Qt::ItemIsEnabled);
@@ -36,7 +36,7 @@ QCasuTreeGroup::QCasuTreeGroup(QGraphicsItem *sceneItem) :
         tempWidget->addChild(new QTreeWidgetItem(QStringList("Temp - RING")));
         tempWidget->addChild(new QTreeWidgetItem(QStringList("Temp - WAX")));
         for(int k = 0; k < 8; k++){
-            _widgetMap.insert(static_cast<QCasuZMQ::dataType>(k + 6), tempWidget->child(k));
+            _widgetMap.insert(static_cast<dataType>(k + 6), tempWidget->child(k));
             tempWidget->child(k)->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled);
         }
         tempWidget->setFlags(Qt::ItemIsEnabled);
@@ -46,8 +46,7 @@ QCasuTreeGroup::QCasuTreeGroup(QGraphicsItem *sceneItem) :
 
 
 QSelectionTreeItem::QSelectionTreeItem(QGraphicsScene *scene) :
-    QCasuTreeGroup(nullptr),
-    _name("Selected CASUs"),
+    QCasuTreeGroup(QString("Selected CASUS")),
     _scene(scene)
 {
 }

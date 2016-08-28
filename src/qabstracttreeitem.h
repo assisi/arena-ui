@@ -12,8 +12,11 @@ protected:
     QMap<dataType, QTreeWidgetItem*> _widgetMap;
     QGraphicsItem * _sceneItem;
 public:
-    QAbstractTreeItem(QGraphicsItem* sceneItem) : _sceneItem(sceneItem){}
+    QAbstractTreeItem(){
+        this->setHidden(true);
+    }
     void resetSelection();
+    void setSceneItem(QGraphicsItem *sceneItem);
 
     //Public virtual methods
     virtual bool isChildSelected();

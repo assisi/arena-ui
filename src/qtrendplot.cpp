@@ -1,10 +1,9 @@
 #include "qtrendplot.h"
 
-QTrendPlot::QTrendPlot(QGraphicsScene* scene, QTreeWidget* tree1,QTreeWidget* tree2 , QWidget *parent) :
+QTrendPlot::QTrendPlot(QTreeWidget* tree1,QTreeWidget* tree2 , QWidget *parent) :
     QCustomPlot(parent),
     casuTree(tree1),
     groupTree(tree2),
-    arenaScene(scene),
     autoPosition(true),
     showLegend(true),
     docked(true)
@@ -54,6 +53,7 @@ void QTrendPlot::addGraph(zmqBuffer *buffer){
     }
 
     QCustomPlot::connect(buffer,SIGNAL(updatePlot()),this,SLOT(replot()));
+    _connectionMap.insert(this->graph(), buffer);
 }
 
 bool sortZmqBuffer(zmqBuffer* buffer1,zmqBuffer* buffer2){
@@ -79,8 +79,8 @@ void QTrendPlot::addGraphList(QList<zmqBuffer *> bufferList)
 
 void QTrendPlot::removeGraph(QCPGraph *graph){
     this->QCustomPlot::removeGraph(graph);
-    disconnect(connectionMap[graph],0,this,0);
-    connectionMap.remove(graph);
+    disconnect(_connectionMap[graph],0,this,0);
+    _connectionMap.remove(graph);
 }
 
 void QTrendPlot::removeSelectedGraphs(){
@@ -88,23 +88,15 @@ void QTrendPlot::removeSelectedGraphs(){
 }
 
 void QTrendPlot::addSelectedGraphs(){
-    QList<QTreeWidgetItem*> selectedList = casuTree->selectedItems();
 
-    foreach(QTreeWidgetItem* item, groupTree->selectedItems()){
-        QTreeWidgetItem* parent = item->parent();
-        while(parent->parent()) parent = parent->parent();
-        QColor color = parent->textColor(0);
-        QString name = item->text(0);
-        QString parentName = parent->text(0);
+    QList<zmqBuffer *> buffers;
 
-        foreach (QGraphicsItem* casuItem, arenaScene->items()) {
-            if(casuItem->childItems().size()) continue;
-            if(((QCasuSceneItem*)casuItem)->groupColor != color && !QString::compare(parentName, "CASU group")) continue;
-            if(!casuItem->isSelected() && !QString::compare(parentName, "Selected CASUs")) continue;
-            selectedList.append(((QCasuSceneItem*)casuItem)->treeItem->widgetMap[name]);
-        }
-    }
-    this->addGraphList(selectedList);
+    for(int k=0; k < casuTree->topLevelItemCount(); k++)
+        buffers.append(dynamic_cast<QAbstractTreeItem *>(casuTree->topLevelItem(k))->getBuffers());
+    for(int k=0; k < groupTree->topLevelItemCount(); k++)
+        buffers.append(dynamic_cast<QAbstractTreeItem *>(groupTree->topLevelItem(k))->getBuffers());
+
+    this->addGraphList(buffers);
 
     this->replot();
 }

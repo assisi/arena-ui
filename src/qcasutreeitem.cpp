@@ -1,7 +1,6 @@
 #include "qcasutreeitem.h"
 
-QCasuTreeItem::QCasuTreeItem(QGraphicsItem *sceneItem, QCasuZMQ *zmqObject) :
-    QAbstractSceneItem(sceneItem),
+QCasuTreeItem::QCasuTreeItem(QCasuZMQ *zmqObject) :
     _zmqObject(zmqObject)
 {
     this->setData(0,Qt::DisplayRole,QStringList(_zmqObject->getName()));
@@ -17,7 +16,7 @@ QCasuTreeItem::QCasuTreeItem(QGraphicsItem *sceneItem, QCasuZMQ *zmqObject) :
         tempWidget->addChild(new QTreeWidgetItem(QStringList("IR - BR")));
         tempWidget->addChild(new QTreeWidgetItem(QStringList("IR - FR")));
         for(int k = 0; k < 6; k++){
-            _widgetMap.insert(static_cast<QCasuZMQ::dataType>(k), tempWidget->child(k));
+            _widgetMap.insert(static_cast<dataType>(k), tempWidget->child(k));
             tempWidget->child(k)->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled);
         }
         tempWidget->setFlags(Qt::ItemIsEnabled);
@@ -36,7 +35,7 @@ QCasuTreeItem::QCasuTreeItem(QGraphicsItem *sceneItem, QCasuZMQ *zmqObject) :
         tempWidget->addChild(new QTreeWidgetItem(QStringList("Temp - RING")));
         tempWidget->addChild(new QTreeWidgetItem(QStringList("Temp - WAX")));
         for(int k = 0; k < 8; k++){
-            _widgetMap.insert(static_cast<QCasuZMQ::dataType>(k + 6), tempWidget->child(k));
+            _widgetMap.insert(static_cast<dataType>(k + 6), tempWidget->child(k));
             tempWidget->child(k)->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled);
         }
         tempWidget->setFlags(Qt::ItemIsEnabled);
@@ -49,7 +48,7 @@ QCasuTreeItem::QCasuTreeItem(QGraphicsItem *sceneItem, QCasuZMQ *zmqObject) :
         tempWidget->addChild(new QTreeWidgetItem(QStringList("Amplitude"), name + ": Vibration - amp"));
         tempWidget->addChild(new QTreeWidgetItem(QStringList("StdDev"), name + ": Vibration - stdDev"));
         for(int k = 0; k < 3; k++){
-            _widgetMap.insert(static_cast<QCasuZMQ::dataType>(k + 14), tempWidget->child(k));
+            _widgetMap.insert(static_cast<dataType>(k + 14), tempWidget->child(k));
             tempWidget->setFlags(Qt::ItemIsEnabled);
         }
         tempWidget->setFlags(Qt::ItemIsEnabled);
@@ -64,11 +63,11 @@ QCasuTreeItem::QCasuTreeItem(QGraphicsItem *sceneItem, QCasuZMQ *zmqObject) :
         tempWidget->child(2)->addChild(new QTreeWidgetItem(QStringList("Frequency")));
         tempWidget->child(2)->addChild(new QTreeWidgetItem(QStringList("Amplitude")));
         for(int k = 0; k < 2; k++){
-            _widgetMap.insert(static_cast<QCasuZMQ::dataType>(k + 17), tempWidget->child(k));
+            _widgetMap.insert(static_cast<dataType>(k + 17), tempWidget->child(k));
             tempWidget->child(k)->setFlags(Qt::ItemIsEnabled);
         }
         for(int k = 0; k < 2; k++){
-            _widgetMap.insert(static_cast<QCasuZMQ::dataType>(k + 19), tempWidget->child(2)->child(k));
+            _widgetMap.insert(static_cast<dataType>(k + 19), tempWidget->child(2)->child(k));
             tempWidget->child(k)->setFlags(Qt::ItemIsEnabled);
         }
         tempWidget->setFlags(Qt::ItemIsEnabled);
@@ -77,11 +76,11 @@ QCasuTreeItem::QCasuTreeItem(QGraphicsItem *sceneItem, QCasuZMQ *zmqObject) :
 
     this->setFlags(Qt::ItemIsEnabled);
 
-    connect (_zmqObject,SIGNAL(updated(QCasuZMQ::dataType),this,SLOT(updateData(QCasuZMQ::dataType));
+    connect (_zmqObject,SIGNAL(updated(dataType)),this,SLOT(updateData(dataType)));
 }
 
 
-void QCasuTreeItem::updateData(QCasuZMQ::dataType key)
+void QCasuTreeItem::updateData(dataType key)
 {
     _widgetMap[key]->setData(1, Qt::DisplayRole, QVariant(_zmqObject->getValue(key)));
     if(key >= 14) _widgetMap[key]->setTextColor(1, _zmqObject->getState(key)? Qt::green : Qt::red);

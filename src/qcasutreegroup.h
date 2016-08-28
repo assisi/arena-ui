@@ -5,10 +5,10 @@
 
 class QCasuTreeGroup : public QAbstractTreeItem
 {
-private:
+protected:
     QString _name;
 public:
-    explicit QCasuTreeGroup(QGraphicsItem* sceneItem);
+    QCasuTreeGroup(QString name = QString("CASU group"));
 };
 
 class QSelectionTreeItem : public QCasuTreeGroup
@@ -16,7 +16,7 @@ class QSelectionTreeItem : public QCasuTreeGroup
 private:
     QGraphicsScene *_scene;
 public:
-    explicit QSelectionTreeItem(QGraphicsScene *scene);
+    QSelectionTreeItem(QGraphicsScene *scene);
     QList<zmqBuffer *> getBuffers();
 };
 #endif // QCASUTREEGROUP_H

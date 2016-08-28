@@ -13,7 +13,7 @@ private:
     QCasuZMQ *_zmqObject;
 
 public:
-    QCasuTreeItem(QGraphicsItem* sceneItem, QCasuZMQ *zmqObject);
+    QCasuTreeItem(QCasuZMQ *zmqObject);
 
 private slots:
     void updateData(dataType key);

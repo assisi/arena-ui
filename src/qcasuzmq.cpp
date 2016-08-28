@@ -4,7 +4,7 @@ QCasuZMQ::QCasuZMQ(QObject *parent, QString casuName) :
     QObject(parent),
     _name(casuName)
 {
-    for(int k = 0; k < _IR_num + _Temp_num; k++) _buffers.insert(static_cast<dataType>(k), new zmqBuffer());
+    for(int k = 0; k < _IR_num + _Temp_num; k++) _buffers.insert(static_cast<dataType>(k), new zmqBuffer(_name, static_cast<dataType>(k)));
     for(int k = _IR_num + _Temp_num; k < _dataType_num; k++)_state.insert(static_cast<dataType>(k), false);
 
     _connectionTimer = new QTimer(this);
@@ -18,13 +18,13 @@ QCasuZMQ::QCasuZMQ(QObject *parent, QString casuName) :
     connect(_connectionTimer, SIGNAL(timeout()),SLOT(connectionTimeout()));
 }
 
-zmqBuffer *QCasuZMQ::getBuffer(QCasuZMQ::dataType key)
+zmqBuffer *QCasuZMQ::getBuffer(dataType key)
 {
     if (key < _IR_num + _Temp_num) return _buffers[key];
     return 0;
 }
 
-double QCasuZMQ::getValue(QCasuZMQ::dataType key)
+double QCasuZMQ::getValue(dataType key)
 {
     if (key < _IR_num + _Temp_num) return _buffers[key]->last().value;
     return _values[key].value;
@@ -35,7 +35,7 @@ QColor QCasuZMQ::getLedColor()
     return _ledColor;
 }
 
-bool QCasuZMQ::getState(QCasuZMQ::dataType key)
+bool QCasuZMQ::getState(dataType key)
 {
     return _state[key];
 }
@@ -64,18 +64,32 @@ double QCasuZMQ::getAvgSamplingTime()
     return itemNum && _connected ? result/itemNum : 0;
 }
 
-string QCasuZMQ::getName()
+QString QCasuZMQ::getName()
 {
     return _name;
 }
 
-void QCasuZMQ::setAddress(QString sub, QString pub, QString msg)
+void QCasuZMQ::setAddresses(QString sub, QString pub, QString msg)
 {
     _subAddr = sub;
     _pubAddr = pub;
     _msgAddr = msg;
 
     this->connectZMQ();
+}
+
+void QCasuZMQ::setAddresses(QStringList addresses)
+{
+    setAddresses(addresses.at(0), addresses.at(1), addresses.at(2));
+}
+
+QStringList QCasuZMQ::getAddresses()
+{
+    QStringList out;
+    out.append(_subAddr);
+    out.append(_pubAddr);
+    out.append(_msgAddr);
+    return out;
 }
 
 bool QCasuZMQ::sendSetpoint(QList<QByteArray> message)
@@ -151,7 +165,7 @@ void QCasuZMQ::messageReceived(const QList<QByteArray> &message)
         _lastDataTime[static_cast<dataType>(0)] = _buffers[static_cast<dataType>(0)]->lastKey();
         for (int k = 0; k < ranges.raw_value_size(); k++){
             if( k == _IR_num) break;
-            newData.value = lexical_cast<double>(ranges.raw_value(k));
+            newData.value = ranges.raw_value(k);
             this->addToBuffer(static_cast<dataType>(k), newData);
             emit updated(static_cast<dataType>(k));
             if(settings->value("log_on").toBool()) _logFile << ";" << newData.value;
@@ -163,7 +177,7 @@ void QCasuZMQ::messageReceived(const QList<QByteArray> &message)
         _lastDataTime[static_cast<dataType>(_IR_num)] = _buffers[static_cast<dataType>(_IR_num)]->lastKey();
         for (int k = 0; k < temperatures.temp_size(); k++){
             if( k == _Temp_num) break;
-            newData.value = lexical_cast <double>(temperatures.temp(k));
+            newData.value = temperatures.temp(k);
             this->addToBuffer(static_cast<dataType>(k+_IR_num), newData);
             emit updated(static_cast<dataType>(k+_IR_num));
             if(settings->value("log_on").toBool()) _logFile << ";" << newData.value;
@@ -239,25 +253,26 @@ void QCasuZMQ::connectionTimeout()
 
 // ----------------------------------------------------------------
 
-zmqBuffer::zmqBuffer(QString casuName, QCasuZMQ::dataType key) :
+zmqBuffer::zmqBuffer(QString casuName, dataType key) :
     _trendName(casuName)
 {
     switch(key){
-    case QCasuZMQ::IR_F  : _trendName += ": IR - F";  break;
-    case QCasuZMQ::IR_FL : _trendName += ": IR - FL"; break;
-    case QCasuZMQ::IR_FR : _trendName += ": IR - FR"; break;
-    case QCasuZMQ::IR_B  : _trendName += ": IR - B";  break;
-    case QCasuZMQ::IR_BR : _trendName += ": IR - BR"; break;
-    case QCasuZMQ::IR_BL : _trendName += ": IR - BL"; break;
+    case IR_F  : _trendName += ": IR - F";  break;
+    case IR_FL : _trendName += ": IR - FL"; break;
+    case IR_FR : _trendName += ": IR - FR"; break;
+    case IR_B  : _trendName += ": IR - B";  break;
+    case IR_BR : _trendName += ": IR - BR"; break;
+    case IR_BL : _trendName += ": IR - BL"; break;
 
-    case QCasuZMQ::Temp_F : _trendName += ": Temp - F"; break;
-    case QCasuZMQ::Temp_R : _trendName += ": Temp - R"; break;
-    case QCasuZMQ::Temp_B : _trendName += ": Temp - B"; break;
-    case QCasuZMQ::Temp_L : _trendName += ": Temp - L"; break;
-    case QCasuZMQ::Temp_Top : _trendName += ": Temp - F"; break;
-    case QCasuZMQ::Temp_Pcb : _trendName += ": Temp - R"; break;
-    case QCasuZMQ::Temp_Ring : _trendName += ": Temp - B"; break;
-    case QCasuZMQ::Temp_Wax : _trendName += ": Temp - L"; break;
+    case Temp_F : _trendName += ": Temp - F"; break;
+    case Temp_R : _trendName += ": Temp - R"; break;
+    case Temp_B : _trendName += ": Temp - B"; break;
+    case Temp_L : _trendName += ": Temp - L"; break;
+    case Temp_Top : _trendName += ": Temp - F"; break;
+    case Temp_Pcb : _trendName += ": Temp - R"; break;
+    case Temp_Ring : _trendName += ": Temp - B"; break;
+    case Temp_Wax : _trendName += ": Temp - L"; break;
+    default: break;
     }
 }
 

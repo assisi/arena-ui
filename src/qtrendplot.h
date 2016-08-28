@@ -28,14 +28,15 @@ private:
      *
      * This is workaround for the context menu action because group functionality was added late
      */
-    QGraphicsScene* arenaScene;
+
+    QMap<QCPGraph *, zmqBuffer *> _connectionMap;
 
     bool autoPosition;
     bool showLegend;
     bool docked;
 
 public:
-    explicit QTrendPlot(QGraphicsScene* scene, QTreeWidget* tree1, QTreeWidget *tree2, QWidget *parent = 0);
+    explicit QTrendPlot(QTreeWidget* tree1, QTreeWidget *tree2, QWidget *parent = 0);
     ~QTrendPlot(){}
 
     /*!

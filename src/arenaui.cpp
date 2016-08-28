@@ -52,22 +52,22 @@ ArenaUI::ArenaUI(QWidget *parent) :
     ui->tabTrend->layout()->addWidget(tempScroll);
 
     //GRAPHICS SCENE
-    arenaScene = new QArenaScene(this);
-    arenaScene->setSceneRect(0,0,800,800);
-    ui->arenaSpace->setScene(arenaScene);
+    _arenaScene = new QArenaScene(this);
+    _arenaScene->setSceneRect(0,0,800,800);
+    ui->arenaSpace->setScene(_arenaScene);
     ui->arenaSpace->setDragMode(QGraphicsView::RubberBandDrag);
     new QGraphicsViewZoom(ui->arenaSpace);
 
 
-    MouseClickHandler* click_handler = new MouseClickHandler(arenaScene, this);
-    arenaScene->installEventFilter(click_handler);
+    MouseClickHandler* click_handler = new MouseClickHandler(_arenaScene, this);
+    _arenaScene->installEventFilter(click_handler);
 
     connect(ui->arenaSpace,SIGNAL(customContextMenuRequested(QPoint)),this,SLOT(customContextMenu(QPoint)));
 
     // - 30fps update
 
     sceneUpdate = new QTimer(this);
-    connect(sceneUpdate, SIGNAL(timeout()),arenaScene,SLOT(update()));
+    connect(sceneUpdate, SIGNAL(timeout()),_arenaScene,SLOT(update()));
     sceneUpdate->start(34);
 
     //DEPLOYMENT
@@ -175,20 +175,20 @@ ArenaUI::~ArenaUI()
 
 void ArenaUI::sortGraphicsScene()
 {
-    QList<QGraphicsItem*> tempSelection = arenaScene->selectedItems(); // save active selection
+    QList<QGraphicsItem*> tempSelection = _arenaScene->selectedItems(); // save active selection
     QPainterPath pp;
-    pp.addRect(arenaScene->sceneRect()); // select all -- selectedItems() doesnt return group children which is a case with items()
-    arenaScene->setSelectionArea(pp);
+    pp.addRect(_arenaScene->sceneRect()); // select all -- selectedItems() doesnt return group children which is a case with items()
+    _arenaScene->setSelectionArea(pp);
 
-    for(int k = 0; k < arenaScene->selectedItems().size(); k++)arenaScene->selectedItems()[k]->setZValue(k+1);
+    for(int k = 0; k < _arenaScene->selectedItems().size(); k++)_arenaScene->selectedItems()[k]->setZValue(k+1);
 
-    for(int k = 0; k+1 < arenaScene->selectedItems().size(); k++)
-        for(int i = k+1; i < arenaScene->selectedItems().size(); i++){
-            QGraphicsItem* item1 = arenaScene->selectedItems()[k];
-            QGraphicsItem* item2 = arenaScene->selectedItems()[i];
+    for(int k = 0; k+1 < _arenaScene->selectedItems().size(); k++)
+        for(int i = k+1; i < _arenaScene->selectedItems().size(); i++){
+            QGraphicsItem* item1 = _arenaScene->selectedItems()[k];
+            QGraphicsItem* item2 = _arenaScene->selectedItems()[i];
 
-            QPainterPath path1 = item1->childItems().size()? ((QCasuSceneGroup*)item1)->completeShape() : item1->shape();
-            QPainterPath path2 = item2->childItems().size()? ((QCasuSceneGroup*)item2)->completeShape() : item2->shape();
+            QPainterPath path1 = item1->childItems().size()? dynamic_cast<QCasuSceneGroup*>(item1)->completeShape() : item1->shape();
+            QPainterPath path2 = item2->childItems().size()? dynamic_cast<QCasuSceneGroup*>(item2)->completeShape() : item2->shape();
 
             if(path1.intersects(path2)){
                 int z1 = item1->zValue();
@@ -208,7 +208,7 @@ void ArenaUI::sortGraphicsScene()
 
     pp = pp.subtracted(pp);
     pp.addRect(0,0,0,0);
-    arenaScene->setSelectionArea(pp);
+    _arenaScene->setSelectionArea(pp);
     foreach(QGraphicsItem* item, tempSelection) item->setSelected(true); // after saving items and groups, return selection as was before
 
 }
@@ -284,12 +284,10 @@ void ArenaUI::on_actionOpenArena_triggered()
         trendTab->removeWidget(trendTab->itemAt(0)->widget());
     }
 
-    arenaScene->clear();
+    _arenaScene->clear();
     ui->casuTree->clear();
     ui->groupTree->clear();
-    arenaScene->selectionTreeWidget = new QCasuTreeItem(ui->groupTree,"Selected CASUs");
-    ui->groupTree->addTopLevelItem(arenaScene->selectionTreeWidget);
-    arenaScene->selectionTreeWidget->setHidden(true);
+    ui->groupTree->addTopLevelItem(new QSelectionTreeItem(_arenaScene));
 
 
 
@@ -320,19 +318,22 @@ void ArenaUI::on_actionOpenArena_triggered()
 
         for(YAML::const_iterator it=arenaNode[assisiFile.arenaLayer.toStdString()].begin(); it!=arenaNode[assisiFile.arenaLayer.toStdString()].end(); it++){
             QString name = QString::fromStdString(it->first.as<std::string>());
-            int xpos = arenaNode[assisiFile.arenaLayer.toStdString()][name.toStdString()]["pose"]["x"].as<int>();
-            int ypos = arenaNode[assisiFile.arenaLayer.toStdString()][name.toStdString()]["pose"]["y"].as<int>();
+            QPointF coordinates;
+            coordinates.setX(arenaNode[assisiFile.arenaLayer.toStdString()][name.toStdString()]["pose"]["x"].as<double>());
+            coordinates.setY(arenaNode[assisiFile.arenaLayer.toStdString()][name.toStdString()]["pose"]["y"].as<double>());
             double yaw = arenaNode[assisiFile.arenaLayer.toStdString()][name.toStdString()]["pose"]["yaw"].as<double>();
 
-            QCasuTreeItem* tempTree = new QCasuTreeItem(ui->casuTree, name);
+            QCasuZMQ *tempZMQ = new QCasuZMQ(this, name);
+            QCasuTreeItem *tempTreeItem = new QCasuTreeItem(tempZMQ);
+            QCasuSceneItem *tempSceneItem = new QCasuSceneItem(coordinates, yaw, tempZMQ);
 
-            ui->casuTree->addTopLevelItem(tempTree);
+            ui->casuTree->addTopLevelItem(tempTreeItem);
+            _arenaScene->addItem(tempSceneItem);
 
-            QCasuSceneItem* tempItem = new QCasuSceneItem(this, xpos*10+400, -ypos*10+400, yaw, tempTree);
+            tempTreeItem->setSceneItem(tempSceneItem);
+            tempSceneItem->setTreeItem(tempTreeItem);
 
-            arenaScene->addItem(tempItem);
-
-            tempTree->setAddr(QString::fromStdString(arenaNode[assisiFile.arenaLayer.toStdString()][name.toStdString()]["sub_addr"].as<std::string>()),
+            tempZMQ->setAddresses(QString::fromStdString(arenaNode[assisiFile.arenaLayer.toStdString()][name.toStdString()]["sub_addr"].as<std::string>()),
                                QString::fromStdString(arenaNode[assisiFile.arenaLayer.toStdString()][name.toStdString()]["pub_addr"].as<std::string>()),
                                QString::fromStdString(arenaNode[assisiFile.arenaLayer.toStdString()][name.toStdString()]["msg_addr"].as<std::string>()));
 
@@ -361,7 +362,7 @@ void ArenaUI::on_actionOpenArena_triggered()
         assisiFile.ngbFile = assisiFile.name.left(assisiFile.name.lastIndexOf('/')+1) + QString::fromStdString(assisiNode["nbg"].as<std::string>());
 
         YAML::Node arenaNode = YAML::LoadFile(assisiFile.arenaFile.toStdString());
-        QMap<QString, QCasuTreeItem*> linker;
+        QMap<QString, QCasuZMQ *> linker;
 
         //LOAD AND SPAWN CASUs
         loadSession.beginGroup("sceneHierarchy");
@@ -377,7 +378,7 @@ void ArenaUI::on_actionOpenArena_triggered()
         tempSize = loadSession.beginReadArray("addresses");
         for(int k = 0; k < tempSize; k++){
             loadSession.setArrayIndex(k);
-            linker[loadSession.value("casuName").toString()]->setAddr(loadSession.value("sub_addr").toString(),
+            linker[loadSession.value("casuName").toString()]->setAddresses(loadSession.value("sub_addr").toString(),
                                                                       loadSession.value("pub_addr").toString(),
                                                                       loadSession.value("msg_addr").toString());
         }
@@ -385,7 +386,7 @@ void ArenaUI::on_actionOpenArena_triggered()
         loadSession.endGroup();
 
         //LOAD AND LINK TREND GRAPHS
-        loadSession.beginGroup("trendGraphs");
+   /*     loadSession.beginGroup("trendGraphs");
         tempSize = loadSession.beginReadArray("plot");
         for(int k = 0; k < tempSize; k++){
             loadSession.setArrayIndex(k);
@@ -405,7 +406,7 @@ void ArenaUI::on_actionOpenArena_triggered()
                         toAdd.append(item);
             }
             if(toAdd.size()){
-                QTrendPlot* tempWidget = new QTrendPlot(arenaScene, ui->casuTree, ui->groupTree);
+                QTrendPlot* tempWidget = new QTrendPlot(_arenaScene, ui->casuTree, ui->groupTree);
                 trendTab->addWidget(tempWidget);
                 tempWidget->addGraphList(toAdd);
                 tempWidget->setWindowTitle(assisiFile.arenaLayer);
@@ -414,7 +415,7 @@ void ArenaUI::on_actionOpenArena_triggered()
             loadSession.endArray();
         }
         loadSession.endArray();
-        loadSession.endGroup();
+        loadSession.endGroup();*/
     }
 
 
@@ -424,24 +425,23 @@ void ArenaUI::on_actionOpenArena_triggered()
 void ArenaUI::on_actionGroup_triggered()
 {
 
-    QList<QGraphicsItem *> itemList= arenaScene->selectedItems();
+    QList<QGraphicsItem *> itemList= _arenaScene->selectedItems();
     if(itemList.size()<2) return;
-    arenaScene->clearSelection();
+    _arenaScene->clearSelection();
 
-    QCasuTreeItem* tempTreeWidget = new QCasuTreeItem(ui->groupTree, QString("CASU group"));
-    QCasuSceneGroup* tempGroup = new QCasuSceneGroup(0, tempTreeWidget);
+    QCasuTreeGroup* tempTreeGroup = new QCasuTreeGroup();
+    QCasuSceneGroup* tempSceneGroup = new QCasuSceneGroup();
+    tempTreeGroup->setSceneItem(tempSceneGroup);
+    tempSceneGroup->setTreeItem(tempTreeGroup);
 
     foreach(QGraphicsItem* item, itemList){
-        tempGroup->addToGroup(item);
-        if(item->childItems().size())((QCasuSceneGroup*)item)->isTopLevel=false;
-        else ((QCasuSceneItem*)item)->inGroup=true;
+        tempSceneGroup->addToGroup(item);
+        dynamic_cast<QAbstractSceneItem *>(item)->setInGroup(true);
     }
 
-    ui->groupTree->addTopLevelItem(tempTreeWidget);
-    arenaScene->addItem(tempGroup);
-
-    tempGroup->setFlag(QGraphicsItem::ItemIsSelectable, true);
-    tempGroup->setSelected(1);
+    ui->groupTree->addTopLevelItem(tempTreeGroup);
+    _arenaScene->addItem(tempSceneGroup);
+    tempTreeGroup->setSelected(1);
 
     this->sortGraphicsScene();
 }
@@ -449,19 +449,17 @@ void ArenaUI::on_actionGroup_triggered()
 
 void ArenaUI::on_actionUngroup_triggered()
 {
-    QList<QGraphicsItem *> itemList= arenaScene->selectedItems();
+    QList<QGraphicsItem *> itemList= _arenaScene->selectedItems();
     foreach(QGraphicsItem* item, itemList)
-        if(item->childItems().size()){
-            QList<QGraphicsItem *> subItemList= item->childItems();
+        if(dynamic_cast<QAbstractSceneItem *>(item)->isGroup()){
+            QList<QGraphicsItem *> subItemList = item->childItems();
             foreach(QGraphicsItem* subItem, subItemList){
-                ((QCasuSceneGroup*)item)->removeFromGroup(subItem);
+                dynamic_cast<QAbstractSceneItem *>(item)->removeFromGroup(subItem);
                 subItem->setSelected(0);
                 subItem->setSelected(1);
-                if(subItem->childItems().size())((QCasuSceneGroup*)subItem)->isTopLevel=true;
-                else ((QCasuSceneItem*)subItem)->inGroup=false;
+                dynamic_cast<QAbstractSceneItem *>(subItem)->setInGroup(false);
             }
-        arenaScene->removeItem(item);
-        delete item;
+            _arenaScene->destroyItemGroup(dynamic_cast<QAbstractSceneItem *>(item));
         }
     this->sortGraphicsScene();
 }
@@ -469,9 +467,8 @@ void ArenaUI::on_actionUngroup_triggered()
 void ArenaUI::on_actionConnect_triggered()
 {
     bool error = false;
-    if (arenaScene->selectedItems().size() != 1) error = true; //Check if excactly one object is selected
-    if (arenaScene->selectedItems().size() == 1)
-        if(arenaScene->selectedItems()[0]->childItems().size()) error = true; // Check if object is single casu (no children)
+    if (_arenaScene->selectedItems().size() != 1) error = true; //Check if excactly one object is selected
+    if(dynamic_cast<QAbstractSceneItem *>(_arenaScene->selectedItems().first())->isGroup()) error = true; // Check if object is single casu (no children)
     if(error){
         QMessageBox msgBox;
         msgBox.setWindowTitle("ERROR");
@@ -480,10 +477,10 @@ void ArenaUI::on_actionConnect_triggered()
         msgBox.exec();
         return;
     }
-    QCasuSceneItem* temp = (QCasuSceneItem*)arenaScene->selectedItems()[0];
-    QDialogConnect* addrDiag = new QDialogConnect(temp->treeItem->sub_addr,temp->treeItem->pub_addr,temp->treeItem->msg_addr);
+    QCasuSceneItem* temp = (QCasuSceneItem*)_arenaScene->selectedItems()[0];
+    QDialogConnect* addrDiag = new QDialogConnect(temp->getAddresses());
     if(addrDiag->exec()){
-        temp->treeItem->setAddr(addrDiag->sub_addr->text(), addrDiag->pub_addr->text(),addrDiag->msg_addr->text());
+        temp->setAddresses(addrDiag->getAddresses());
     }
 }
 
@@ -498,7 +495,7 @@ void ArenaUI::on_actionToggleLog_triggered()
 
 void ArenaUI::on_actionPlot_selected_in_same_trend_triggered()
 {
-    QTrendPlot* tempWidget = new QTrendPlot(arenaScene, ui->casuTree, ui->groupTree);
+    QTrendPlot* tempWidget = new QTrendPlot(ui->casuTree, ui->groupTree);
     trendTab->addWidget(tempWidget);
 
     tempWidget->addSelectedGraphs();
@@ -507,7 +504,7 @@ void ArenaUI::on_actionPlot_selected_in_same_trend_triggered()
 
 void ArenaUI::on_actionPlot_selected_in_different_trends_triggered()
 {
-    QList<QTreeWidgetItem*> selectedList = ui->casuTree->selectedItems();
+ /*   QList<QTreeWidgetItem*> selectedList = ui->casuTree->selectedItems();
 
     foreach(QTreeWidgetItem* item, ui->groupTree->selectedItems()){
         QTreeWidgetItem* parent = item->parent();
@@ -516,7 +513,7 @@ void ArenaUI::on_actionPlot_selected_in_different_trends_triggered()
         QString name = item->text(0);
         QString parentName = parent->text(0);
 
-        foreach (QGraphicsItem* casuItem, arenaScene->items()) {
+        foreach (QGraphicsItem* casuItem, _arenaScene->items()) {
             if(casuItem->childItems().size()) continue;
             if(((QCasuSceneItem*)casuItem)->groupColor != color && !QString::compare(parentName, "CASU group")) continue;
             if(!casuItem->isSelected() && !QString::compare(parentName, "Selected CASUs")) continue;
@@ -529,14 +526,12 @@ void ArenaUI::on_actionPlot_selected_in_different_trends_triggered()
         QList<QTreeWidgetItem*> tempList;
         tempList.append(item);
 
-        QTrendPlot* tempWidget = new QTrendPlot(arenaScene, ui->casuTree, ui->groupTree);
+        QTrendPlot* tempWidget = new QTrendPlot(_arenaScene, ui->casuTree, ui->groupTree);
         trendTab->addWidget(tempWidget);
 
         tempWidget->addGraphList(tempList);
         tempWidget->setWindowTitle(assisiFile.arenaLayer);
-    }
-
-
+    }*/
 }
 
 void ArenaUI::on_actionSettings_triggered()
@@ -585,11 +580,11 @@ void ArenaUI::customContextMenu(QPoint pos)
     menu->setAttribute(Qt::WA_DeleteOnClose);
 
     bool error_single = false;
-    if (arenaScene->selectedItems().size() != 1) error_single = true; //Check if excactly one object is selected
-    if (arenaScene->selectedItems().size() == 1)
-        if(arenaScene->selectedItems()[0]->childItems().size()) error_single = true; // Check if object is single casu (no children)
+    if (_arenaScene->selectedItems().size() != 1) error_single = true; //Check if excactly one object is selected
+    if (_arenaScene->selectedItems().size() == 1)
+        if(_arenaScene->selectedItems()[0]->childItems().size()) error_single = true; // Check if object is single casu (no children)
 
-    bool error_selected = !arenaScene->selectedItems().size();
+    bool error_selected = !_arenaScene->selectedItems().size();
 
     menu->addAction(settings->value("IR_on").toBool() ? "Hide proximity sensors" : "Show proximity sensors",this,SLOT(toggleIR()));
     menu->addAction(settings->value("temp_on").toBool() ? "Hide temperature sensors" : "Show temperature sensors",this,SLOT(toggleTemp()));
@@ -634,18 +629,10 @@ void ArenaUI::moveDeployScroll(int min, int max)
 
 void ArenaUI::sendSetpoint(QString actuator)
 {
-    QDialogSetpoint* dialog = new QDialogSetpoint(actuator,arenaScene->selectedItems());
+    QDialogSetpoint* dialog = new QDialogSetpoint(actuator,_arenaScene->selectedItems());
     if(dialog->exec())
-        groupSendSetpoint(arenaScene->selectedItems(),dialog->message);
-}
-
-void ArenaUI::groupSendSetpoint(QList<QGraphicsItem *> group, QList<QByteArray> message)
-{
-    foreach(QGraphicsItem* item, group)
-        if(item->childItems().size())
-            groupSendSetpoint(item->childItems(),message);
-        else
-            ((QCasuSceneItem*)item)->treeItem->sendSetpoint(message);
+        foreach(QGraphicsItem* item, _arenaScene->selectedItems())
+            dynamic_cast<QAbstractSceneItem *>(item)->sendSetpoint(dialog->getMessage());
 }
 
 void ArenaUI::groupSave(QSettings *saveState, QList<QGraphicsItem *> group, QString groupName)
@@ -653,13 +640,13 @@ void ArenaUI::groupSave(QSettings *saveState, QList<QGraphicsItem *> group, QStr
     saveState->beginWriteArray(groupName);
     for(int k=0; k < group.size() ; k++){
         saveState->setArrayIndex(k);
-        if(!group[k]->childItems().size()) saveState->setValue("casuName",((QCasuSceneItem*)group[k])->treeItem->casuName);
+        if(!dynamic_cast<QAbstractSceneItem *>(group[k])->isGroup()) saveState->setValue("casuName",dynamic_cast<QCasuSceneItem *>(group[k])->getName());
         else groupSave(saveState, group[k]->childItems(), "group");
     }
     saveState->endArray();
 }
 
-QList<QGraphicsItem *>* ArenaUI::groupLoad(YAML::Node* arenaNode, QSettings *loadState, int groupSize, QMap<QString, QCasuTreeItem*>* linker, QProgressBar* progress)
+QList<QGraphicsItem *>* ArenaUI::groupLoad(YAML::Node* arenaNode, QSettings *loadState, int groupSize, QMap<QString, QCasuZMQ *> *linkMap, QProgressBar* progress)
 {
     QList<QGraphicsItem *>* returnGroup = new QList<QGraphicsItem *>;
     for(int k=0; k < groupSize; k++){
@@ -668,44 +655,47 @@ QList<QGraphicsItem *>* ArenaUI::groupLoad(YAML::Node* arenaNode, QSettings *loa
 
         if(loadState->childKeys().size()){
             QString name = loadState->value("casuName").toString();
-            int xpos = (*arenaNode)[assisiFile.arenaLayer.toStdString()][name.toStdString()]["pose"]["x"].as<int>();
-            int ypos =(*arenaNode)[assisiFile.arenaLayer.toStdString()][name.toStdString()]["pose"]["y"].as<int>();
+            QPointF coordinates;
+            coordinates.setX((*arenaNode)[assisiFile.arenaLayer.toStdString()][name.toStdString()]["pose"]["x"].as<double>());
+            coordinates.setY((*arenaNode)[assisiFile.arenaLayer.toStdString()][name.toStdString()]["pose"]["y"].as<double>());
             double yaw = (*arenaNode)[assisiFile.arenaLayer.toStdString()][name.toStdString()]["pose"]["yaw"].as<double>();
 
-            QCasuTreeItem* tempTree = new QCasuTreeItem(ui->casuTree, name);
+            QCasuZMQ *tempZMQ = new QCasuZMQ(this, name);
+            QCasuTreeItem *tempTreeItem = new QCasuTreeItem(tempZMQ);
+            QCasuSceneItem *tempSceneItem = new QCasuSceneItem(coordinates, yaw, tempZMQ);
 
-            ui->casuTree->addTopLevelItem(tempTree);
+            ui->casuTree->addTopLevelItem(tempTreeItem);
+            _arenaScene->addItem(tempSceneItem);
 
-            QGraphicsItem* tempItem = new QCasuSceneItem(this, xpos*10+400, -ypos*10+400, yaw, tempTree);
+            tempTreeItem->setSceneItem(tempSceneItem);
+            tempSceneItem->setTreeItem(tempTreeItem);
 
-            arenaScene->addItem(tempItem);
-
-            linker->insert(name, tempTree);
+            linkMap->insert(name, tempZMQ);
 
             progress->setValue(progress->value()+1);
-            returnGroup->append(tempItem);
+            returnGroup->append(tempSceneItem);
         }
         else{
             int tempSize = loadState->beginReadArray("group");
             progress->setMaximum(progress->maximum() + tempSize);
 
-            QList<QGraphicsItem *> itemList= *groupLoad(arenaNode, loadState, tempSize, linker, progress);
-            QCasuTreeItem* tempTreeWidget = new QCasuTreeItem(ui->groupTree, QString("CASU group"));
-            QCasuSceneGroup* tempGroup = new QCasuSceneGroup(0, tempTreeWidget);
+            QCasuTreeGroup* tempTreeGroup = new QCasuTreeGroup();
+            QCasuSceneGroup* tempSceneGroup = new QCasuSceneGroup();
+            tempTreeGroup->setSceneItem(tempSceneGroup);
+            tempSceneGroup->setTreeItem(tempTreeGroup);
 
+            QList<QGraphicsItem *> itemList= *groupLoad(arenaNode, loadState, tempSize, linkMap, progress);
             foreach(QGraphicsItem* item, itemList){
-                tempGroup->addToGroup(item);
-                if(item->childItems().size())((QCasuSceneGroup*)item)->isTopLevel=false;
-                else ((QCasuSceneItem*)item)->inGroup=true;
+                tempSceneGroup->addToGroup(item);
+                dynamic_cast<QAbstractSceneItem *>(item)->setInGroup(true);
             }
 
-            ui->groupTree->addTopLevelItem(tempTreeWidget);
-            arenaScene->addItem(tempGroup);
+            ui->groupTree->addTopLevelItem(tempTreeGroup);
+            _arenaScene->addItem(tempSceneGroup);
 
-            tempGroup->setFlag(QGraphicsItem::ItemIsSelectable, true);
-            tempGroup->setSelected(0);
+            tempTreeGroup->setSelected(0);
             loadState->endArray();
-            returnGroup->append(tempGroup);
+            returnGroup->append(tempSceneGroup);
         }
 
         QApplication::processEvents();
@@ -728,22 +718,22 @@ void ArenaUI::on_actionSave_triggered()
 
     //save CASU graphics scene
 
-    QList<QGraphicsItem*> tempSelection = arenaScene->selectedItems(); // save active selection
+    QList<QGraphicsItem*> tempSelection = _arenaScene->selectedItems(); // save active selection
     QPainterPath pp;
-    pp.addRect(arenaScene->sceneRect()); // select all -- selectedItems() doesnt return group children which is a case with items()
-    arenaScene->setSelectionArea(pp);
+    pp.addRect(_arenaScene->sceneRect()); // select all -- selectedItems() doesnt return group children which is a case with items()
+    _arenaScene->setSelectionArea(pp);
 
     saveState.beginGroup("sceneHierarchy");
-    groupSave(&saveState, arenaScene->selectedItems(),"main");
+    groupSave(&saveState, _arenaScene->selectedItems(),"main");
     saveState.endGroup();
 
     pp = pp.subtracted(pp);
     pp.addRect(0,0,0,0);
-    arenaScene->setSelectionArea(pp);
+    _arenaScene->setSelectionArea(pp);
     foreach(QGraphicsItem* item, tempSelection) item->setSelected(true); // after saving items and groups, return selection as was before
 
     //save trend position and graphs
-
+/*
     saveState.beginGroup("trendGraphs");
     saveState.beginWriteArray("plot");
     for(int k=0; k < trendTab->count() ; k++){
@@ -758,20 +748,21 @@ void ArenaUI::on_actionSave_triggered()
     }
     saveState.endArray();
     saveState.endGroup();
-
+*/
     //save connection settins
-
+/*
     saveState.beginGroup("connectionSettings");
     saveState.beginWriteArray("addresses");
     for(int k=0; k < ui->casuTree->topLevelItemCount(); k++){
         saveState.setArrayIndex(k);
-        saveState.setValue("casuName",((QCasuTreeItem*)ui->casuTree->topLevelItem(k))->casuName);
+        saveState.setValue("casuName",dynamic_cast<QCasuTreeItem*>(ui->casuTree->topLevelItem(k))->getName());
+        QStringList addresses = dynamic_cast<QCasuTreeItem*>(ui->casuTree->topLevelItem(k))
         saveState.setValue("sub_addr",((QCasuTreeItem*)ui->casuTree->topLevelItem(k))->sub_addr);
         saveState.setValue("pub_addr",((QCasuTreeItem*)ui->casuTree->topLevelItem(k))->pub_addr);
         saveState.setValue("msg_addr",((QCasuTreeItem*)ui->casuTree->topLevelItem(k))->msg_addr);
     }
     saveState.endArray();
-    saveState.endGroup();
+    saveState.endGroup();*/
 }
 
 void ArenaUI::on_actionCamera_toggled(bool arg1)

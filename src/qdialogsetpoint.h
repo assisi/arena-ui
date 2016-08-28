@@ -34,11 +34,11 @@ private:
     QLineEdit* value1;
     QLineEdit* value2;
     QString command_;
-
-public:
     QList<QByteArray> message;
 
+public:
     QDialogSetpoint(QString command, QList<QGraphicsItem *> group);
+    QList<QByteArray> getMessage();
 
 private slots:
     void prepareMessage();

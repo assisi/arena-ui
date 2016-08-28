@@ -18,7 +18,7 @@
 class QCasuSceneItem : public QAbstractSceneItem
 {
 private:
-    QPointF _coord;
+    QPointF _coordinates;
     int _yaw;
     QElapsedTimer *FPScheck;
 
@@ -30,8 +30,16 @@ private:
 public:
     bool isGroup() const;
     QList<zmqBuffer *> getBuffers(dataType key);
+    QVector<QPointF> getCoordinateVector();
+    void sendSetpoint(QList<QByteArray> message);
 
-    QCasuSceneItem(QPointF coordinates, double yaw, QCasuTreeItem *treeItem, QCasuZMQ *zmqObject);
+    QCasuSceneItem(QPointF coordinates, double yaw, QCasuZMQ *zmqObject);
+
+    void setAddresses(QStringList addresses);
+    QStringList getAddresses();
+    QString getName();
+    double getValue(dataType key);
+    bool getState(dataType key);
 
     QRectF boundingRect() const;
 
