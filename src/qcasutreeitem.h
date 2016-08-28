@@ -13,11 +13,10 @@ private:
     QCasuZMQ *_zmqObject;
 
 public:
-    QCasuTreeItem(QCasuZMQ *zmqObject);
-    bool isChildSelected();
+    QCasuTreeItem(QGraphicsItem* sceneItem, QCasuZMQ *zmqObject);
 
 private slots:
-    void updateData(QCasuZMQ::dataType key);
+    void updateData(dataType key);
 };
 
 #endif // CASUTREEITEM_H

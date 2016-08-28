@@ -23,7 +23,7 @@ protected:
 
 public:
     bool isGroup() const;
-    QList<zmqBuffer *> getBuffers(QCasuZMQ::dataType key);
+    QList<zmqBuffer *> getBuffers(dataType key);
     void setGroupColor(QColor color);
 
     QCasuSceneGroup(QAbstractTreeItem *treeItem);

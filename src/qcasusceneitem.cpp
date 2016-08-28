@@ -5,7 +5,7 @@ bool QCasuSceneItem::isGroup() const
     return false;
 }
 
-QList<zmqBuffer *> QCasuSceneItem::getBuffers(QCasuZMQ::dataType key)
+QList<zmqBuffer *> QCasuSceneItem::getBuffers(dataType key)
 {
     QList<zmqBuffer *> out;
     out.append(_zmqObject->getBuffer(key));
@@ -56,7 +56,7 @@ void QCasuSceneItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *op
             painter->setBrush(brush);
             double tempIR;
             // Scale sensor reading pie to be ~18cm (~3x the edge of CASU ring) at maximum reading value (2^16)
-            if (_zmqObject->isConnected()) tempIR = _zmqObject->getValue(static_cast<QCasuZMQ::dataType>(k)) / 65536 * 1.8;
+            if (_zmqObject->isConnected()) tempIR = _zmqObject->getValue(static_cast<dataType>(k)) / 65536 * 1.8;
             else tempIR = 0;
             painter->drawPie(QIRTriangle(_coord,_yaw + k*60, tempIR), (_yaw + k*60 - 25)*16, 50*16); // 0° is at 3 o'clock, ccw direction
         }
@@ -66,7 +66,7 @@ void QCasuSceneItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *op
     if(settings->value("temp_on").toBool()){
         for(int k = 0; k < 4; k++){
             if(_zmqObject->isConnected()){
-                double tempTemp = value = _zmqObject->getValue(static_cast<QCasuZMQ::dataType>(6 + k));
+                double tempTemp = value = _zmqObject->getValue(static_cast<dataType>(6 + k));
                 if (tempTemp > 50) tempTemp = 50;
                 if (tempTemp < 20) tempTemp = 20;
 
@@ -99,7 +99,7 @@ void QCasuSceneItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *op
     else if(_zmqObject->isConnected())pen.setColor(Qt::green);
     else pen.setColor(Qt::red);
 
-    brush.setColor(_zmqObject->getState(QCasuZMQ::LED) ? brush.setColor(_zmqObject->getLedColor()) : Qt::gray);
+    brush.setColor(_zmqObject->getState(LED) ? brush.setColor(_zmqObject->getLedColor()) : Qt::gray);
     if(((QAbstractTreeItem*)_treeItem)->isChildSelected()) brush.setStyle(Qt::Dense2Pattern);
 
     painter->setPen(pen);
@@ -111,8 +111,8 @@ void QCasuSceneItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *op
                       _coord.y() + 9*sin(-_yaw*PI/180));
 
     //paint airflow marker
-    if(settings->value("air_on").toBool() && _zmqObject->isConnected() && _zmqObject->getState(QCasuZMQ::Airflow)){
-        double value = _zmqObject->getValue(QCasuZMQ::Airflow);
+    if(settings->value("air_on").toBool() && _zmqObject->isConnected() && _zmqObject->getState(Airflow)){
+        double value = _zmqObject->getValue(Airflow);
 
         pen.setColor(Qt::transparent);
         brush.setColor(QColor(250, 218, 94, 96));
@@ -127,9 +127,9 @@ void QCasuSceneItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *op
     }
 
     //paint vibration marker
-    if(settings->value("vibr_on").toBool() && _zmqObject->isConnected() && _zmqObject->getState(QCasuZMQ::Speaker)){
-        double freq = _zmqObject->getValue(QCasuZMQ::Frequency);
-        double amplitude = _zmqObject->getValue(QCasuZMQ::Amplitude);
+    if(settings->value("vibr_on").toBool() && _zmqObject->isConnected() && _zmqObject->getState(Speaker)){
+        double freq = _zmqObject->getValue(Frequency);
+        double amplitude = _zmqObject->getValue(Amplitude);
 
         pen.setColor(QColor(255,255,255,96));
         pen.setWidth(2);

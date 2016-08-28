@@ -29,7 +29,7 @@ private:
 
 public:
     bool isGroup() const;
-    QList<zmqBuffer *> getBuffers(QCasuZMQ::dataType key);
+    QList<zmqBuffer *> getBuffers(dataType key);
 
     QCasuSceneItem(QPointF coordinates, double yaw, QCasuTreeItem *treeItem, QCasuZMQ *zmqObject);
 
