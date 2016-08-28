@@ -39,6 +39,8 @@ private:
      */
     QProcess* spawner;
 
+    qint64 simulatorPID;
+
     /*!
      * \brief Appends shell output in UI
      * \param text - colected shell output

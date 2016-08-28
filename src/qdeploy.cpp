@@ -1,7 +1,8 @@
 #include "qdeploy.h"
 
 QDeploy::QDeploy(QWidget *parent) :
-    QLabel(parent)
+    QLabel(parent),
+    simulatorPID(0)
 {
     this->setAlignment(Qt::AlignLeft | Qt::AlignTop);
     this->setTextFormat(Qt::PlainText);
@@ -74,7 +75,11 @@ void QDeploy::cleanLog()
 
 void QDeploy::simulatorStart()
 {
-    if(simulatorProcess->state() == 0)simulatorProcess->start(settings->value("simulator").toString());
+    if(simulatorPID != 0){
+        this->appendText("[arenaUI] Simulator already running (" + QString::number(simulatorPID) +")\n");
+        return;
+    }
+    if(simulatorProcess->state() == 0)simulatorProcess->startDetached(settings->value("simulator").toString(), QStringList(), QString(), &simulatorPID);
     if(!simulatorProcess->waitForStarted(1000)){
         simulatorProcess->terminate();
         this->appendText("[arenaUI] Cannot start: " + settings->value("simulator").toString() + "\n");
@@ -84,7 +89,8 @@ void QDeploy::simulatorStart()
 
 void QDeploy::simulatorStop()
 {
-    simulatorProcess->close();
+    if(simulatorPID != 0) simulatorProcess->execute(QString("kill -9 ") + QString::number(simulatorPID));
+    simulatorPID = 0;
 }
 
 void QDeploy::appendOut()
