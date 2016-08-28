@@ -34,13 +34,13 @@ QTrendPlot::QTrendPlot(QGraphicsScene* scene, QTreeWidget* tree1,QTreeWidget* tr
    connect(this,&QTrendPlot::beforeReplot,this,&QTrendPlot::prettyPlot);
 }
 
-void QTrendPlot::addGraph(QTreeBuffer* treeItem){
+void QTrendPlot::addGraph(zmqBuffer *buffer){
     for(int k=0; k<this->graphCount(); k++){
-        if (!QString::compare(this->graph(k)->name(), treeItem->legendName)) return;
+        if (!QString::compare(this->graph(k)->name(), buffer->getTrendName())) return;
     }
     this->QCustomPlot::addGraph();
-    this->graph()->setData(treeItem->buffer);
-    this->graph()->setName(treeItem->legendName);
+    this->graph()->setData(buffer);
+    this->graph()->setName(buffer->getTrendName());
     this->graph()->setPen(QPen(Qt::black));
 
     for(int k=7; k < 20; k++){
@@ -53,22 +53,21 @@ void QTrendPlot::addGraph(QTreeBuffer* treeItem){
         }
     }
 
-    QCustomPlot::connect(treeItem,SIGNAL(updatePlot()),this,SLOT(replot()));
-    connectionMap[this->graph()] = treeItem;
+    QCustomPlot::connect(buffer,SIGNAL(updatePlot()),this,SLOT(replot()));
 }
 
-bool sortQTreeWidgetItem(QTreeWidgetItem* item1,QTreeWidgetItem* item2){
-    return QString::compare(((QTreeBuffer*)item1)->legendName,((QTreeBuffer*)item2)->legendName) < 0;
+bool sortZmqBuffer(zmqBuffer* buffer1,zmqBuffer* buffer2){
+    return QString::compare(buffer1->getTrendName(), buffer2->getTrendName()) < 0;
 }
-void QTrendPlot::addGraphList(QList<QTreeWidgetItem*> itemList)
+void QTrendPlot::addGraphList(QList<zmqBuffer *> bufferList)
 {    
     bool new_trend = true;
     if(this->graphCount()) new_trend = false;
 
-    itemList = itemList.toSet().toList(); //remove duplicates
-    qSort(itemList.begin(),itemList.end(),sortQTreeWidgetItem); //sort by legend name
+    bufferList = bufferList.toSet().toList(); //remove duplicates
+    qSort(bufferList.begin(),bufferList.end(),sortZmqBuffer); //sort by legend name
 
-    foreach (QTreeWidgetItem* item, itemList) this->addGraph((QTreeBuffer*)item);
+    foreach (zmqBuffer* item, bufferList) this->addGraph(item);
 
     if(new_trend){
         this->rescaleAxes();

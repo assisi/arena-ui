@@ -35,11 +35,6 @@ private:
     bool docked;
 
 public:
-    /*!
-     * \brief Map which stores information about connected QTreeBuffer and QCPGraph items
-     */
-    QMap<QCPGraph*,QTreeBuffer*> connectionMap;
-
     explicit QTrendPlot(QGraphicsScene* scene, QTreeWidget* tree1, QTreeWidget *tree2, QWidget *parent = 0);
     ~QTrendPlot(){}
 
@@ -47,12 +42,12 @@ public:
      * \brief Add single QCPGraph to this plot and connect it to corresponding QTreeBuffer
      * \param treeItem
      */
-    void addGraph(QTreeBuffer *treeItem);
+    void addGraph(zmqBuffer *treeItem);
     /*!
      * \brief Parse multiple QTreeBuffer items
      * \param itemList
      */
-    void addGraphList(QList<QTreeWidgetItem *> itemList);
+    void addGraphList(QList<zmqBuffer *> itemList);
     /*!
      * \brief Remove single QCPGraph and disconnect it from its source
      * \param graph

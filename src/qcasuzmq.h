@@ -18,13 +18,18 @@ namespace zmqData {
         Frequency, Amplitude, StdDev,
         Peltier, Airflow, Speaker, LED};
 
-    class zmqBuffer : public QCPDataMap
+    class zmqBuffer : public QObject, public QCPDataMap
         {
+            Q_OBJECT
         private:
             QString _trendName;
         public:
             zmqBuffer(QString casuName, dataType key);
+            void insert(const double &key, const QCPData &value);
+            void erase(QMap::iterator it);
             QString getTrendName();
+        signals:
+            void updatePlot();
         };
 }
 

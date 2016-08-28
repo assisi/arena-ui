@@ -261,6 +261,18 @@ zmqBuffer::zmqBuffer(QString casuName, QCasuZMQ::dataType key) :
     }
 }
 
+void zmqBuffer::insert(const double &key, const QCPData &value)
+{
+    this->QMap::insert(key, value);
+    emit updatePlot();
+}
+
+void zmqBuffer::erase(QMap::iterator it)
+{
+    this->QMap::erase(it);
+    emit updatePlot();
+}
+
 QString zmqBuffer::getTrendName()
 {
     return _trendName;
