@@ -389,27 +389,21 @@ void ArenaUI::on_actionOpenArena_triggered()
         loadSession.endGroup();
 
         //LOAD AND LINK TREND GRAPHS
-   /*     loadSession.beginGroup("trendGraphs");
+        loadSession.beginGroup("trendGraphs");
         tempSize = loadSession.beginReadArray("plot");
         for(int k = 0; k < tempSize; k++){
             loadSession.setArrayIndex(k);
             int graphSize = loadSession.beginReadArray("graph");
-            QList<QTreeWidgetItem*> toAdd;
+            QList<zmqBuffer *> toAdd;
 
             for(int i = 0; i < graphSize; i++){
                 loadSession.setArrayIndex(i);
-                QString graphName = loadSession.value("data").toString();
-                QString casuName = graphName.left(graphName.indexOf(":"));
-
-                QSet<QTreeWidgetItem*> temp = linker[casuName]->widget_IR_children.toSet() +
-                        linker[casuName]->widget_temp_children.toSet();
-
-                foreach(QTreeWidgetItem* item, temp)
-                    if(((QTreeBuffer*)item)->legendName == graphName)
-                        toAdd.append(item);
+                QString casuName = loadSession.value("casuName").toString();
+                dataType key = static_cast<dataType>(loadSession.value("key").toInt());
+                toAdd.append(linker[casuName]->getBuffer(key));
             }
             if(toAdd.size()){
-                QTrendPlot* tempWidget = new QTrendPlot(_arenaScene, ui->casuTree, ui->groupTree);
+                QTrendPlot* tempWidget = new QTrendPlot(ui->casuTree, ui->groupTree);
                 trendTab->addWidget(tempWidget);
                 tempWidget->addGraphList(toAdd);
                 tempWidget->setWindowTitle(assisiFile.arenaLayer);
@@ -418,7 +412,7 @@ void ArenaUI::on_actionOpenArena_triggered()
             loadSession.endArray();
         }
         loadSession.endArray();
-        loadSession.endGroup();*/
+        loadSession.endGroup();
     }
 
 
@@ -738,7 +732,7 @@ void ArenaUI::on_actionSave_triggered()
     foreach(QGraphicsItem* item, tempSelection) item->setSelected(true); // after saving items and groups, return selection as was before
 
     //save trend position and graphs
-/*
+
     saveState.beginGroup("trendGraphs");
     saveState.beginWriteArray("plot");
     for(int k=0; k < trendTab->count() ; k++){
@@ -747,27 +741,32 @@ void ArenaUI::on_actionSave_triggered()
         saveState.beginWriteArray("graph");
         for(int i=0; i < tempPlot->graphCount(); i++){
             saveState.setArrayIndex(i);
-            saveState.setValue("data",tempPlot->connectionMap[tempPlot->graph(i)]->legendName);
+            saveState.setValue("casuName",tempPlot->link(tempPlot->graph(i))->getCasuName());
+            saveState.setValue("key",static_cast<int>(tempPlot->link(tempPlot->graph(i))->getDataType()));
         }
         saveState.endArray();
     }
     saveState.endArray();
     saveState.endGroup();
-*/
+
     //save connection settins
-/*
+
     saveState.beginGroup("connectionSettings");
     saveState.beginWriteArray("addresses");
-    for(int k=0; k < ui->casuTree->topLevelItemCount(); k++){
-        saveState.setArrayIndex(k);
-        saveState.setValue("casuName",dynamic_cast<QCasuTreeItem*>(ui->casuTree->topLevelItem(k))->getName());
-        QStringList addresses = dynamic_cast<QCasuTreeItem*>(ui->casuTree->topLevelItem(k))
-        saveState.setValue("sub_addr",((QCasuTreeItem*)ui->casuTree->topLevelItem(k))->sub_addr);
-        saveState.setValue("pub_addr",((QCasuTreeItem*)ui->casuTree->topLevelItem(k))->pub_addr);
-        saveState.setValue("msg_addr",((QCasuTreeItem*)ui->casuTree->topLevelItem(k))->msg_addr);
-    }
+    int index = 0;
+    foreach(QGraphicsItem *item, _arenaScene->items())
+        if(!dynamic_cast<QAbstractSceneItem *>(item)->isGroup()){
+            saveState.setArrayIndex(index++);
+            saveState.setValue("casuName",dynamic_cast<QCasuSceneItem *>(item)->getName());
+            QStringList addresses = dynamic_cast<QCasuSceneItem *>(item)->getAddresses();
+            saveState.setValue("sub_addr",addresses.at(0));
+            saveState.setValue("pub_addr",addresses.at(1));
+            saveState.setValue("msg_addr",addresses.at(2));
+        }
+
+
     saveState.endArray();
-    saveState.endGroup();*/
+    saveState.endGroup();
 }
 
 void ArenaUI::on_actionCamera_toggled(bool arg1)

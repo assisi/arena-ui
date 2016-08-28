@@ -28,7 +28,7 @@ double QCasuZMQ::getValue(dataType key)
 {
     if (key < _IR_num + _Temp_num){
         if (_buffers[key]->isEmpty()) return 0;
-        else _buffers[key]->last().value;
+        else return _buffers[key]->last().value;
     }
     return _values[key].value;
 }
@@ -257,24 +257,26 @@ void QCasuZMQ::connectionTimeout()
 // ----------------------------------------------------------------
 
 zmqBuffer::zmqBuffer(QString casuName, dataType key) :
-    _trendName(casuName)
+    _legendName(casuName),
+    _casuName(casuName),
+    _key(key)
 {
     switch(key){
-    case IR_F  : _trendName += ": IR - F";  break;
-    case IR_FL : _trendName += ": IR - FL"; break;
-    case IR_FR : _trendName += ": IR - FR"; break;
-    case IR_B  : _trendName += ": IR - B";  break;
-    case IR_BR : _trendName += ": IR - BR"; break;
-    case IR_BL : _trendName += ": IR - BL"; break;
+    case IR_F  : _legendName += ": IR - F";  break;
+    case IR_FL : _legendName += ": IR - FL"; break;
+    case IR_FR : _legendName += ": IR - FR"; break;
+    case IR_B  : _legendName += ": IR - B";  break;
+    case IR_BR : _legendName += ": IR - BR"; break;
+    case IR_BL : _legendName += ": IR - BL"; break;
 
-    case Temp_F : _trendName += ": Temp - F"; break;
-    case Temp_R : _trendName += ": Temp - R"; break;
-    case Temp_B : _trendName += ": Temp - B"; break;
-    case Temp_L : _trendName += ": Temp - L"; break;
-    case Temp_Top : _trendName += ": Temp - F"; break;
-    case Temp_Pcb : _trendName += ": Temp - R"; break;
-    case Temp_Ring : _trendName += ": Temp - B"; break;
-    case Temp_Wax : _trendName += ": Temp - L"; break;
+    case Temp_F : _legendName += ": Temp - F"; break;
+    case Temp_R : _legendName += ": Temp - R"; break;
+    case Temp_B : _legendName += ": Temp - B"; break;
+    case Temp_L : _legendName += ": Temp - L"; break;
+    case Temp_Top : _legendName += ": Temp - F"; break;
+    case Temp_Pcb : _legendName += ": Temp - R"; break;
+    case Temp_Ring : _legendName += ": Temp - B"; break;
+    case Temp_Wax : _legendName += ": Temp - L"; break;
     default: break;
     }
 }
@@ -291,9 +293,19 @@ void zmqBuffer::erase(QMap::iterator it)
     emit updatePlot();
 }
 
-QString zmqBuffer::getTrendName()
+QString zmqBuffer::getLegendName()
 {
-    return _trendName;
+    return _legendName;
+}
+
+QString zmqBuffer::getCasuName()
+{
+    return _casuName;
+}
+
+dataType zmqBuffer::getDataType()
+{
+    return _key;
 }
 
 double zmqBuffer::getLastTime()

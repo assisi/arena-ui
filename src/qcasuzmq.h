@@ -26,12 +26,16 @@ namespace zmqData {
         {
             Q_OBJECT
         private:
-            QString _trendName;
+            QString _legendName;
+            QString _casuName;
+            dataType _key;
         public:
             zmqBuffer(QString casuName, dataType key);
             void insert(const double &key, const QCPData &value);
             void erase(QMap::iterator it);
-            QString getTrendName();
+            QString getLegendName();
+            QString getCasuName();
+            dataType getDataType();
             double getLastTime();
         signals:
             void updatePlot();

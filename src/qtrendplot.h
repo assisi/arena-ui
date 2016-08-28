@@ -55,6 +55,8 @@ public:
      */
     void removeGraph(QCPGraph* graph);
 
+    zmqBuffer *link(QCPGraph *graph);
+
 protected:
     /*!
      * \brief Overloaded function which is responsible for constat 9:16 size ratio

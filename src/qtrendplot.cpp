@@ -35,11 +35,11 @@ QTrendPlot::QTrendPlot(QTreeWidget* tree1,QTreeWidget* tree2 , QWidget *parent) 
 
 void QTrendPlot::addGraph(zmqBuffer *buffer){
     for(int k=0; k<this->graphCount(); k++){
-        if (!QString::compare(this->graph(k)->name(), buffer->getTrendName())) return;
+        if (!QString::compare(this->graph(k)->name(), buffer->getLegendName())) return;
     }
     this->QCustomPlot::addGraph();
     this->graph()->setData(buffer);
-    this->graph()->setName(buffer->getTrendName());
+    this->graph()->setName(buffer->getLegendName());
     this->graph()->setPen(QPen(Qt::black));
 
     for(int k=7; k < 20; k++){
@@ -57,7 +57,7 @@ void QTrendPlot::addGraph(zmqBuffer *buffer){
 }
 
 bool sortZmqBuffer(zmqBuffer* buffer1,zmqBuffer* buffer2){
-    return QString::compare(buffer1->getTrendName(), buffer2->getTrendName()) < 0;
+    return QString::compare(buffer1->getLegendName(), buffer2->getLegendName()) < 0;
 }
 void QTrendPlot::addGraphList(QList<zmqBuffer *> bufferList)
 {    
@@ -81,6 +81,11 @@ void QTrendPlot::removeGraph(QCPGraph *graph){
     this->QCustomPlot::removeGraph(graph);
     disconnect(_connectionMap[graph],0,this,0);
     _connectionMap.remove(graph);
+}
+
+zmqBuffer *QTrendPlot::link(QCPGraph *graph)
+{
+    return _connectionMap[graph];
 }
 
 void QTrendPlot::removeSelectedGraphs(){
