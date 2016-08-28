@@ -10,7 +10,7 @@ class QAbstractTreeItem : public QTreeWidgetItem
 {
 protected:
     QMap<dataType, QTreeWidgetItem*> _widgetMap;
-    QGraphicsItem * _sceneItem;
+    QGraphicsItem *_sceneItem;
 public:
     QAbstractTreeItem();
     void resetSelection();

@@ -11,6 +11,8 @@
 class QAbstractTreeItem;
 class QAbstractSceneItem : public QGraphicsItemGroup
 {
+private:
+    void recursiveSetHidden(bool state);
 protected:
     bool _inGroup;
     QColor _groupColor;

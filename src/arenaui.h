@@ -174,7 +174,7 @@ private slots:
      * \brief Action for toggling QCasuSceneItem graphics elements
      */
     void toggleVibr();
-
+    void toggleAvgTime();
     /*!
      * \brief Updates selected QCasuTreeItem elements in tabCasus
      */

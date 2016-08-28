@@ -56,7 +56,7 @@ void QTrendPlot::addGraph(zmqBuffer *buffer){
     _connectionMap.insert(this->graph(), buffer);
 }
 
-bool sortZmqBuffer(zmqBuffer* buffer1,zmqBuffer* buffer2){
+bool sortZmqBuffer(zmqBuffer *buffer1,zmqBuffer *buffer2){
     return QString::compare(buffer1->getLegendName(), buffer2->getLegendName()) < 0;
 }
 void QTrendPlot::addGraphList(QList<zmqBuffer *> bufferList)
@@ -94,14 +94,14 @@ void QTrendPlot::removeSelectedGraphs(){
 
 void QTrendPlot::addSelectedGraphs(){
 
-    QList<zmqBuffer *> buffers;
+    QList<zmqBuffer *> bufferList;
 
     for(int k=0; k < casuTree->topLevelItemCount(); k++)
-        buffers.append(dynamic_cast<QAbstractTreeItem *>(casuTree->topLevelItem(k))->getBuffers());
+        bufferList.append(dynamic_cast<QAbstractTreeItem *>(casuTree->topLevelItem(k))->getBuffers());
     for(int k=0; k < groupTree->topLevelItemCount(); k++)
-        buffers.append(dynamic_cast<QAbstractTreeItem *>(groupTree->topLevelItem(k))->getBuffers());
+        bufferList.append(dynamic_cast<QAbstractTreeItem *>(groupTree->topLevelItem(k))->getBuffers());
 
-    this->addGraphList(buffers);
+    this->addGraphList(bufferList);
 
     this->replot();
 }

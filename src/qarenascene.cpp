@@ -20,6 +20,7 @@ void QArenaScene::drawBackground(QPainter *painter, const QRectF &rect)
 
 void QArenaScene::drawForeground(QPainter *painter, const QRectF &rect)
 {
+    Q_UNUSED(rect)
     if(!settings->value("temp_on").toBool()) return; //don't draw when not showing temp sensors
 
     painter->setRenderHints(QPainter::Antialiasing | QPainter::SmoothPixmapTransform, true);
@@ -58,15 +59,19 @@ void QArenaScene::drawForeground(QPainter *painter, const QRectF &rect)
     painter->drawText(_view->mapToScene(QPoint(101,36)), "35 °C");
     painter->drawText(_view->mapToScene(QPoint(191,36)), "50 °C");
 
-    double time = 0;
-    double connectedItems = 0;
+    int time = 0;
+    int connectedItems = 0;
     foreach(QGraphicsItem *item, items())
         if(!dynamic_cast<QAbstractSceneItem *>(item)->isGroup())
             if(dynamic_cast<QCasuSceneItem *>(item)->isConnected()){
                 time += dynamic_cast<QCasuSceneItem *>(item)->getAvgSamplingTime();
                 connectedItems++;
             }
-    if(connectedItems) painter->drawText(_view->mapToScene(rect.topRight().toPoint() - QPoint(50,50)), QString::number(time/connectedItems));
+    if(connectedItems && settings->value("avgTime_on").toBool()){
+        QPoint samplingTimePosition = _view->rect().topRight() - QPoint(200,-20);
+        QString tempText = QString("Avg. sample time: ") + QString::number(time/connectedItems) + QString("ms");
+        painter->drawText(_view->mapToScene(samplingTimePosition), tempText);
+    }
 }
 
 QArenaScene::QArenaScene(QWidget *parent) : QGraphicsScene(parent){

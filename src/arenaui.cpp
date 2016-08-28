@@ -502,34 +502,23 @@ void ArenaUI::on_actionPlot_selected_in_same_trend_triggered()
 
 void ArenaUI::on_actionPlot_selected_in_different_trends_triggered()
 {
- /*   QList<QTreeWidgetItem*> selectedList = ui->casuTree->selectedItems();
+    QList<zmqBuffer *> bufferList;
 
-    foreach(QTreeWidgetItem* item, ui->groupTree->selectedItems()){
-        QTreeWidgetItem* parent = item->parent();
-        while(parent->parent()) parent = parent->parent();
-        QColor color = parent->textColor(0);
-        QString name = item->text(0);
-        QString parentName = parent->text(0);
+    for(int k=0; k < ui->casuTree->topLevelItemCount(); k++)
+        bufferList.append(dynamic_cast<QAbstractTreeItem *>(ui->casuTree->topLevelItem(k))->getBuffers());
+    for(int k=0; k < ui->groupTree->topLevelItemCount(); k++)
+        bufferList.append(dynamic_cast<QAbstractTreeItem *>(ui->groupTree->topLevelItem(k))->getBuffers());
 
-        foreach (QGraphicsItem* casuItem, _arenaScene->items()) {
-            if(casuItem->childItems().size()) continue;
-            if(((QCasuSceneItem*)casuItem)->groupColor != color && !QString::compare(parentName, "CASU group")) continue;
-            if(!casuItem->isSelected() && !QString::compare(parentName, "Selected CASUs")) continue;
-            selectedList.append(((QCasuSceneItem*)casuItem)->treeItem->widgetMap[name]);
+    foreach(zmqBuffer* buffer, bufferList){
+        QList<zmqBuffer*> tempList;
+        tempList.append(buffer);
 
-        }
-    }
-
-    foreach (QTreeWidgetItem* item, selectedList) {
-        QList<QTreeWidgetItem*> tempList;
-        tempList.append(item);
-
-        QTrendPlot* tempWidget = new QTrendPlot(_arenaScene, ui->casuTree, ui->groupTree);
+        QTrendPlot* tempWidget = new QTrendPlot(ui->casuTree, ui->groupTree);
         trendTab->addWidget(tempWidget);
 
         tempWidget->addGraphList(tempList);
         tempWidget->setWindowTitle(assisiFile.arenaLayer);
-    }*/
+    }
 }
 
 void ArenaUI::on_actionSettings_triggered()
@@ -556,6 +545,11 @@ void ArenaUI::toggleAir()
 void ArenaUI::toggleVibr()
 {
     settings->setValue("vibr_on",!settings->value("vibr_on").toBool());
+}
+
+void ArenaUI::toggleAvgTime()
+{
+    settings->setValue("avgTime_on",!settings->value("avgTime_on").toBool());
 }
 
 void ArenaUI::updateTreeSelection()
@@ -588,6 +582,7 @@ void ArenaUI::customContextMenu(QPoint pos)
     menu->addAction(settings->value("temp_on").toBool() ? "Hide temperature sensors" : "Show temperature sensors",this,SLOT(toggleTemp()));
     menu->addAction(settings->value("vibr_on").toBool() ? "Hide vibration marker" : "Show vibration marker",this,SLOT(toggleVibr()));
     menu->addAction(settings->value("air_on").toBool() ? "Hide airflow marker" : "Show airflow marker",this,SLOT(toggleAir()));
+    menu->addAction(settings->value("avgTime_on").toBool() ? "Hide avg. sample time" : "Show avg. sample time",this,SLOT(toggleAvgTime()));
     menu->addSeparator();
     temp = menu->addAction("Group selected",this,SLOT(on_actionGroup_triggered()));
     if(error_selected) temp->setEnabled(false);

@@ -65,7 +65,7 @@ bool QCasuSceneItem::isConnected()
     return _zmqObject->isConnected();
 }
 
-double QCasuSceneItem::getAvgSamplingTime()
+int QCasuSceneItem::getAvgSamplingTime()
 {
     return _zmqObject->getAvgSamplingTime();
 }
@@ -101,8 +101,8 @@ void QCasuSceneItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *op
             brush.setColor(Qt::black);
             painter->setBrush(brush);
             double tempIR;
-            // Scale sensor reading pie to be ~18cm (~3x the edge of CASU ring) at maximum reading value (2^16)
-            if (_zmqObject->isConnected()) tempIR = _zmqObject->getValue(static_cast<dataType>(k)) / 65536 * 1.8;
+
+            if (_zmqObject->isConnected()) tempIR = _zmqObject->getValue(static_cast<dataType>(k)) / 65536;
             else tempIR = 0;
             painter->drawPie(QIRTriangle(_coordinates,_yaw + k*60, tempIR), (_yaw + k*60 - 25)*16, 50*16); // 0° is at 3 o'clock, ccw direction
         }
@@ -203,7 +203,7 @@ void QCasuSceneItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *op
 
 QIRTriangle::QIRTriangle(QPointF center, double angle, double value)
 {
-    double side = 5+18*value; //
+    double side = 5 + 32 * value; // Scale sensor reading pie to be ~18cm (~3x the edge of CASU ring) at maximum reading value (2^16)
     double offset = 3; // center offset from center of CASU
 
     angle = angle * PI/180;

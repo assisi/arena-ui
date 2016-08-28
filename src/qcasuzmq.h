@@ -56,7 +56,7 @@ public:
     double getValue(dataType key);
     QColor getLedColor();
     bool getState(dataType key);
-    double getAvgSamplingTime();
+    int getAvgSamplingTime();
     QString getName();
 
     void setAddresses(QString sub, QString pub, QString msg);

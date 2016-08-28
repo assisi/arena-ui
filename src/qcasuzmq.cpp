@@ -43,28 +43,19 @@ bool QCasuZMQ::getState(dataType key)
     return _state[key];
 }
 
-double QCasuZMQ::getAvgSamplingTime()
+int QCasuZMQ::getAvgSamplingTime()
 {
     double result = 0;
     double itemNum = 0;
 
-    foreach(double data, _lastDataTime){
-        dataType key = _lastDataTime.key(data, LED);
+    foreach(double oldTime, _lastDataTime){
+        dataType key = _lastDataTime.key(oldTime, LED);
         if(key == LED) continue;
-        result += _values[key].key - data;
+        if(key >= _IR_num + _Temp_num) result += _values[key].key - oldTime;
+        else result += _buffers[key]->getLastTime() - oldTime;
         itemNum++;
     }
-    /*check IR sampling time*/
-    if(_lastDataTime.contains(static_cast<dataType>(0))){
-        result += _buffers[static_cast<dataType>(0)]->getLastTime() - _lastDataTime[static_cast<dataType>(0)];
-        itemNum++;
-    }
-    /*check Temp sampling time*/{}
-    if(_lastDataTime.contains(static_cast<dataType>(_IR_num))){
-        result += _buffers[static_cast<dataType>(_IR_num)]->getLastTime() - _lastDataTime[static_cast<dataType>(_IR_num)];
-        itemNum++;
-    }
-    return itemNum && _connected ? result/itemNum : 0;
+    return itemNum && _connected ? result*1000/itemNum : 0;
 }
 
 QString QCasuZMQ::getName()
