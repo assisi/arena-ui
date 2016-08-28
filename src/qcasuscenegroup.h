@@ -30,9 +30,10 @@ public:
 
     QCasuSceneGroup();
 
+    QRectF boundingRect();
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
 
-    QPainterPath shape();
+    QPainterPath shape() const;
     QPainterPath completeShape();
 };
 

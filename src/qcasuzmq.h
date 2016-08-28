@@ -18,6 +18,10 @@ namespace zmqData {
         Frequency, Amplitude, StdDev,
         Peltier, Airflow, Speaker, LED};
 
+    const static int _IR_num = 6;
+    const static int _Temp_num = 8;
+    const static int _dataType_num = 21;
+
     class zmqBuffer : public QObject, public QCPDataMap
         {
             Q_OBJECT
@@ -28,6 +32,7 @@ namespace zmqData {
             void insert(const double &key, const QCPData &value);
             void erase(QMap::iterator it);
             QString getTrendName();
+            double getLastTime();
         signals:
             void updatePlot();
         };
@@ -76,10 +81,6 @@ private:
     QMap<dataType, double> _lastDataTime;
     QMap<dataType, bool> _state;
     QColor _ledColor;
-
-    const static int _IR_num = 6;
-    const static int _Temp_num = 8;
-    const static int _dataType_num = 21;
 
     ofstream _logFile;
     QString _logName;

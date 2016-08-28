@@ -67,6 +67,12 @@ void QCasuSceneGroup::setGroupColor(QColor color)
 
 QCasuSceneGroup::QCasuSceneGroup()
 {
+
+}
+
+QRectF QCasuSceneGroup::boundingRect()
+{
+    return childrenBoundingRect();
 }
 
 void QCasuSceneGroup::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
@@ -86,7 +92,7 @@ void QCasuSceneGroup::paint(QPainter *painter, const QStyleOptionGraphicsItem *o
     painter->drawPath(_groupLine);
 }
 
-QPainterPath QCasuSceneGroup::shape()
+QPainterPath QCasuSceneGroup::shape() const
 {
     return _groupShape;
 }

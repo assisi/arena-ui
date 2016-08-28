@@ -26,7 +26,10 @@ zmqBuffer *QCasuZMQ::getBuffer(dataType key)
 
 double QCasuZMQ::getValue(dataType key)
 {
-    if (key < _IR_num + _Temp_num) return _buffers[key]->last().value;
+    if (key < _IR_num + _Temp_num){
+        if (_buffers[key]->isEmpty()) return 0;
+        else _buffers[key]->last().value;
+    }
     return _values[key].value;
 }
 
@@ -53,12 +56,12 @@ double QCasuZMQ::getAvgSamplingTime()
     }
     /*check IR sampling time*/
     if(_lastDataTime.contains(static_cast<dataType>(0))){
-        result += _buffers[static_cast<dataType>(0)]->lastKey() - _lastDataTime[static_cast<dataType>(0)];
+        result += _buffers[static_cast<dataType>(0)]->getLastTime() - _lastDataTime[static_cast<dataType>(0)];
         itemNum++;
     }
     /*check Temp sampling time*/{}
     if(_lastDataTime.contains(static_cast<dataType>(_IR_num))){
-        result += _buffers[static_cast<dataType>(_IR_num)]->lastKey() - _lastDataTime[static_cast<dataType>(_IR_num)];
+        result += _buffers[static_cast<dataType>(_IR_num)]->getLastTime() - _lastDataTime[static_cast<dataType>(_IR_num)];
         itemNum++;
     }
     return itemNum && _connected ? result/itemNum : 0;
@@ -162,7 +165,7 @@ void QCasuZMQ::messageReceived(const QList<QByteArray> &message)
     if (device == "IR"){
         AssisiMsg::RangeArray ranges;
         ranges.ParseFromString(data);
-        _lastDataTime[static_cast<dataType>(0)] = _buffers[static_cast<dataType>(0)]->lastKey();
+        _lastDataTime[static_cast<dataType>(0)] = _buffers[static_cast<dataType>(0)]->getLastTime();
         for (int k = 0; k < ranges.raw_value_size(); k++){
             if( k == _IR_num) break;
             newData.value = ranges.raw_value(k);
@@ -174,7 +177,7 @@ void QCasuZMQ::messageReceived(const QList<QByteArray> &message)
     if (device == "Temp"){
         AssisiMsg::TemperatureArray temperatures;
         temperatures.ParseFromString(data);
-        _lastDataTime[static_cast<dataType>(_IR_num)] = _buffers[static_cast<dataType>(_IR_num)]->lastKey();
+        _lastDataTime[static_cast<dataType>(_IR_num)] = _buffers[static_cast<dataType>(_IR_num)]->getLastTime();
         for (int k = 0; k < temperatures.temp_size(); k++){
             if( k == _Temp_num) break;
             newData.value = temperatures.temp(k);
@@ -291,4 +294,10 @@ void zmqBuffer::erase(QMap::iterator it)
 QString zmqBuffer::getTrendName()
 {
     return _trendName;
+}
+
+double zmqBuffer::getLastTime()
+{
+    if (this->isEmpty()) return 0;
+    return last().key;
 }

@@ -40,6 +40,8 @@ public:
     QString getName();
     double getValue(dataType key);
     bool getState(dataType key);
+    bool isConnected();
+    double getAvgSamplingTime();
 
     QRectF boundingRect() const;
 

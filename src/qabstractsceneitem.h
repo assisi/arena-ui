@@ -1,6 +1,8 @@
 #ifndef QABSTRACTSCENEITEM_H
 #define QABSTRACTSCENEITEM_H
 
+#include <memory>
+
 #include <QGraphicsItemGroup>
 #include <QVariant>
 
@@ -17,11 +19,11 @@ protected:
     //Protected virtual methods
     virtual QVariant itemChange(GraphicsItemChange change, const QVariant &value);
 public:
-    QAbstractSceneItem(){
-        this->setFlag(GraphicsItemFlag::ItemIsSelectable);
-    }
+    QAbstractSceneItem();
+
     void setInGroup(bool state);
     void setTreeItem(QTreeWidgetItem *treeItem);
+    void deleteTreeItem();
 
     // Public pure virtual methods
     virtual bool isGroup() const = 0;
@@ -31,6 +33,7 @@ public:
 
     // Public virtual methods
     virtual void setGroupColor(QColor color);
+    virtual QPainterPath shape() const;
 };
 
 #endif // QABSTRACTSCENEITEM_H

@@ -32,7 +32,6 @@ QCasuSceneItem::QCasuSceneItem(QPointF coordinates, double yaw, QCasuZMQ *zmqObj
     _vibrAngle(0),
     _zmqObject(zmqObject)
 {
-    setFlag(QGraphicsItem::ItemIsSelectable);
     FPScheck = new QElapsedTimer();
 }
 
@@ -59,6 +58,16 @@ double QCasuSceneItem::getValue(dataType key)
 bool QCasuSceneItem::getState(dataType key)
 {
     return _zmqObject->getState(key);
+}
+
+bool QCasuSceneItem::isConnected()
+{
+    return _zmqObject->isConnected();
+}
+
+double QCasuSceneItem::getAvgSamplingTime()
+{
+    return _zmqObject->getAvgSamplingTime();
 }
 
 
@@ -88,7 +97,7 @@ void QCasuSceneItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *op
 
     //paint IR sensor readings
     if(settings->value("IR_on").toBool()){
-        for(int k = 0; k < 6; k++){
+        for(int k = 0; k < _IR_num; k++){
             brush.setColor(Qt::black);
             painter->setBrush(brush);
             double tempIR;
@@ -135,6 +144,9 @@ void QCasuSceneItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *op
     if(isSelected() && _inGroup)pen.setColor(_groupColor);
     else if(_zmqObject->isConnected())pen.setColor(Qt::green);
     else pen.setColor(Qt::red);
+
+    if(isSelected()) pen.setStyle(Qt::DotLine);
+    else pen.setStyle(Qt::SolidLine);
 
     brush.setColor(_zmqObject->getState(LED) ? _zmqObject->getLedColor() : Qt::gray);
     if(dynamic_cast<QAbstractTreeItem *>(_treeItem)->isChildSelected()) brush.setStyle(Qt::Dense2Pattern);

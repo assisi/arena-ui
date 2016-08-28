@@ -15,7 +15,7 @@ QCasuTreeItem::QCasuTreeItem(QCasuZMQ *zmqObject) :
         tempWidget->addChild(new QTreeWidgetItem(QStringList("IR - B")));
         tempWidget->addChild(new QTreeWidgetItem(QStringList("IR - BR")));
         tempWidget->addChild(new QTreeWidgetItem(QStringList("IR - FR")));
-        for(int k = 0; k < 6; k++){
+        for(int k = 0; k < _IR_num; k++){
             _widgetMap.insert(static_cast<dataType>(k), tempWidget->child(k));
             tempWidget->child(k)->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled);
         }
@@ -34,8 +34,8 @@ QCasuTreeItem::QCasuTreeItem(QCasuZMQ *zmqObject) :
         tempWidget->addChild(new QTreeWidgetItem(QStringList("Temp - PCB")));
         tempWidget->addChild(new QTreeWidgetItem(QStringList("Temp - RING")));
         tempWidget->addChild(new QTreeWidgetItem(QStringList("Temp - WAX")));
-        for(int k = 0; k < 8; k++){
-            _widgetMap.insert(static_cast<dataType>(k + 6), tempWidget->child(k));
+        for(int k = 0; k < _Temp_num; k++){
+            _widgetMap.insert(static_cast<dataType>(k + _IR_num), tempWidget->child(k));
             tempWidget->child(k)->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled);
         }
         tempWidget->setFlags(Qt::ItemIsEnabled);
@@ -67,7 +67,7 @@ QCasuTreeItem::QCasuTreeItem(QCasuZMQ *zmqObject) :
             tempWidget->child(k)->setFlags(Qt::ItemIsEnabled);
         }
         for(int k = 0; k < 2; k++){
-            _widgetMap.insert(static_cast<dataType>(k + 19), tempWidget->child(2)->child(k));
+            _widgetMap.insert(static_cast<dataType>(k + 14), tempWidget->child(2)->child(k));
             tempWidget->child(k)->setFlags(Qt::ItemIsEnabled);
         }
         tempWidget->setFlags(Qt::ItemIsEnabled);

@@ -1,5 +1,3 @@
-#include <boost/lexical_cast.hpp>
-
 #include <QThread>
 #include <QGraphicsSceneMouseEvent>
 #include <QFileDialog>
@@ -184,11 +182,11 @@ void ArenaUI::sortGraphicsScene()
 
     for(int k = 0; k+1 < _arenaScene->selectedItems().size(); k++)
         for(int i = k+1; i < _arenaScene->selectedItems().size(); i++){
-            QGraphicsItem* item1 = _arenaScene->selectedItems()[k];
-            QGraphicsItem* item2 = _arenaScene->selectedItems()[i];
+            QAbstractSceneItem *item1 = dynamic_cast<QAbstractSceneItem *>(_arenaScene->selectedItems()[k]);
+            QAbstractSceneItem *item2 = dynamic_cast<QAbstractSceneItem *>(_arenaScene->selectedItems()[i]);
 
-            QPainterPath path1 = item1->childItems().size()? dynamic_cast<QCasuSceneGroup*>(item1)->completeShape() : item1->shape();
-            QPainterPath path2 = item2->childItems().size()? dynamic_cast<QCasuSceneGroup*>(item2)->completeShape() : item2->shape();
+            QPainterPath path1 = item1->isGroup()? dynamic_cast<QCasuSceneGroup*>(item1)->completeShape() : item1->shape();
+            QPainterPath path2 = item2->isGroup()? dynamic_cast<QCasuSceneGroup*>(item2)->completeShape() : item2->shape();
 
             if(path1.intersects(path2)){
                 int z1 = item1->zValue();
@@ -287,7 +285,11 @@ void ArenaUI::on_actionOpenArena_triggered()
     _arenaScene->clear();
     ui->casuTree->clear();
     ui->groupTree->clear();
-    ui->groupTree->addTopLevelItem(new QSelectionTreeItem(_arenaScene));
+
+    _arenaScene->selectionTreeWidget = new QSelectionTreeItem(_arenaScene);
+    _arenaScene->selectionTreeWidget->setHidden(true);
+    ui->groupTree->addTopLevelItem(_arenaScene->selectionTreeWidget);
+    _arenaScene->selectionTreeWidget->setHidden(true);
 
 
 
@@ -319,19 +321,20 @@ void ArenaUI::on_actionOpenArena_triggered()
         for(YAML::const_iterator it=arenaNode[assisiFile.arenaLayer.toStdString()].begin(); it!=arenaNode[assisiFile.arenaLayer.toStdString()].end(); it++){
             QString name = QString::fromStdString(it->first.as<std::string>());
             QPointF coordinates;
-            coordinates.setX(arenaNode[assisiFile.arenaLayer.toStdString()][name.toStdString()]["pose"]["x"].as<double>());
-            coordinates.setY(arenaNode[assisiFile.arenaLayer.toStdString()][name.toStdString()]["pose"]["y"].as<double>());
+            coordinates.setX(400 + 10 * arenaNode[assisiFile.arenaLayer.toStdString()][name.toStdString()]["pose"]["x"].as<double>());
+            coordinates.setY(400 - 10 * arenaNode[assisiFile.arenaLayer.toStdString()][name.toStdString()]["pose"]["y"].as<double>());
             double yaw = arenaNode[assisiFile.arenaLayer.toStdString()][name.toStdString()]["pose"]["yaw"].as<double>();
 
             QCasuZMQ *tempZMQ = new QCasuZMQ(this, name);
             QCasuTreeItem *tempTreeItem = new QCasuTreeItem(tempZMQ);
             QCasuSceneItem *tempSceneItem = new QCasuSceneItem(coordinates, yaw, tempZMQ);
 
-            ui->casuTree->addTopLevelItem(tempTreeItem);
-            _arenaScene->addItem(tempSceneItem);
-
             tempTreeItem->setSceneItem(tempSceneItem);
             tempSceneItem->setTreeItem(tempTreeItem);
+
+            ui->casuTree->addTopLevelItem(tempTreeItem);
+            _arenaScene->addItem(tempSceneItem);
+            tempTreeItem->setHidden(true);
 
             tempZMQ->setAddresses(QString::fromStdString(arenaNode[assisiFile.arenaLayer.toStdString()][name.toStdString()]["sub_addr"].as<std::string>()),
                                QString::fromStdString(arenaNode[assisiFile.arenaLayer.toStdString()][name.toStdString()]["pub_addr"].as<std::string>()),
@@ -441,7 +444,7 @@ void ArenaUI::on_actionGroup_triggered()
 
     ui->groupTree->addTopLevelItem(tempTreeGroup);
     _arenaScene->addItem(tempSceneGroup);
-    tempTreeGroup->setSelected(1);
+    tempSceneGroup->setSelected(true);
 
     this->sortGraphicsScene();
 }
@@ -455,10 +458,11 @@ void ArenaUI::on_actionUngroup_triggered()
             QList<QGraphicsItem *> subItemList = item->childItems();
             foreach(QGraphicsItem* subItem, subItemList){
                 dynamic_cast<QAbstractSceneItem *>(item)->removeFromGroup(subItem);
-                subItem->setSelected(0);
-                subItem->setSelected(1);
+                subItem->setSelected(false);
+                subItem->setSelected(true);
                 dynamic_cast<QAbstractSceneItem *>(subItem)->setInGroup(false);
             }
+            dynamic_cast<QAbstractSceneItem *>(item)->deleteTreeItem();
             _arenaScene->destroyItemGroup(dynamic_cast<QAbstractSceneItem *>(item));
         }
     this->sortGraphicsScene();
@@ -656,19 +660,20 @@ QList<QGraphicsItem *>* ArenaUI::groupLoad(YAML::Node* arenaNode, QSettings *loa
         if(loadState->childKeys().size()){
             QString name = loadState->value("casuName").toString();
             QPointF coordinates;
-            coordinates.setX((*arenaNode)[assisiFile.arenaLayer.toStdString()][name.toStdString()]["pose"]["x"].as<double>());
-            coordinates.setY((*arenaNode)[assisiFile.arenaLayer.toStdString()][name.toStdString()]["pose"]["y"].as<double>());
+            coordinates.setX(400 + 10 * (*arenaNode)[assisiFile.arenaLayer.toStdString()][name.toStdString()]["pose"]["x"].as<double>());
+            coordinates.setY(400 - 10 * (*arenaNode)[assisiFile.arenaLayer.toStdString()][name.toStdString()]["pose"]["y"].as<double>());
             double yaw = (*arenaNode)[assisiFile.arenaLayer.toStdString()][name.toStdString()]["pose"]["yaw"].as<double>();
 
             QCasuZMQ *tempZMQ = new QCasuZMQ(this, name);
             QCasuTreeItem *tempTreeItem = new QCasuTreeItem(tempZMQ);
             QCasuSceneItem *tempSceneItem = new QCasuSceneItem(coordinates, yaw, tempZMQ);
 
-            ui->casuTree->addTopLevelItem(tempTreeItem);
-            _arenaScene->addItem(tempSceneItem);
-
             tempTreeItem->setSceneItem(tempSceneItem);
             tempSceneItem->setTreeItem(tempTreeItem);
+
+            ui->casuTree->addTopLevelItem(tempTreeItem);
+            _arenaScene->addItem(tempSceneItem);
+            tempTreeItem->setHidden(true);
 
             linkMap->insert(name, tempZMQ);
 
