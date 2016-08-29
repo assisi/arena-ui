@@ -1,6 +1,7 @@
 #ifndef QDEPLOY_H
 #define QDEPLOY_H
 
+#include <QDebug>
 #include <QLabel>
 #include <QProcess>
 #include <QWindow>
@@ -30,14 +31,6 @@ private:
      * \brief Individual process for executing shell commands
      */
     QProcess* _shell;
-    /*!
-     * \brief Individual process in which simulator runs
-     */
-    QProcess* _simulatorProcess;
-    /*!
-     * \brief Individual process for spawning simulator objects
-     */
-    QProcess* _spawner;
 
     qint64 _simulatorPID;
 
@@ -46,6 +39,7 @@ private:
      * \param text - colected shell output
      */
     void appendText(QString text);
+    bool isSimulatorStarted();
 
 signals:
 
