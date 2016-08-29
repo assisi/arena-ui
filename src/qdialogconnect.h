@@ -14,13 +14,13 @@
 class QDialogConnect : public QDialog
 {
     Q_OBJECT
-
+private:
+    QLineEdit* _subAddr;
+    QLineEdit* _pubAddr;
+    QLineEdit* _msgAddr;
 public:
-    QLineEdit* sub_addr;
-    QLineEdit* pub_addr;
-    QLineEdit* msg_addr;
-
-    QDialogConnect(QString sub, QString pub, QString msg);
+    QDialogConnect(QStringList addresses);
+    QStringList getAddresses();
 };
 
 #endif // QDIALOGCONNECT_H

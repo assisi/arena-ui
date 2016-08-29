@@ -7,16 +7,14 @@
 #include <QVariant>
 #include <QtAlgorithms>
 
-#include "qcasutreeitem.h"
-#include "qcasusceneitem.h"
+#include "qabstractsceneitem.h"
 
-class QCasuSceneGroup : public QGraphicsItemGroup
+class QCasuSceneGroup : public QAbstractSceneItem
 {
 private:
-    QPainterPath groupLine;
-    QPainterPath groupShape;
-
-    QColor groupColor;
+    QPainterPath _groupLine;
+    QPainterPath _groupShape;
+    QVector<QPointF> _childCoordinates;
 
     QVector<QLineF> Prim(QVector<QPointF> list);
 
@@ -24,26 +22,24 @@ protected:
     QVariant itemChange(GraphicsItemChange change, const QVariant &value);
 
 public:
-    QVector<QPointF> childCoords;
-    bool isTopLevel;
-    QCasuTreeItem* treeItem;
-
-    explicit QCasuSceneGroup(QGraphicsItem* parent = 0, QCasuTreeItem *widget = 0);
-    ~QCasuSceneGroup();
-
-    QRectF boundingRect() const;
-
-    void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
-
+    bool isGroup() const;
+    QList<zmqBuffer *> getBuffers(dataType key);
+    QVector<QPointF> getCoordinateVector();
+    void sendSetpoint(QList<QByteArray> message);
     void setGroupColor(QColor color);
 
+    void addToGroup(QGraphicsItem *item);
+    void addToGroup(QList<QGraphicsItem *> itemList);
+    void removeFromGroup(QGraphicsItem *item);
+    void removeFromGroup(QList<QGraphicsItem *> itemList);
+
+    QCasuSceneGroup();
+
+    QRectF boundingRect();
+    void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
+
     QPainterPath shape() const;
-
-    QPainterPath completeShape() const;
-signals:
-
-public slots:
-
+    QPainterPath completeShape();
 };
 
 #endif // QCASUSCENEGROUP_H

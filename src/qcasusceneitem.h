@@ -5,7 +5,7 @@
 #include <QGraphicsItem>
 #include <QGraphicsScene>
 
-#include "qcasutreeitem.h"
+#include "qabstractsceneitem.h"
 
 #define PI 3.14159265
 
@@ -15,43 +15,33 @@
  * All graphical elements for individual CASU are drawn with this item
  */
 
-class QCasuSceneItem : public QObject, public QGraphicsItem
+class QCasuSceneItem : public QAbstractSceneItem
 {
-    Q_OBJECT
-
 private:
-//ANIMATION
-    /*!
-     * \brief Timer that checks if graphics scene update was called with animation timer or some other event
-     */
-    QElapsedTimer* FPScheck;
-    /*!
-     * \brief Current angle of rotation animation
-     *
-     * Increment during scene update depends on sensor values
-     */
-    double airflowAngle;
-    /*!
-     * \brief Current angle of rotation animation
-     *
-     * Increment during scene update depends on sensor values
-     */
-    double vibrAngle;
+    QPointF _coordinates;
+    int _yaw;
+    QElapsedTimer *FPScheck;
+
+    double _airflowAngle;
+    double _vibrAngle;
+
+    QCasuZMQ *_zmqObject;
 
 public:
-    int x_center;
-    int y_center;
-    int yaw_;
+    bool isGroup() const;
+    QList<zmqBuffer *> getBuffers(dataType key);
+    QVector<QPointF> getCoordinateVector();
+    void sendSetpoint(QList<QByteArray> message);
 
-    bool inGroup;
-    QColor groupColor;
+    QCasuSceneItem(QPointF coordinates, double yaw, QCasuZMQ *zmqObject);
 
-    /*!
-     * \brief Pointer to corresponding QCasuTreeItem for same CASU
-     */
-    QCasuTreeItem* treeItem;
-
-    QCasuSceneItem(QObject *parent, int x, int y, double yaw, QCasuTreeItem *widget);
+    void setAddresses(QStringList addresses);
+    QStringList getAddresses();
+    QString getName();
+    double getValue(dataType key);
+    bool getState(dataType key);
+    bool isConnected();
+    int getAvgSamplingTime();
 
     QRectF boundingRect() const;
 
@@ -61,9 +51,6 @@ public:
      * All graphical elements are implemented in this
      */
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
-
-protected slots:
-
 };
 
 /*!
