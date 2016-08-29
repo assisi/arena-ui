@@ -30,17 +30,18 @@ void QDeploy::appendText(QString text)
 
 bool QDeploy::isSimulatorStarted()
 {
-    _shell->start("sh");
-    _shell->write("pgrep ");
     QString tempString = settings->value("simulator").toString();
     tempString = tempString.right(tempString.size() - tempString.lastIndexOf("/") - 1);
     tempString = tempString.left(15);
+
+    _shell->start("sh");
+    _shell->write("pgrep ");
     _shell->write(tempString.toStdString().c_str());
     _shell->closeWriteChannel();
     _shell->waitForFinished();
+
     QString out(_shell->readAll());
     if(out.size()) _simulatorPID = out.toLongLong();
-    qDebug() << _simulatorPID << out << tempString;
     return out.size();
 }
 
@@ -90,7 +91,7 @@ void QDeploy::simulatorStart()
             return;
         }
         _shell->startDetached(settings->value("simulator").toString(), QStringList(), QString(), &_simulatorPID);
-        if(_simulatorPID == 0) appendText("[Simulator] Cannot start: " + settings->value("simulator").toString() + "\n");
+        if(!_simulatorPID) appendText("[Simulator] Cannot start: " + settings->value("simulator").toString() + "\n");
         else appendText("[Simulator] New simulator started (PID: " + QString::number(_simulatorPID) +")\n");
     }
     else appendText("[arenaUI] Already running a process\n");
