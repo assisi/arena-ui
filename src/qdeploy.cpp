@@ -31,13 +31,17 @@ void QDeploy::appendText(QString text)
 bool QDeploy::isSimulatorStarted()
 {
     _shell->start("sh");
-    _shell->write("ps -e -o command | grep \"");
-    _shell->write(settings->value("simulator").toString().toStdString().c_str());
-    _shell->write("\"");
+    _shell->write("pgrep ");
+    QString tempString = settings->value("simulator").toString();
+    tempString = tempString.right(tempString.size() - tempString.lastIndexOf("/") - 1);
+    tempString = tempString.left(15);
+    _shell->write(tempString.toStdString().c_str());
     _shell->closeWriteChannel();
     _shell->waitForFinished();
     QString out(_shell->readAll());
-    return out.indexOf("grep");
+    if(out.size()) _simulatorPID = out.toLongLong();
+    qDebug() << _simulatorPID << out << tempString;
+    return out.size();
 }
 
 void QDeploy::deploy()
@@ -82,8 +86,7 @@ void QDeploy::simulatorStart()
 {
     if(_shell->state() == QProcess::NotRunning){
         if(isSimulatorStarted()){
-            if(_simulatorPID) appendText("[Simulator] Simulator is running (PID: " + QString::number(_simulatorPID) +")\n");
-            else appendText("[Simulator] Simulator is running outside this program.");
+            appendText("[Simulator] Simulator is already running (PID: " + QString::number(_simulatorPID) +")\n");
             return;
         }
         _shell->startDetached(settings->value("simulator").toString(), QStringList(), QString(), &_simulatorPID);
@@ -98,13 +101,9 @@ void QDeploy::simulatorStart()
 void QDeploy::simulatorStop()
 {
     if(isSimulatorStarted()){
-        if(_simulatorPID){
-            _shell->execute(QString("kill ") + QString::number(_simulatorPID));
-            appendText("[Simulator] Simulator process is stopped.");
-        }
-        else appendText("[Simulator] Simulator is running outside this program.");
+        _shell->execute(QString("kill ") + QString::number(_simulatorPID));
+        appendText("[Simulator] Simulator process is stopped.");
     }
-    _simulatorPID = 0;
 }
 
 void QDeploy::appendOut()
