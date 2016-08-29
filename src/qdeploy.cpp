@@ -2,32 +2,32 @@
 
 QDeploy::QDeploy(QWidget *parent) :
     QLabel(parent),
-    simulatorPID(0)
+    _simulatorPID(0)
 {
     this->setAlignment(Qt::AlignLeft | Qt::AlignTop);
     this->setTextFormat(Qt::PlainText);
     this->setWordWrap(true);
 
-    shell = new QProcess;
-    simulatorProcess = new QProcess;
-    spawner = new QProcess;
+    _shell = new QProcess;
+    _simulatorProcess = new QProcess;
+    _spawner = new QProcess;
 
 }
 
 QDeploy::~QDeploy()
 {
-    shell->close();
-    spawner->close();
-    simulatorProcess->close();
-    delete shell;
-    delete spawner;
-    delete simulatorProcess;
+    _shell->close();
+    _spawner->close();
+    _simulatorProcess->close();
+    delete _shell;
+    delete _spawner;
+    delete _simulatorProcess;
 }
 
 
 void QDeploy::setWorkingDirectory(QString dir)
 {
-    shell->setWorkingDirectory(dir);
+    _shell->setWorkingDirectory(dir);
 }
 
 void QDeploy::appendText(QString text)
@@ -37,8 +37,8 @@ void QDeploy::appendText(QString text)
 
 void QDeploy::deploy()
 {
-    if(shell->state() == QProcess::NotRunning){
-        shell->start("deploy.py", QStringList(assisiFile.name));
+    if(_shell->state() == QProcess::NotRunning){
+        _shell->start("deploy.py", QStringList(assisiFile.name));
         this->appendText("[arenaUI] Starting 'deploy.py'\n");
     }
     else this->appendText("[arenaUI] Already running a program\n");
@@ -46,8 +46,8 @@ void QDeploy::deploy()
 
 void QDeploy::run()
 {
-    if(shell->state() == QProcess::NotRunning){
-        shell->start("assisirun.py", QStringList(assisiFile.name));
+    if(_shell->state() == QProcess::NotRunning){
+        _shell->start("assisirun.py", QStringList(assisiFile.name));
         this->appendText("[arenaUI] Starting 'assisirun.py'\n");
     }
     else this->appendText("[arenaUI] Already running a program\n");
@@ -55,14 +55,14 @@ void QDeploy::run()
 
 void QDeploy::stop()
 {
-    if(shell->state() != QProcess::NotRunning) shell->close();
+    if(_shell->state() != QProcess::NotRunning) _shell->close();
     else this->appendText("[arenaUI] Program is not running\n");
 }
 
 void QDeploy::collect()
 {
-    if(shell->state() == QProcess::NotRunning){
-        shell->start("collect_data.py", QStringList(assisiFile.name));
+    if(_shell->state() == QProcess::NotRunning){
+        _shell->start("collect_data.py", QStringList(assisiFile.name));
         this->appendText("[arenaUI] Starting 'collect_data.py'\n");
     }
     else this->appendText("[arenaUI] Already running a program\n");
@@ -75,28 +75,28 @@ void QDeploy::cleanLog()
 
 void QDeploy::simulatorStart()
 {
-    if(simulatorPID != 0){
-        this->appendText("[arenaUI] Simulator already running (" + QString::number(simulatorPID) +")\n");
+    if(_simulatorPID != 0){
+        this->appendText("[arenaUI] Simulator PID exist: " + QString::number(_simulatorPID) +"\n");
+        this->appendText("[arenaUI] Stop simulator to reset PID!");
         return;
     }
-    if(simulatorProcess->state() == 0)simulatorProcess->startDetached(settings->value("simulator").toString(), QStringList(), QString(), &simulatorPID);
-    if(!simulatorProcess->waitForStarted(1000)){
-        simulatorProcess->terminate();
+    if(_simulatorProcess->state() == 0)_simulatorProcess->startDetached(settings->value("simulator").toString(), QStringList(), QString(), &_simulatorPID);
+    if(_simulatorPID == 0){
         this->appendText("[arenaUI] Cannot start: " + settings->value("simulator").toString() + "\n");
     }
-    spawner->start("sim.py", QStringList(assisiFile.arenaFile));
+    _spawner->start("sim.py", QStringList(assisiFile.arenaFile));
 }
 
 void QDeploy::simulatorStop()
 {
-    if(simulatorPID != 0) simulatorProcess->execute(QString("kill -9 ") + QString::number(simulatorPID));
-    simulatorPID = 0;
+    if(_simulatorPID != 0) _simulatorProcess->execute(QString("kill ") + QString::number(_simulatorPID));
+    _simulatorPID = 0;
 }
 
 void QDeploy::appendOut()
 {
     QProcess* proc = (QProcess*) this->sender();
-    if(proc == shell) this->appendText("[SHELL][OUT] ");
+    if(proc == _shell) this->appendText("[SHELL][OUT] ");
     else this->appendText("[SIMULATOR][OUT] ");
     this->appendText(proc->readAllStandardOutput());
 }
@@ -104,27 +104,27 @@ void QDeploy::appendOut()
 void QDeploy::appendErr()
 {
     QProcess* proc = (QProcess*) this->sender();
-    if(proc == shell) this->appendText("[SHELL][ERR] ");
+    if(proc == _shell) this->appendText("[SHELL][ERR] ");
     else this->appendText("[SIMULATOR][ERR] ");
     this->appendText(proc->readAllStandardError());
 }
 
 void QDeploy::toggleOutput(int state){
     if(state){
-        shell->readAllStandardError();
-        shell->readAllStandardOutput();
-        spawner->readAllStandardError();
-        spawner->readAllStandardOutput();
-        connect(shell, SIGNAL(readyReadStandardOutput()), this, SLOT(appendOut()));
-        connect(shell, SIGNAL(readyReadStandardError()), this, SLOT(appendErr()));
-        connect(spawner, SIGNAL(readyReadStandardOutput()), this, SLOT(appendOut()));
-        connect(spawner, SIGNAL(readyReadStandardError()), this, SLOT(appendErr()));
+        _shell->readAllStandardError();
+        _shell->readAllStandardOutput();
+        _spawner->readAllStandardError();
+        _spawner->readAllStandardOutput();
+        connect(_shell, SIGNAL(readyReadStandardOutput()), this, SLOT(appendOut()));
+        connect(_shell, SIGNAL(readyReadStandardError()), this, SLOT(appendErr()));
+        connect(_spawner, SIGNAL(readyReadStandardOutput()), this, SLOT(appendOut()));
+        connect(_spawner, SIGNAL(readyReadStandardError()), this, SLOT(appendErr()));
     }
     else{
-        disconnect(shell, SIGNAL(readyReadStandardOutput()), this, SLOT(appendOut()));
-        disconnect(shell, SIGNAL(readyReadStandardError()), this, SLOT(appendErr()));
-        disconnect(spawner, SIGNAL(readyReadStandardOutput()), this, SLOT(appendOut()));
-        disconnect(spawner, SIGNAL(readyReadStandardError()), this, SLOT(appendErr()));
+        disconnect(_shell, SIGNAL(readyReadStandardOutput()), this, SLOT(appendOut()));
+        disconnect(_shell, SIGNAL(readyReadStandardError()), this, SLOT(appendErr()));
+        disconnect(_spawner, SIGNAL(readyReadStandardOutput()), this, SLOT(appendOut()));
+        disconnect(_spawner, SIGNAL(readyReadStandardError()), this, SLOT(appendErr()));
     }
 
 }

@@ -29,17 +29,17 @@ private:
     /*!
      * \brief Individual process for executing shell commands
      */
-    QProcess* shell;
+    QProcess* _shell;
     /*!
      * \brief Individual process in which simulator runs
      */
-    QProcess* simulatorProcess;
+    QProcess* _simulatorProcess;
     /*!
      * \brief Individual process for spawning simulator objects
      */
-    QProcess* spawner;
+    QProcess* _spawner;
 
-    qint64 simulatorPID;
+    qint64 _simulatorPID;
 
     /*!
      * \brief Appends shell output in UI

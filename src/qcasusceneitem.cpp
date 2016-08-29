@@ -126,7 +126,7 @@ void QCasuSceneItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *op
 
             painter->setPen(pen);
 
-            QTempArc arc(_coordinates, _yaw - k*90); // 0° is at 3 o'clock, ccw direction
+            QTempArc arc(_coordinates, _yaw + k*90); // 0° is at 3 o'clock, ccw direction
             painter->drawArc(arc.rect, arc.start ,arc.span);
         }
     }
