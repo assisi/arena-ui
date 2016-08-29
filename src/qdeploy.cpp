@@ -103,7 +103,7 @@ void QDeploy::simulatorStop()
 {
     if(isSimulatorStarted()){
         _shell->execute(QString("kill ") + QString::number(_simulatorPID));
-        appendText("[Simulator] Simulator process is stopped.");
+        appendText("[Simulator] Simulator process is stopped.\n");
     }
 }
 

@@ -68,7 +68,8 @@ void QArenaScene::drawForeground(QPainter *painter, const QRectF &rect)
                 connectedItems++;
             }
     if(connectedItems && settings->value("avgTime_on").toBool()){
-        QPoint samplingTimePosition = _view->rect().topRight() - QPoint(200,-20);
+        QPoint samplingTimePosition = _view->rect().topRight() - QPoint(180,-20);
+        if(_view->verticalScrollBar()->isVisible()) samplingTimePosition -= QPoint(20,0);
         QString tempText = QString("Avg. sample time: ") + QString::number(time/connectedItems) + QString("ms");
         painter->drawText(_view->mapToScene(samplingTimePosition), tempText);
     }
