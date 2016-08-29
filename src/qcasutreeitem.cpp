@@ -3,8 +3,13 @@
 QCasuTreeItem::QCasuTreeItem(QCasuZMQ *zmqObject) :
     _zmqObject(zmqObject)
 {
-    this->setData(0,Qt::DisplayRole,QStringList(_zmqObject->getName()));
+    setData(0,Qt::DisplayRole,QStringList(_zmqObject->getName()));
     QTreeWidgetItem* tempWidget;
+
+    tempWidget = new QNoSortTreeItem(QStringList("LED color"));
+    tempWidget->setFlags(Qt::ItemIsEnabled);
+    _widgetMap.insert(LED, tempWidget);
+    addChild(tempWidget);
 
     //zadavanje djece IR grani:
     {
@@ -20,7 +25,7 @@ QCasuTreeItem::QCasuTreeItem(QCasuZMQ *zmqObject) :
             tempWidget->child(k)->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled);
         }
         tempWidget->setFlags(Qt::ItemIsEnabled);
-        this->addChild(tempWidget);
+        addChild(tempWidget);
     }
 
     //zadavanje djece temp grani:
@@ -39,7 +44,7 @@ QCasuTreeItem::QCasuTreeItem(QCasuZMQ *zmqObject) :
             tempWidget->child(k)->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled);
         }
         tempWidget->setFlags(Qt::ItemIsEnabled);
-        this->addChild(tempWidget);
+        addChild(tempWidget);
     }
     //zadavanje djece vibr grani:
     /*{
@@ -52,7 +57,7 @@ QCasuTreeItem::QCasuTreeItem(QCasuZMQ *zmqObject) :
             tempWidget->setFlags(Qt::ItemIsEnabled);
         }
         tempWidget->setFlags(Qt::ItemIsEnabled);
-        this->addChild(tempWidget);
+        addChild(tempWidget);
     } */
     //zadavanje djece setpoint grani:
     {
@@ -71,10 +76,10 @@ QCasuTreeItem::QCasuTreeItem(QCasuZMQ *zmqObject) :
             tempWidget->child(k)->setFlags(Qt::ItemIsEnabled);
         }
         tempWidget->setFlags(Qt::ItemIsEnabled);
-        this->addChild(tempWidget);
+        addChild(tempWidget);
     }
 
-    this->setFlags(Qt::ItemIsEnabled);
+    setFlags(Qt::ItemIsEnabled);
 
     connect (_zmqObject,SIGNAL(updated(dataType)),this,SLOT(updateData(dataType)));
 }
@@ -82,6 +87,12 @@ QCasuTreeItem::QCasuTreeItem(QCasuZMQ *zmqObject) :
 
 void QCasuTreeItem::updateData(dataType key)
 {
+    if(key == LED){
+        if(_zmqObject->getState(LED)) _widgetMap[key]->setData(1, Qt::DisplayRole, QVariant(_zmqObject->getLedColor().name()));
+        else _widgetMap[key]->setData(1, Qt::DisplayRole, QVariant());
+        _widgetMap[key]->setTextColor(1, _zmqObject->getLedColor());
+        return;
+    }
     _widgetMap[key]->setData(1, Qt::DisplayRole, QVariant(_zmqObject->getValue(key)));
     if(key >= 14) _widgetMap[key]->setTextColor(1, _zmqObject->getState(key)? Qt::green : Qt::red);
 }

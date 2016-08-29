@@ -35,7 +35,7 @@ double QCasuZMQ::getValue(dataType key)
 
 QColor QCasuZMQ::getLedColor()
 {
-    return _ledColor;
+    return _state[LED] ? _ledColor : Qt::gray;
 }
 
 bool QCasuZMQ::getState(dataType key)
@@ -232,6 +232,7 @@ freq, ampl, stdDev ---> currently setpoints are stored on those values
                           LEDcolor.color().green(),
                           LEDcolor.color().blue());
         _state[LED] = command == "On";
+        emit updated(LED);
         if(settings->value("log_on").toBool()) _logFile << ";" << _ledColor.name().toStdString()
                                                        << ";" << _state[LED];
     }

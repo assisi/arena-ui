@@ -148,7 +148,7 @@ void QCasuSceneItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *op
     if(isSelected()) pen.setStyle(Qt::DotLine);
     else pen.setStyle(Qt::SolidLine);
 
-    brush.setColor(_zmqObject->getState(LED) ? _zmqObject->getLedColor() : Qt::gray);
+    brush.setColor(_zmqObject->getLedColor());
     if(dynamic_cast<QAbstractTreeItem *>(_treeItem)->isChildSelected()) brush.setStyle(Qt::Dense2Pattern);
 
     painter->setPen(pen);
