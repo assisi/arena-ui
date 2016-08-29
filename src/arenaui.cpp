@@ -44,7 +44,7 @@ ArenaUI::ArenaUI(QWidget *parent) :
 
     tempScroll->setWidget(tempWidget);
     tempScroll->setWidgetResizable(true);
-    trendTab = new QVBoxLayout(tempWidget);
+    _trendTab = new QVBoxLayout(tempWidget);
 
     ui->tabTrend->setLayout(new QVBoxLayout);
     ui->tabTrend->layout()->addWidget(tempScroll);
@@ -64,9 +64,9 @@ ArenaUI::ArenaUI(QWidget *parent) :
 
     // - 30fps update
 
-    sceneUpdate = new QTimer(this);
-    connect(sceneUpdate, SIGNAL(timeout()),_arenaScene,SLOT(update()));
-    sceneUpdate->start(34);
+    _sceneUpdate = new QTimer(this);
+    connect(_sceneUpdate, SIGNAL(timeout()),_arenaScene,SLOT(update()));
+    _sceneUpdate->start(34);
 
     //DEPLOYMENT
     ui->tabDeploy->setLayout(new QVBoxLayout);
@@ -74,11 +74,11 @@ ArenaUI::ArenaUI(QWidget *parent) :
     // - deployment header
     tempWidget = new QWidget;
     QGridLayout* tempLayout = new QGridLayout;
-    deployWidget = new QDeploy(this);
+    _deployWidget = new QDeploy(this);
 
-    deployArena = new QLabel;
-    deployNeighborhood = new QLabel;
-    deployFile = new QLabel;
+    _deployArena = new QLabel;
+    _deployNeighborhood = new QLabel;
+    _deployFile = new QLabel;
 
     QFont tempFont;
     tempFont.setBold(true);
@@ -98,9 +98,9 @@ ArenaUI::ArenaUI(QWidget *parent) :
     tempLabel->setFont(tempFont);
     tempLayout->addWidget(tempLabel,3,1);
 
-    tempLayout->addWidget(deployArena,1,2);
-    tempLayout->addWidget(deployNeighborhood,2,2);
-    tempLayout->addWidget(deployFile,3,2);
+    tempLayout->addWidget(_deployArena,1,2);
+    tempLayout->addWidget(_deployNeighborhood,2,2);
+    tempLayout->addWidget(_deployFile,3,2);
 
     tempWidget->setLayout(tempLayout);
     ui->tabDeploy->layout()->addWidget(tempWidget);
@@ -110,57 +110,57 @@ ArenaUI::ArenaUI(QWidget *parent) :
     tempWidget->setLayout(new FlowLayout);
 
     QPushButton* tempButton = new QPushButton("Deploy");
-    connect(tempButton,SIGNAL(clicked()), deployWidget, SLOT(deploy()));
+    connect(tempButton,SIGNAL(clicked()), _deployWidget, SLOT(deploy()));
     tempWidget->layout()->addWidget(tempButton);
 
     tempButton = new QPushButton("Run");
-    connect(tempButton,SIGNAL(clicked()), deployWidget, SLOT(run()));
+    connect(tempButton,SIGNAL(clicked()), _deployWidget, SLOT(run()));
     tempWidget->layout()->addWidget(tempButton);
 
     tempButton = new QPushButton("Stop");
-    connect(tempButton,SIGNAL(clicked()), deployWidget, SLOT(stop()));
+    connect(tempButton,SIGNAL(clicked()), _deployWidget, SLOT(stop()));
     tempWidget->layout()->addWidget(tempButton);
 
     tempButton = new QPushButton("Collect data");
-    connect(tempButton,SIGNAL(clicked()), deployWidget, SLOT(collect()));
+    connect(tempButton,SIGNAL(clicked()), _deployWidget, SLOT(collect()));
     tempWidget->layout()->addWidget(tempButton);
 
     tempButton = new QPushButton("Clean log");
-    connect(tempButton,SIGNAL(clicked()), deployWidget, SLOT(cleanLog()));
+    connect(tempButton,SIGNAL(clicked()), _deployWidget, SLOT(cleanLog()));
     tempWidget->layout()->addWidget(tempButton);
 
     tempButton = new QPushButton("Start simulator");
-    connect(tempButton,SIGNAL(clicked()), deployWidget, SLOT(simulatorStart()));
+    connect(tempButton,SIGNAL(clicked()), _deployWidget, SLOT(simulatorStart()));
     tempWidget->layout()->addWidget(tempButton);
 
     tempButton = new QPushButton("Stop simulator");
-    connect(tempButton,SIGNAL(clicked()), deployWidget, SLOT(simulatorStop()));
+    connect(tempButton,SIGNAL(clicked()), _deployWidget, SLOT(simulatorStop()));
     tempWidget->layout()->addWidget(tempButton);
 
     ui->tabDeploy->layout()->addWidget(tempWidget);
 
     // - text output window
-    deployScroll = new QScrollArea;
-    deployScroll->setWidget(deployWidget);
-    deployScroll->setFrameStyle(QFrame::Panel | QFrame::Sunken);
-    deployScroll->setWidgetResizable(true);
-    deployScroll->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+    _deployScroll = new QScrollArea;
+    _deployScroll->setWidget(_deployWidget);
+    _deployScroll->setFrameStyle(QFrame::Panel | QFrame::Sunken);
+    _deployScroll->setWidgetResizable(true);
+    _deployScroll->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 
-    ui->tabDeploy->layout()->addWidget(deployScroll);
+    ui->tabDeploy->layout()->addWidget(_deployScroll);
 
-    connect(deployScroll->verticalScrollBar(),SIGNAL(rangeChanged(int,int)),this,SLOT(moveDeployScroll(int,int)));
+    connect(_deployScroll->verticalScrollBar(),SIGNAL(rangeChanged(int,int)),this,SLOT(moveDeployScroll(int,int)));
 
     tempWidget = new QWidget;
     tempWidget->setLayout(new FlowLayout);
 
     tempButton = new QPushButton("Clear output");
     tempButton->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Fixed);
-    connect(tempButton,SIGNAL(clicked()), deployWidget, SLOT(clear()));
+    connect(tempButton,SIGNAL(clicked()), _deployWidget, SLOT(clear()));
     tempWidget->layout()->addWidget(tempButton);
 
     QCheckBox* temCheckBox = new QCheckBox("Catch shell output");
     temCheckBox->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Fixed);
-    connect(temCheckBox,SIGNAL(stateChanged(int)), deployWidget, SLOT(toggleOutput(int)));
+    connect(temCheckBox,SIGNAL(stateChanged(int)), _deployWidget, SLOT(toggleOutput(int)));
     tempWidget->layout()->addWidget(temCheckBox);
 
     ui->tabDeploy->layout()->addWidget(tempWidget);
@@ -277,35 +277,34 @@ void ArenaUI::on_actionOpenArena_triggered()
     QString loadFile = QFileDialog::getOpenFileName(this,tr("Open Arena configuration file"), settings->value("arenaFolder").toString(), tr("All(*.arenaUI *assisi);;Project(*.assisi);;Session(*.arenaUI)"));
     if(!loadFile.size()) return;
 
-    while(trendTab->count()){
-        ((QCustomPlot*)trendTab->itemAt(0)->widget())->close();
-        trendTab->removeWidget(trendTab->itemAt(0)->widget());
+    while(_trendTab->count()){
+        ((QCustomPlot*)_trendTab->itemAt(0)->widget())->close();
+        _trendTab->removeWidget(_trendTab->itemAt(0)->widget());
     }
 
     _arenaScene->clear();
     ui->casuTree->clear();
     ui->groupTree->clear();
-
-    _arenaScene->selectionTreeWidget = new QSelectionTreeItem(_arenaScene);
-    _arenaScene->selectionTreeWidget->setHidden(true);
-    ui->groupTree->addTopLevelItem(_arenaScene->selectionTreeWidget);
-    _arenaScene->selectionTreeWidget->setHidden(true);
-
+    /*Create new selectionTreeItem*/{
+        QSelectionTreeItem *tempTreeItem = new QSelectionTreeItem(_arenaScene);
+        ui->groupTree->addTopLevelItem(tempTreeItem);
+        _arenaScene->setTreeItem(tempTreeItem);
+    }
 
 
     if(loadFile.endsWith(".assisi")){
         assisiFile.name = loadFile;
-        assisiNode = YAML::LoadFile(assisiFile.name.toStdString());
+        _assisiNode = YAML::LoadFile(assisiFile.name.toStdString());
 
-        deployArena->setText(QString::fromStdString(assisiNode["arena"].as<std::string>()));
-        deployFile->setText(QString::fromStdString(assisiNode["dep"].as<std::string>()));
-        deployNeighborhood->setText(QString::fromStdString(assisiNode["nbg"].as<std::string>()));
+        _deployArena->setText(QString::fromStdString(_assisiNode["arena"].as<std::string>()));
+        _deployFile->setText(QString::fromStdString(_assisiNode["dep"].as<std::string>()));
+        _deployNeighborhood->setText(QString::fromStdString(_assisiNode["nbg"].as<std::string>()));
 
-        deployWidget->setWorkingDirectory(assisiFile.name.left(assisiFile.name.lastIndexOf('/')));
+        _deployWidget->setWorkingDirectory(assisiFile.name.left(assisiFile.name.lastIndexOf('/')));
 
-        assisiFile.arenaFile = assisiFile.name.left(assisiFile.name.lastIndexOf('/')+1) + QString::fromStdString(assisiNode["arena"].as<std::string>());
-        assisiFile.depFile = assisiFile.name.left(assisiFile.name.lastIndexOf('/')+1) + QString::fromStdString(assisiNode["dep"].as<std::string>());
-        assisiFile.ngbFile = assisiFile.name.left(assisiFile.name.lastIndexOf('/')+1) + QString::fromStdString(assisiNode["nbg"].as<std::string>());
+        assisiFile.arenaFile = assisiFile.name.left(assisiFile.name.lastIndexOf('/')+1) + QString::fromStdString(_assisiNode["arena"].as<std::string>());
+        assisiFile.depFile = assisiFile.name.left(assisiFile.name.lastIndexOf('/')+1) + QString::fromStdString(_assisiNode["dep"].as<std::string>());
+        assisiFile.ngbFile = assisiFile.name.left(assisiFile.name.lastIndexOf('/')+1) + QString::fromStdString(_assisiNode["nbg"].as<std::string>());
 
         YAML::Node arenaNode = YAML::LoadFile(assisiFile.arenaFile.toStdString());
         QList<QString> layers;
@@ -352,17 +351,17 @@ void ArenaUI::on_actionOpenArena_triggered()
         assisiFile.name = loadSession.value("assisiFile").toString();
         assisiFile.arenaLayer = loadSession.value("arenaLayer").toString();
 
-        assisiNode = YAML::LoadFile(assisiFile.name.toStdString());
+        _assisiNode = YAML::LoadFile(assisiFile.name.toStdString());
 
-        deployArena->setText(QString::fromStdString(assisiNode["arena"].as<std::string>()));
-        deployFile->setText(QString::fromStdString(assisiNode["dep"].as<std::string>()));
-        deployNeighborhood->setText(QString::fromStdString(assisiNode["nbg"].as<std::string>()));
+        _deployArena->setText(QString::fromStdString(_assisiNode["arena"].as<std::string>()));
+        _deployFile->setText(QString::fromStdString(_assisiNode["dep"].as<std::string>()));
+        _deployNeighborhood->setText(QString::fromStdString(_assisiNode["nbg"].as<std::string>()));
 
-        deployWidget->setWorkingDirectory(assisiFile.name.left(assisiFile.name.lastIndexOf('/')));
+        _deployWidget->setWorkingDirectory(assisiFile.name.left(assisiFile.name.lastIndexOf('/')));
 
-        assisiFile.arenaFile = assisiFile.name.left(assisiFile.name.lastIndexOf('/')+1) + QString::fromStdString(assisiNode["arena"].as<std::string>());
-        assisiFile.depFile = assisiFile.name.left(assisiFile.name.lastIndexOf('/')+1) + QString::fromStdString(assisiNode["dep"].as<std::string>());
-        assisiFile.ngbFile = assisiFile.name.left(assisiFile.name.lastIndexOf('/')+1) + QString::fromStdString(assisiNode["nbg"].as<std::string>());
+        assisiFile.arenaFile = assisiFile.name.left(assisiFile.name.lastIndexOf('/')+1) + QString::fromStdString(_assisiNode["arena"].as<std::string>());
+        assisiFile.depFile = assisiFile.name.left(assisiFile.name.lastIndexOf('/')+1) + QString::fromStdString(_assisiNode["dep"].as<std::string>());
+        assisiFile.ngbFile = assisiFile.name.left(assisiFile.name.lastIndexOf('/')+1) + QString::fromStdString(_assisiNode["nbg"].as<std::string>());
 
         YAML::Node arenaNode = YAML::LoadFile(assisiFile.arenaFile.toStdString());
         QMap<QString, QCasuZMQ *> linker;
@@ -404,7 +403,7 @@ void ArenaUI::on_actionOpenArena_triggered()
             }
             if(toAdd.size()){
                 QTrendPlot* tempWidget = new QTrendPlot(ui->casuTree, ui->groupTree);
-                trendTab->addWidget(tempWidget);
+                _trendTab->addWidget(tempWidget);
                 tempWidget->addGraphList(toAdd);
                 tempWidget->setWindowTitle(assisiFile.arenaLayer);
             }
@@ -494,7 +493,7 @@ void ArenaUI::on_actionToggleLog_triggered()
 void ArenaUI::on_actionPlot_selected_in_same_trend_triggered()
 {
     QTrendPlot* tempWidget = new QTrendPlot(ui->casuTree, ui->groupTree);
-    trendTab->addWidget(tempWidget);
+    _trendTab->addWidget(tempWidget);
 
     tempWidget->addSelectedGraphs();
     tempWidget->setWindowTitle(assisiFile.arenaLayer);
@@ -514,7 +513,7 @@ void ArenaUI::on_actionPlot_selected_in_different_trends_triggered()
         tempList.append(buffer);
 
         QTrendPlot* tempWidget = new QTrendPlot(ui->casuTree, ui->groupTree);
-        trendTab->addWidget(tempWidget);
+        _trendTab->addWidget(tempWidget);
 
         tempWidget->addGraphList(tempList);
         tempWidget->setWindowTitle(assisiFile.arenaLayer);
@@ -617,7 +616,7 @@ void ArenaUI::customContextMenu(QPoint pos)
 void ArenaUI::moveDeployScroll(int min, int max)
 {
     Q_UNUSED(min)
-    deployScroll->verticalScrollBar()->setValue(max);
+    _deployScroll->verticalScrollBar()->setValue(max);
 }
 
 void ArenaUI::sendSetpoint(QString actuator)
@@ -730,8 +729,8 @@ void ArenaUI::on_actionSave_triggered()
 
     saveState.beginGroup("trendGraphs");
     saveState.beginWriteArray("plot");
-    for(int k=0; k < trendTab->count() ; k++){
-        QTrendPlot* tempPlot = (QTrendPlot*) trendTab->itemAt(k)->widget();
+    for(int k=0; k < _trendTab->count() ; k++){
+        QTrendPlot* tempPlot = (QTrendPlot*) _trendTab->itemAt(k)->widget();
         saveState.setArrayIndex(k);
         saveState.beginWriteArray("graph");
         for(int i=0; i < tempPlot->graphCount(); i++){

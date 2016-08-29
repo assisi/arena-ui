@@ -58,32 +58,32 @@ private:
     /*!
      * \brief YAML node to parse associated project files
      */
-    YAML::Node assisiNode;
+    YAML::Node _assisiNode;
 
     /*!
      * \brief Tab in which trend plots are docked
      */
-    QVBoxLayout* trendTab;
+    QVBoxLayout* _trendTab;
     /*!
      * \brief Custom widget for deployment
      */
-    QDeploy* deployWidget;
+    QDeploy* _deployWidget;
     /*!
      * \brief Pointer to shell output scroll area
      */
-    QScrollArea* deployScroll;
+    QScrollArea* _deployScroll;
     /*!
      * \brief Pointer to QLabel for showing loaded associated file
      */
-    QLabel* deployArena;
+    QLabel* _deployArena;
     /*!
      * \brief Pointer to QLabel for showing loaded associated file
      */
-    QLabel* deployFile;
+    QLabel* _deployFile;
     /*!
      * \brief Pointer to QLabel for showing loaded associated file
      */
-    QLabel* deployNeighborhood;
+    QLabel* _deployNeighborhood;
     /*!
      * \brief Custom widget for video streaming
      */
@@ -92,7 +92,7 @@ private:
     /*!
      * \brief Timer responsible for 30FPS graphics scene refresh rate
      */
-    QTimer* sceneUpdate;
+    QTimer* _sceneUpdate;
 
     /*!
      * \brief Function which sorts arenaScene elements so overlaping items won't hide smaller items (rendering them unselectable)

@@ -85,11 +85,17 @@ void QArenaScene::mousePressEvent(QGraphicsSceneMouseEvent *event)
     else QGraphicsScene::mousePressEvent(event);
 }
 
+void QArenaScene::setTreeItem(QSelectionTreeItem *treeItem)
+{
+    _treeItem = treeItem;
+    _treeItem->setHidden(true);
+}
+
 void QArenaScene::checkSelection()
 {
     QList<QGraphicsItem *> tempList = this->selectedItems();
-    if(tempList.size()>1) selectionTreeWidget->setHidden(false);
-    else selectionTreeWidget->setHidden(true);
+    if(tempList.size()>1) _treeItem->setHidden(false);
+    else _treeItem->setHidden(true);
 
     int color = 14;
 
