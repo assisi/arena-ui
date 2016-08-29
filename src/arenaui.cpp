@@ -68,7 +68,7 @@ ArenaUI::ArenaUI(QWidget *parent) :
     connect(_sceneUpdate, SIGNAL(timeout()),_arenaScene,SLOT(update()));
     _sceneUpdate->start(34);
 
-    //DEPLOYMENT
+    //DEPLOYMENT - TODO: remove all this excesive code and reimplement it
     ui->tabDeploy->setLayout(new QVBoxLayout);
 
     // - deployment header
@@ -291,7 +291,7 @@ void ArenaUI::on_actionOpenArena_triggered()
         _arenaScene->setTreeItem(tempTreeItem);
     }
 
-
+// FIXME: github issue #39
     if(loadFile.endsWith(".assisi")){
         assisiFile.name = loadFile;
         _assisiNode = YAML::LoadFile(assisiFile.name.toStdString());

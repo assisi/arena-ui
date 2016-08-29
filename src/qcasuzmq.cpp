@@ -178,12 +178,8 @@ void QCasuZMQ::messageReceived(const QList<QByteArray> &message)
         }
     }
 
-/*
------
-Vibration measurements?
-freq, ampl, stdDev ---> currently setpoints are stored on those values
------
-*/
+// TODO: Implement Vibration measurements
+
     if (device == "Peltier"){
         AssisiMsg::Temperature pelt;
         pelt.ParseFromString(data);

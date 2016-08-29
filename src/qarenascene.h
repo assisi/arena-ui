@@ -9,7 +9,7 @@
 /*!
  * \brief Subclassed QGraphicsScene with overloaded \b mousePressEvent function as a bug workaround.
  *
- * BUG [QTBUG-10138] - http://www.qtcentre.org/threads/36953-QGraphicsItem-deselected-on-contextMenuEvent
+ * [QTBUG-10138] - http://www.qtcentre.org/threads/36953-QGraphicsItem-deselected-on-contextMenuEvent
  */
 class QArenaScene : public QGraphicsScene
 {
