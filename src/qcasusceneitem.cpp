@@ -187,7 +187,7 @@ void QCasuSceneItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *op
         painter->setPen(pen);
         painter->setBrush(brush);
         // 30 FPS, max_speed = 12 deg/frame -> w = 1 rpm
-        _vibrAngle = fmod(_vibrAngle - amplitude/100* 12*FPSrepaint, 360);
+        _vibrAngle = fmod(_vibrAngle - amplitude/50* 12*FPSrepaint, 360);
         // wawesNum = [6 .. 15]
         int wawesNum = 6+9*freq/1500;
         QVibratingCircle tempItem = QVibratingCircle(_coordinates, wawesNum, _vibrAngle);

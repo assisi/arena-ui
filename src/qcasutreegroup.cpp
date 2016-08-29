@@ -7,8 +7,7 @@ QCasuTreeGroup::QCasuTreeGroup(QString name) :
     this->setData(0,Qt::DisplayRole,QStringList(_name));
     QTreeWidgetItem* tempWidget;
 
-    //zadavanje djece IR grani:
-    {
+    /* IR branch children */{
         tempWidget = new QNoSortTreeItem(QStringList("IR - Proximity"));
         tempWidget->addChild(new QNoSortTreeItem(QStringList("IR - F")));
         tempWidget->addChild(new QNoSortTreeItem(QStringList("IR - FL")));
@@ -24,8 +23,7 @@ QCasuTreeGroup::QCasuTreeGroup(QString name) :
         this->addChild(tempWidget);
     }
 
-    //zadavanje djece temp grani:
-    {
+    /* Temperature branch children */{
         tempWidget = new QNoSortTreeItem(QStringList("Temperature"));
         tempWidget->addChild(new QNoSortTreeItem(QStringList("Temp - F")));
         tempWidget->addChild(new QNoSortTreeItem(QStringList("Temp - L")));

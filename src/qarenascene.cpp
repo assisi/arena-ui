@@ -1,7 +1,5 @@
 #include "qarenascene.h"
 
-// Subclassed QGraphicsScene for a BUG [QTBUG-10138]
-// http://www.qtcentre.org/threads/36953-QGraphicsItem-deselected-on-contextMenuEvent
 void QArenaScene::drawBackground(QPainter *painter, const QRectF &rect)
 {
     Q_UNUSED(rect);
