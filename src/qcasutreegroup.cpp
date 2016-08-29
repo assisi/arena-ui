@@ -9,13 +9,13 @@ QCasuTreeGroup::QCasuTreeGroup(QString name) :
 
     //zadavanje djece IR grani:
     {
-        tempWidget = new QTreeWidgetItem(QStringList("IR - Proximity"));
-        tempWidget->addChild(new QTreeWidgetItem(QStringList("IR - F")));
-        tempWidget->addChild(new QTreeWidgetItem(QStringList("IR - FL")));
-        tempWidget->addChild(new QTreeWidgetItem(QStringList("IR - BL")));
-        tempWidget->addChild(new QTreeWidgetItem(QStringList("IR - B")));
-        tempWidget->addChild(new QTreeWidgetItem(QStringList("IR - BR")));
-        tempWidget->addChild(new QTreeWidgetItem(QStringList("IR - FR")));
+        tempWidget = new QNoSortTreeItem(QStringList("IR - Proximity"));
+        tempWidget->addChild(new QNoSortTreeItem(QStringList("IR - F")));
+        tempWidget->addChild(new QNoSortTreeItem(QStringList("IR - FL")));
+        tempWidget->addChild(new QNoSortTreeItem(QStringList("IR - BL")));
+        tempWidget->addChild(new QNoSortTreeItem(QStringList("IR - B")));
+        tempWidget->addChild(new QNoSortTreeItem(QStringList("IR - BR")));
+        tempWidget->addChild(new QNoSortTreeItem(QStringList("IR - FR")));
         for(int k = 0; k < _IR_num; k++){
             _widgetMap.insert(static_cast<dataType>(k), tempWidget->child(k));
             tempWidget->child(k)->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled);
@@ -26,15 +26,15 @@ QCasuTreeGroup::QCasuTreeGroup(QString name) :
 
     //zadavanje djece temp grani:
     {
-        tempWidget = new QTreeWidgetItem(QStringList("Temperature"));
-        tempWidget->addChild(new QTreeWidgetItem(QStringList("Temp - F")));
-        tempWidget->addChild(new QTreeWidgetItem(QStringList("Temp - L")));
-        tempWidget->addChild(new QTreeWidgetItem(QStringList("Temp - B")));
-        tempWidget->addChild(new QTreeWidgetItem(QStringList("Temp - R")));
-        tempWidget->addChild(new QTreeWidgetItem(QStringList("Temp - TOP")));
-        tempWidget->addChild(new QTreeWidgetItem(QStringList("Temp - PCB")));
-        tempWidget->addChild(new QTreeWidgetItem(QStringList("Temp - RING")));
-        tempWidget->addChild(new QTreeWidgetItem(QStringList("Temp - WAX")));
+        tempWidget = new QNoSortTreeItem(QStringList("Temperature"));
+        tempWidget->addChild(new QNoSortTreeItem(QStringList("Temp - F")));
+        tempWidget->addChild(new QNoSortTreeItem(QStringList("Temp - L")));
+        tempWidget->addChild(new QNoSortTreeItem(QStringList("Temp - B")));
+        tempWidget->addChild(new QNoSortTreeItem(QStringList("Temp - R")));
+        tempWidget->addChild(new QNoSortTreeItem(QStringList("Temp - TOP")));
+        tempWidget->addChild(new QNoSortTreeItem(QStringList("Temp - PCB")));
+        tempWidget->addChild(new QNoSortTreeItem(QStringList("Temp - RING")));
+        tempWidget->addChild(new QNoSortTreeItem(QStringList("Temp - WAX")));
         for(int k = 0; k < _Temp_num; k++){
             _widgetMap.insert(static_cast<dataType>(k + _IR_num), tempWidget->child(k));
             tempWidget->child(k)->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled);

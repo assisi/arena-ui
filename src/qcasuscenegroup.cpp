@@ -65,6 +65,30 @@ void QCasuSceneGroup::setGroupColor(QColor color)
         dynamic_cast<QAbstractSceneItem *>(item)->setGroupColor(color);
 }
 
+void QCasuSceneGroup::addToGroup(QGraphicsItem *item)
+{
+    QGraphicsItemGroup::addToGroup(item);
+    dynamic_cast<QAbstractSceneItem *>(item)->setInGroup(true);
+}
+
+void QCasuSceneGroup::addToGroup(QList<QGraphicsItem *> itemList)
+{
+    foreach(QGraphicsItem* item, itemList) addToGroup(item);
+}
+
+void QCasuSceneGroup::removeFromGroup(QGraphicsItem *item)
+{
+    QGraphicsItemGroup::removeFromGroup(item);
+    item->setSelected(false);
+    item->setSelected(true);
+    dynamic_cast<QAbstractSceneItem *>(item)->setInGroup(false);
+}
+
+void QCasuSceneGroup::removeFromGroup(QList<QGraphicsItem *> itemList)
+{
+    foreach(QGraphicsItem* item, itemList) removeFromGroup(item);
+}
+
 QCasuSceneGroup::QCasuSceneGroup()
 {
 

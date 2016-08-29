@@ -1,6 +1,7 @@
 #ifndef QABSTRACTTREEITEM_H
 #define QABSTRACTTREEITEM_H
 
+#include <utility>
 #include <QTreeWidgetItem>
 
 #include "qcasuzmq.h"
@@ -19,6 +20,31 @@ public:
     //Public virtual methods
     virtual bool isChildSelected();
     virtual QList<zmqBuffer *> getBuffers();
+};
+
+/*!
+ * \brief Subclassed QTreeWidgetItem to disable sort on children
+ */
+class QNoSortTreeItem : public QTreeWidgetItem
+{
+public:
+    template <typename ...Params>
+    /*!
+     * \brief Calls QTreeWigdetItem constructor with same parameters
+     * \param params
+     */
+    QNoSortTreeItem(Params&&... params) : QTreeWidgetItem(forward<Params>(params)...) {}
+    /*!
+     * \brief reimplemented operator <
+     * \param other [unused]
+     * \return always false
+     *
+     * Always returns false so tree items will retain order in which they are inserted.
+     */
+    bool operator<(const QTreeWidgetItem& other) const {
+        Q_UNUSED(other);
+        return false;
+    }
 };
 
 #endif // QABSTRACTTREEITEM_H

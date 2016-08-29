@@ -28,6 +28,11 @@ public:
     void sendSetpoint(QList<QByteArray> message);
     void setGroupColor(QColor color);
 
+    void addToGroup(QGraphicsItem *item);
+    void addToGroup(QList<QGraphicsItem *> itemList);
+    void removeFromGroup(QGraphicsItem *item);
+    void removeFromGroup(QList<QGraphicsItem *> itemList);
+
     QCasuSceneGroup();
 
     QRectF boundingRect();

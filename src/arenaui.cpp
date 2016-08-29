@@ -373,7 +373,7 @@ void ArenaUI::on_actionOpenArena_triggered()
         groupLoad(&arenaNode, &loadSession, tempSize, &linker, &progress);
         loadSession.endArray();
         loadSession.endGroup();
-        this->sortGraphicsScene();
+        sortGraphicsScene();
 
         //LOAD AND SET CONNECTIONS
         loadSession.beginGroup("connectionSettings");
@@ -414,7 +414,6 @@ void ArenaUI::on_actionOpenArena_triggered()
         loadSession.endGroup();
     }
 
-
     this->setWindowTitle("ASSISI - " + loadFile.mid(loadFile.lastIndexOf("/")) + ": " + assisiFile.arenaLayer);
 }
 
@@ -430,10 +429,7 @@ void ArenaUI::on_actionGroup_triggered()
     tempTreeGroup->setSceneItem(tempSceneGroup);
     tempSceneGroup->setTreeItem(tempTreeGroup);
 
-    foreach(QGraphicsItem* item, itemList){
-        tempSceneGroup->addToGroup(item);
-        dynamic_cast<QAbstractSceneItem *>(item)->setInGroup(true);
-    }
+    tempSceneGroup->addToGroup(itemList);
 
     ui->groupTree->addTopLevelItem(tempTreeGroup);
     _arenaScene->addItem(tempSceneGroup);
@@ -448,13 +444,7 @@ void ArenaUI::on_actionUngroup_triggered()
     QList<QGraphicsItem *> itemList= _arenaScene->selectedItems();
     foreach(QGraphicsItem* item, itemList)
         if(dynamic_cast<QAbstractSceneItem *>(item)->isGroup()){
-            QList<QGraphicsItem *> subItemList = item->childItems();
-            foreach(QGraphicsItem* subItem, subItemList){
-                dynamic_cast<QAbstractSceneItem *>(item)->removeFromGroup(subItem);
-                subItem->setSelected(false);
-                subItem->setSelected(true);
-                dynamic_cast<QAbstractSceneItem *>(subItem)->setInGroup(false);
-            }
+            dynamic_cast<QCasuSceneGroup *>(item)->removeFromGroup(item->childItems());
             dynamic_cast<QAbstractSceneItem *>(item)->deleteTreeItem();
             _arenaScene->destroyItemGroup(dynamic_cast<QAbstractSceneItem *>(item));
         }
@@ -678,10 +668,7 @@ QList<QGraphicsItem *>* ArenaUI::groupLoad(YAML::Node* arenaNode, QSettings *loa
             tempSceneGroup->setTreeItem(tempTreeGroup);
 
             QList<QGraphicsItem *> itemList= *groupLoad(arenaNode, loadState, tempSize, linkMap, progress);
-            foreach(QGraphicsItem* item, itemList){
-                tempSceneGroup->addToGroup(item);
-                dynamic_cast<QAbstractSceneItem *>(item)->setInGroup(true);
-            }
+            tempSceneGroup->addToGroup(itemList);
 
             ui->groupTree->addTopLevelItem(tempTreeGroup);
             _arenaScene->addItem(tempSceneGroup);
