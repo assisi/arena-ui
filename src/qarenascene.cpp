@@ -61,8 +61,8 @@ void QArenaScene::drawForeground(QPainter *painter, const QRectF &rect)
     int connectedItems = 0;
     foreach(QGraphicsItem *item, items())
         if(!dynamic_cast<QAbstractSceneItem *>(item)->isGroup())
-            if(dynamic_cast<QCasuSceneItem *>(item)->isConnected()){
-                time += dynamic_cast<QCasuSceneItem *>(item)->getAvgSamplingTime();
+            if(dynamic_cast<QCasuSceneItem *>(item)->getZmqObject()->isConnected()){
+                time += dynamic_cast<QCasuSceneItem *>(item)->getZmqObject()->getAvgSamplingTime();
                 connectedItems++;
             }
     if(connectedItems && settings->value("avgTime_on").toBool()){
