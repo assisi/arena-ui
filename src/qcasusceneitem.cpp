@@ -35,41 +35,10 @@ QCasuSceneItem::QCasuSceneItem(QPointF coordinates, double yaw, QCasuZMQ *zmqObj
     FPScheck = new QElapsedTimer();
 }
 
-void QCasuSceneItem::setAddresses(QStringList addresses)
+QCasuZMQ *QCasuSceneItem::getZmqObject()
 {
-    _zmqObject->setAddresses(addresses.at(0), addresses.at(1), addresses.at(2));
+    return _zmqObject;
 }
-
-QStringList QCasuSceneItem::getAddresses()
-{
-    return _zmqObject->getAddresses();
-}
-
-QString QCasuSceneItem::getName()
-{
-    return _zmqObject->getName();
-}
-
-double QCasuSceneItem::getValue(dataType key)
-{
-    return _zmqObject->getValue(key);
-}
-
-bool QCasuSceneItem::getState(dataType key)
-{
-    return _zmqObject->getState(key);
-}
-
-bool QCasuSceneItem::isConnected()
-{
-    return _zmqObject->isConnected();
-}
-
-int QCasuSceneItem::getAvgSamplingTime()
-{
-    return _zmqObject->getAvgSamplingTime();
-}
-
 
 QRectF QCasuSceneItem::boundingRect() const
 {

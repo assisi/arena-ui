@@ -46,7 +46,7 @@ QDialogSetpoint::QDialogSetpoint(QString command, QList<QGraphicsItem *> group) 
 
         if(groupSelected) value1->setText("26.00");
         else{
-            double temp = tempItem->getValue(Peltier);
+            double temp = tempItem->getZmqObject()->getValue(Peltier);
             if(temp > 26)
                 value1->setText(QString::number(temp,'f',2));
             else
@@ -74,8 +74,8 @@ QDialogSetpoint::QDialogSetpoint(QString command, QList<QGraphicsItem *> group) 
             value2->setText("50.00");
         }
         else{
-            double temp1 = tempItem->getValue(Frequency);
-            double temp2 = tempItem->getValue(Amplitude);
+            double temp1 = tempItem->getZmqObject()->getValue(Frequency);
+            double temp2 = tempItem->getZmqObject()->getValue(Amplitude);
 
             if(temp1 >= 50){
                 value1->setText(QString::number(temp1,'f',2));
@@ -119,7 +119,7 @@ QDialogSetpoint::QDialogSetpoint(QString command, QList<QGraphicsItem *> group) 
 
         if(groupSelected) value1->setText("1.00");
         else{
-            double temp = tempItem->getValue(Airflow);
+            double temp = tempItem->getZmqObject()->getValue(Airflow);
             if(temp > 1)
                 value1->setText(QString::number(temp,'f',2));
             else

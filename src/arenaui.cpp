@@ -465,9 +465,9 @@ void ArenaUI::on_actionConnect_triggered()
         return;
     }
     QCasuSceneItem* temp = (QCasuSceneItem*)_arenaScene->selectedItems()[0];
-    QDialogConnect* addrDiag = new QDialogConnect(temp->getAddresses());
+    QDialogConnect* addrDiag = new QDialogConnect(temp->getZmqObject()->getAddresses());
     if(addrDiag->exec()){
-        temp->setAddresses(addrDiag->getAddresses());
+        temp->getZmqObject()->setAddresses(addrDiag->getAddresses());
     }
 }
 
@@ -622,7 +622,7 @@ void ArenaUI::groupSave(QSettings *saveState, QList<QGraphicsItem *> group, QStr
     saveState->beginWriteArray(groupName);
     for(int k=0; k < group.size() ; k++){
         saveState->setArrayIndex(k);
-        if(!dynamic_cast<QAbstractSceneItem *>(group[k])->isGroup()) saveState->setValue("casuName",dynamic_cast<QCasuSceneItem *>(group[k])->getName());
+        if(!dynamic_cast<QAbstractSceneItem *>(group[k])->isGroup()) saveState->setValue("casuName",dynamic_cast<QCasuSceneItem *>(group[k])->getZmqObject()->getName());
         else groupSave(saveState, group[k]->childItems(), "group");
     }
     saveState->endArray();
@@ -738,8 +738,8 @@ void ArenaUI::on_actionSave_triggered()
     foreach(QGraphicsItem *item, _arenaScene->items())
         if(!dynamic_cast<QAbstractSceneItem *>(item)->isGroup()){
             saveState.setArrayIndex(index++);
-            saveState.setValue("casuName",dynamic_cast<QCasuSceneItem *>(item)->getName());
-            QStringList addresses = dynamic_cast<QCasuSceneItem *>(item)->getAddresses();
+            saveState.setValue("casuName",dynamic_cast<QCasuSceneItem *>(item)->getZmqObject()->getName());
+            QStringList addresses = dynamic_cast<QCasuSceneItem *>(item)->getZmqObject()->getAddresses();
             saveState.setValue("sub_addr",addresses.at(0));
             saveState.setValue("pub_addr",addresses.at(1));
             saveState.setValue("msg_addr",addresses.at(2));

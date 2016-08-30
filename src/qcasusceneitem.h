@@ -35,13 +35,7 @@ public:
 
     QCasuSceneItem(QPointF coordinates, double yaw, QCasuZMQ *zmqObject);
 
-    void setAddresses(QStringList addresses);
-    QStringList getAddresses();
-    QString getName();
-    double getValue(dataType key);
-    bool getState(dataType key);
-    bool isConnected();
-    int getAvgSamplingTime();
+    QCasuZMQ *getZmqObject();
 
     QRectF boundingRect() const;
 
