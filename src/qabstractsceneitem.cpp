@@ -53,3 +53,8 @@ QPainterPath QAbstractSceneItem::shape() const
     out.addRect(boundingRect());
     return out;
 }
+
+QPainterPath QAbstractSceneItem::completeShape()
+{
+    return shape();
+}

@@ -185,8 +185,8 @@ void ArenaUI::sortGraphicsScene()
             QAbstractSceneItem *item1 = dynamic_cast<QAbstractSceneItem *>(_arenaScene->selectedItems()[k]);
             QAbstractSceneItem *item2 = dynamic_cast<QAbstractSceneItem *>(_arenaScene->selectedItems()[i]);
 
-            QPainterPath path1 = std::move(item1->isGroup()? dynamic_cast<QCasuSceneGroup*>(item1)->completeShape() : item1->shape());
-            QPainterPath path2 = std::move(item2->isGroup()? dynamic_cast<QCasuSceneGroup*>(item2)->completeShape() : item2->shape());
+            QPainterPath path1 = std::move(item1->completeShape());
+            QPainterPath path2 = std::move(item2->completeShape());
 
             if(path1.intersects(path2)){
                 int z1 = item1->zValue();

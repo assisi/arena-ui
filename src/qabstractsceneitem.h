@@ -36,6 +36,7 @@ public:
     // Public virtual methods
     virtual void setGroupColor(QColor color);
     virtual QPainterPath shape() const;
+    virtual QPainterPath completeShape();
 };
 
 #endif // QABSTRACTSCENEITEM_H
