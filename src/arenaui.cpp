@@ -185,8 +185,8 @@ void ArenaUI::sortGraphicsScene()
             QAbstractSceneItem *item1 = dynamic_cast<QAbstractSceneItem *>(_arenaScene->selectedItems()[k]);
             QAbstractSceneItem *item2 = dynamic_cast<QAbstractSceneItem *>(_arenaScene->selectedItems()[i]);
 
-            QPainterPath path1 = item1->isGroup()? dynamic_cast<QCasuSceneGroup*>(item1)->completeShape() : item1->shape();
-            QPainterPath path2 = item2->isGroup()? dynamic_cast<QCasuSceneGroup*>(item2)->completeShape() : item2->shape();
+            QPainterPath path1 = std::move(item1->isGroup()? dynamic_cast<QCasuSceneGroup*>(item1)->completeShape() : item1->shape());
+            QPainterPath path2 = std::move(item2->isGroup()? dynamic_cast<QCasuSceneGroup*>(item2)->completeShape() : item2->shape());
 
             if(path1.intersects(path2)){
                 int z1 = item1->zValue();
@@ -628,9 +628,9 @@ void ArenaUI::groupSave(QSettings *saveState, QList<QGraphicsItem *> group, QStr
     saveState->endArray();
 }
 
-QList<QGraphicsItem *>* ArenaUI::groupLoad(YAML::Node* arenaNode, QSettings *loadState, int groupSize, QMap<QString, QCasuZMQ *> *linkMap, QProgressBar* progress)
+QList<QGraphicsItem *> ArenaUI::groupLoad(YAML::Node* arenaNode, QSettings *loadState, int groupSize, QMap<QString, QCasuZMQ *> *linkMap, QProgressBar* progress)
 {
-    QList<QGraphicsItem *>* returnGroup = new QList<QGraphicsItem *>;
+    QList<QGraphicsItem *> returnGroup;
     for(int k=0; k < groupSize; k++){
         loadState->setArrayIndex(k);
         progress->setValue(progress->value()+1);
@@ -656,7 +656,7 @@ QList<QGraphicsItem *>* ArenaUI::groupLoad(YAML::Node* arenaNode, QSettings *loa
             linkMap->insert(name, tempZMQ);
 
             progress->setValue(progress->value()+1);
-            returnGroup->append(tempSceneItem);
+            returnGroup.append(tempSceneItem);
         }
         else{
             int tempSize = loadState->beginReadArray("group");
@@ -667,7 +667,7 @@ QList<QGraphicsItem *>* ArenaUI::groupLoad(YAML::Node* arenaNode, QSettings *loa
             tempTreeGroup->setSceneItem(tempSceneGroup);
             tempSceneGroup->setTreeItem(tempTreeGroup);
 
-            QList<QGraphicsItem *> itemList= *groupLoad(arenaNode, loadState, tempSize, linkMap, progress);
+            QList<QGraphicsItem *> itemList= std::move(groupLoad(arenaNode, loadState, tempSize, linkMap, progress));
             tempSceneGroup->addToGroup(itemList);
 
             ui->groupTree->addTopLevelItem(tempTreeGroup);
@@ -675,7 +675,7 @@ QList<QGraphicsItem *>* ArenaUI::groupLoad(YAML::Node* arenaNode, QSettings *loa
 
             tempTreeGroup->setSelected(0);
             loadState->endArray();
-            returnGroup->append(tempSceneGroup);
+            returnGroup.append(tempSceneGroup);
         }
 
         QApplication::processEvents();
@@ -739,7 +739,7 @@ void ArenaUI::on_actionSave_triggered()
         if(!dynamic_cast<QAbstractSceneItem *>(item)->isGroup()){
             saveState.setArrayIndex(index++);
             saveState.setValue("casuName",dynamic_cast<QCasuSceneItem *>(item)->getZmqObject()->getName());
-            QStringList addresses = dynamic_cast<QCasuSceneItem *>(item)->getZmqObject()->getAddresses();
+            QStringList addresses = std::move(dynamic_cast<QCasuSceneItem *>(item)->getZmqObject()->getAddresses());
             saveState.setValue("sub_addr",addresses.at(0));
             saveState.setValue("pub_addr",addresses.at(1));
             saveState.setValue("msg_addr",addresses.at(2));

@@ -1,7 +1,6 @@
 #ifndef QABSTRACTTREEITEM_H
 #define QABSTRACTTREEITEM_H
 
-#include <utility>
 #include <QTreeWidgetItem>
 
 #include "qcasuzmq.h"

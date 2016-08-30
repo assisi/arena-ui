@@ -1,6 +1,8 @@
 #ifndef GLOBAL
 #define GLOBAL
 
+#include <utility>
+
 #include <QString>
 #include <QDateTime>
 #include <QSettings>

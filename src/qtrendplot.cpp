@@ -141,7 +141,6 @@ void QTrendPlot::prettyPlot()
     }
 }
 
-
 void QTrendPlot::enableAutoPosition(){
     autoPosition = true;
 }

@@ -110,7 +110,7 @@ private:
     /*!
      * \brief Recursive function which loads grouping hieararchy of arenaScene items when loading a session
      */
-    QList<QGraphicsItem *> *groupLoad(YAML::Node *arenaNode, QSettings *loadState, int groupSize, QMap<QString, QCasuZMQ*>* linkMap, QProgressBar *progress);
+    QList<QGraphicsItem *> groupLoad(YAML::Node *arenaNode, QSettings *loadState, int groupSize, QMap<QString, QCasuZMQ*>* linkMap, QProgressBar *progress);
 
 private slots:
     /*!

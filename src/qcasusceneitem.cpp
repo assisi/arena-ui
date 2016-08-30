@@ -159,7 +159,7 @@ void QCasuSceneItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *op
         _vibrAngle = fmod(_vibrAngle - amplitude/50* 12*FPSrepaint, 360);
         // wawesNum = [6 .. 15]
         int wawesNum = 6+9*freq/1500;
-        QVibratingCircle tempItem = QVibratingCircle(_coordinates, wawesNum, _vibrAngle);
+        QVibratingCircle tempItem = std::move(QVibratingCircle(_coordinates, wawesNum, _vibrAngle));
         painter->drawPath(tempItem);
         pen.setColor(QColor(128,128,128,96));
         painter->setPen(pen);
@@ -168,7 +168,6 @@ void QCasuSceneItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *op
 
     if(FPSrepaint) FPScheck->start();
 }
-
 
 QIRTriangle::QIRTriangle(QPointF center, double angle, double value)
 {
@@ -185,7 +184,6 @@ QIRTriangle::QIRTriangle(QPointF center, double angle, double value)
     setTopLeft(topLeft);
     setBottomRight(bottomRight);
 }
-
 
 QTempArc::QTempArc(QPointF center, double angle)
 {
