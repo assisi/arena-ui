@@ -91,9 +91,9 @@ void QDialogSettings::findFolder()
 
 void QDialogSettings::saveConfig()
 {
-    settings->setValue("logFolder", logFolder->text() + "/");
-    settings->setValue("camFolder", camFolder->text() + "/");
-    settings->setValue("arenaFolder", arenaFolder->text() + "/");
+    settings->setValue("logFolder", logFolder->text() + (logFolder->text().endsWith("/")? "" : "/"));
+    settings->setValue("camFolder", camFolder->text() + (camFolder->text().endsWith("/")? "" : "/"));
+    settings->setValue("arenaFolder", arenaFolder->text() + (arenaFolder->text().endsWith("/")? "" : "/"));
     settings->setValue("simulator", simFile->text());
     settings->setValue("trendTimeSpan", QTime::fromString(trendTimeSpan->text(),"mm:ss"));
     settings->setValue("trendSampleTime_ms", trendSampleTime_ms->text());

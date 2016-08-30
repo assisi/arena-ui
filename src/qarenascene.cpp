@@ -1,7 +1,5 @@
 #include "qarenascene.h"
 
-// Subclassed QGraphicsScene for a BUG [QTBUG-10138]
-// http://www.qtcentre.org/threads/36953-QGraphicsItem-deselected-on-contextMenuEvent
 void QArenaScene::drawBackground(QPainter *painter, const QRectF &rect)
 {
     Q_UNUSED(rect);
@@ -58,6 +56,21 @@ void QArenaScene::drawForeground(QPainter *painter, const QRectF &rect)
     painter->drawText(_view->mapToScene(QPoint(11,36)), "20 °C");
     painter->drawText(_view->mapToScene(QPoint(101,36)), "35 °C");
     painter->drawText(_view->mapToScene(QPoint(191,36)), "50 °C");
+
+    int time = 0;
+    int connectedItems = 0;
+    foreach(QGraphicsItem *item, items())
+        if(!dynamic_cast<QAbstractSceneItem *>(item)->isGroup())
+            if(dynamic_cast<QCasuSceneItem *>(item)->getZmqObject()->isConnected()){
+                time += dynamic_cast<QCasuSceneItem *>(item)->getZmqObject()->getAvgSamplingTime();
+                connectedItems++;
+            }
+    if(connectedItems && settings->value("avgTime_on").toBool()){
+        QPoint samplingTimePosition = _view->rect().topRight() - QPoint(180,-20);
+        if(_view->verticalScrollBar()->isVisible()) samplingTimePosition -= QPoint(20,0);
+        QString tempText = QString("Avg. sample time: ") + QString::number(time/connectedItems) + QString("ms");
+        painter->drawText(_view->mapToScene(samplingTimePosition), tempText);
+    }
 }
 
 QArenaScene::QArenaScene(QWidget *parent) : QGraphicsScene(parent){
@@ -71,18 +84,21 @@ void QArenaScene::mousePressEvent(QGraphicsSceneMouseEvent *event)
     else QGraphicsScene::mousePressEvent(event);
 }
 
+void QArenaScene::setTreeItem(QSelectionTreeItem *treeItem)
+{
+    _treeItem = treeItem;
+    _treeItem->setHidden(true);
+}
+
 void QArenaScene::checkSelection()
 {
-    QList<QGraphicsItem*> tempList = this->selectedItems();
-    if(tempList.size()>1) selectionTreeWidget->setHidden(false);
-    else selectionTreeWidget->setHidden(true);
+    QList<QGraphicsItem *> tempList = this->selectedItems();
+    if(tempList.size()>1) _treeItem->setHidden(false);
+    else _treeItem->setHidden(true);
 
     int color = 14;
 
-    foreach(QGraphicsItem* item, tempList){
-        if(item->childItems().size()){
-            ((QCasuSceneGroup*)item)->setGroupColor((Qt::GlobalColor) color);
-            ((QCasuSceneGroup*)item)->treeItem->setTextColor(0,(Qt::GlobalColor) color++);
-        }
-    }
+    foreach(QGraphicsItem *item, tempList)
+        if(dynamic_cast<QAbstractSceneItem *>(item)->isGroup())
+            dynamic_cast<QAbstractSceneItem *>(item)->setGroupColor(static_cast<Qt::GlobalColor>(color++));
 }

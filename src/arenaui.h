@@ -18,8 +18,12 @@
 #include "qdialogconnect.h"
 #include "qdialogsettings.h"
 #include "qdialogsetpoint.h"
+
 #include "qcasuscenegroup.h"
 #include "qcasusceneitem.h"
+#include "qcasutreeitem.h"
+#include "qcasutreegroup.h"
+
 #include "qtrendplot.h"
 #include "qdeploy.h"
 #include "qgraphicsviewzoom.h"
@@ -50,36 +54,36 @@ private:
     /*!
      * \brief Pointer to main graphics scene
      */
-    QArenaScene *arenaScene;
+    QArenaScene *_arenaScene;
     /*!
      * \brief YAML node to parse associated project files
      */
-    YAML::Node assisiNode;
+    YAML::Node _assisiNode;
 
     /*!
      * \brief Tab in which trend plots are docked
      */
-    QVBoxLayout* trendTab;
+    QVBoxLayout* _trendTab;
     /*!
      * \brief Custom widget for deployment
      */
-    QDeploy* deployWidget;
+    QDeploy* _deployWidget;
     /*!
      * \brief Pointer to shell output scroll area
      */
-    QScrollArea* deployScroll;
+    QScrollArea* _deployScroll;
     /*!
      * \brief Pointer to QLabel for showing loaded associated file
      */
-    QLabel* deployArena;
+    QLabel* _deployArena;
     /*!
      * \brief Pointer to QLabel for showing loaded associated file
      */
-    QLabel* deployFile;
+    QLabel* _deployFile;
     /*!
      * \brief Pointer to QLabel for showing loaded associated file
      */
-    QLabel* deployNeighborhood;
+    QLabel* _deployNeighborhood;
     /*!
      * \brief Custom widget for video streaming
      */
@@ -88,7 +92,7 @@ private:
     /*!
      * \brief Timer responsible for 30FPS graphics scene refresh rate
      */
-    QTimer* sceneUpdate;
+    QTimer* _sceneUpdate;
 
     /*!
      * \brief Function which sorts arenaScene elements so overlaping items won't hide smaller items (rendering them unselectable)
@@ -106,7 +110,7 @@ private:
     /*!
      * \brief Recursive function which loads grouping hieararchy of arenaScene items when loading a session
      */
-    QList<QGraphicsItem *> *groupLoad(YAML::Node *arenaNode, QSettings *loadState, int groupSize, QMap<QString, QCasuTreeItem *> *linker, QProgressBar *progress);
+    QList<QGraphicsItem *> *groupLoad(YAML::Node *arenaNode, QSettings *loadState, int groupSize, QMap<QString, QCasuZMQ*>* linkMap, QProgressBar *progress);
 
 private slots:
     /*!
@@ -170,7 +174,7 @@ private slots:
      * \brief Action for toggling QCasuSceneItem graphics elements
      */
     void toggleVibr();
-
+    void toggleAvgTime();
     /*!
      * \brief Updates selected QCasuTreeItem elements in tabCasus
      */

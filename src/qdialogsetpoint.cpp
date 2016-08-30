@@ -4,11 +4,14 @@ QDialogSetpoint::QDialogSetpoint(QString command, QList<QGraphicsItem *> group) 
 {
     bool groupSelected;
 
-    QCasuTreeItem* treeItem = ((QCasuSceneItem*)group[0])->treeItem;
+    QCasuSceneItem *tempItem;
 
     if(group.size() > 1) groupSelected = true;
-    else if(group[0]->childItems().size()) groupSelected = true;
-    else groupSelected = false;
+    else if(dynamic_cast<QAbstractSceneItem *>(group.first())->isGroup()) groupSelected = true;
+    else {
+        groupSelected = false;
+        tempItem = dynamic_cast<QCasuSceneItem *>(group.first());
+    }
 
     this->setWindowTitle(command + " data to send to CASUs");
 
@@ -42,8 +45,8 @@ QDialogSetpoint::QDialogSetpoint(QString command, QList<QGraphicsItem *> group) 
         tempLayout->addWidget(buttons,3,0);
 
         if(groupSelected) value1->setText("26.00");
-        if(!groupSelected){
-            double temp = treeItem->widget_setpoints_children[0]->data(1,Qt::DisplayRole).toDouble();
+        else{
+            double temp = tempItem->getZmqObject()->getValue(Peltier);
             if(temp > 26)
                 value1->setText(QString::number(temp,'f',2));
             else
@@ -70,9 +73,9 @@ QDialogSetpoint::QDialogSetpoint(QString command, QList<QGraphicsItem *> group) 
             value1->setText("500.00");
             value2->setText("50.00");
         }
-        if(!groupSelected){
-            double temp1 = treeItem->widget_setpoints_vibr_children[0]->data(1,Qt::DisplayRole).toDouble();
-            double temp2 = treeItem->widget_setpoints_vibr_children[1]->data(1,Qt::DisplayRole).toDouble();
+        else{
+            double temp1 = tempItem->getZmqObject()->getValue(Frequency);
+            double temp2 = tempItem->getZmqObject()->getValue(Amplitude);
 
             if(temp1 >= 50){
                 value1->setText(QString::number(temp1,'f',2));
@@ -115,8 +118,8 @@ QDialogSetpoint::QDialogSetpoint(QString command, QList<QGraphicsItem *> group) 
         tempLayout->addWidget(buttons,3,0);
 
         if(groupSelected) value1->setText("1.00");
-        if(!groupSelected){
-            double temp = treeItem->widget_setpoints_children[1]->data(1,Qt::DisplayRole).toDouble();
+        else{
+            double temp = tempItem->getZmqObject()->getValue(Airflow);
             if(temp > 1)
                 value1->setText(QString::number(temp,'f',2));
             else
@@ -140,10 +143,13 @@ QDialogSetpoint::QDialogSetpoint(QString command, QList<QGraphicsItem *> group) 
 
 }
 
+QList<QByteArray> QDialogSetpoint::getMessage()
+{
+    return message;
+}
+
 void QDialogSetpoint::prepareMessage()
 {
-    using namespace AssisiMsg;
-
     if (!value1->hasAcceptableInput()){
         reject();
         return;
@@ -152,7 +158,7 @@ void QDialogSetpoint::prepareMessage()
     // value2 is checked only in place where it is used
 
     if(command_ == "Temperature"){
-        Temperature temp;
+        AssisiMsg::Temperature temp;
         temp.set_temp(value1->text().toFloat());
 
         int size = temp.ByteSize();
@@ -168,7 +174,7 @@ void QDialogSetpoint::prepareMessage()
                 reject();
                 return;
             }
-        VibrationSetpoint vibr;
+        AssisiMsg::VibrationSetpoint vibr;
         vibr.set_freq(value1->text().toDouble());
         vibr.set_amplitude(value2->text().toDouble());
 
@@ -183,7 +189,7 @@ void QDialogSetpoint::prepareMessage()
     if(command_ == "LED"){
         QColor userColor(value1->text());
 
-        ColorStamped color;
+        AssisiMsg::ColorStamped color;
         color.mutable_color()->set_red((double)userColor.red()/255);
         color.mutable_color()->set_green((double)userColor.green()/255);
         color.mutable_color()->set_blue((double)userColor.blue()/255);
@@ -197,7 +203,7 @@ void QDialogSetpoint::prepareMessage()
         message.push_back(QByteArray((char*)buffer, size));
     }
     if(command_ == "Airflow"){
-        Airflow air;
+        AssisiMsg::Airflow air;
         air.set_intensity(value1->text().toFloat());
         int size = air.ByteSize();
         void *buffer = malloc(size);

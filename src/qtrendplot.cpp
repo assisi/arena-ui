@@ -1,10 +1,9 @@
 #include "qtrendplot.h"
 
-QTrendPlot::QTrendPlot(QGraphicsScene* scene, QTreeWidget* tree1,QTreeWidget* tree2 , QWidget *parent) :
+QTrendPlot::QTrendPlot(QTreeWidget* tree1,QTreeWidget* tree2 , QWidget *parent) :
     QCustomPlot(parent),
     casuTree(tree1),
     groupTree(tree2),
-    arenaScene(scene),
     autoPosition(true),
     showLegend(true),
     docked(true)
@@ -34,13 +33,13 @@ QTrendPlot::QTrendPlot(QGraphicsScene* scene, QTreeWidget* tree1,QTreeWidget* tr
    connect(this,&QTrendPlot::beforeReplot,this,&QTrendPlot::prettyPlot);
 }
 
-void QTrendPlot::addGraph(QTreeBuffer* treeItem){
+void QTrendPlot::addGraph(zmqBuffer *buffer){
     for(int k=0; k<this->graphCount(); k++){
-        if (!QString::compare(this->graph(k)->name(), treeItem->legendName)) return;
+        if (!QString::compare(this->graph(k)->name(), buffer->getLegendName())) return;
     }
     this->QCustomPlot::addGraph();
-    this->graph()->setData(treeItem->buffer);
-    this->graph()->setName(treeItem->legendName);
+    this->graph()->setData(buffer);
+    this->graph()->setName(buffer->getLegendName());
     this->graph()->setPen(QPen(Qt::black));
 
     for(int k=7; k < 20; k++){
@@ -53,22 +52,22 @@ void QTrendPlot::addGraph(QTreeBuffer* treeItem){
         }
     }
 
-    QCustomPlot::connect(treeItem,SIGNAL(updatePlot()),this,SLOT(replot()));
-    connectionMap[this->graph()] = treeItem;
+    QCustomPlot::connect(buffer,SIGNAL(updatePlot()),this,SLOT(replot()));
+    _connectionMap.insert(this->graph(), buffer);
 }
 
-bool sortQTreeWidgetItem(QTreeWidgetItem* item1,QTreeWidgetItem* item2){
-    return QString::compare(((QTreeBuffer*)item1)->legendName,((QTreeBuffer*)item2)->legendName) < 0;
+bool sortZmqBuffer(zmqBuffer *buffer1,zmqBuffer *buffer2){
+    return QString::compare(buffer1->getLegendName(), buffer2->getLegendName()) < 0;
 }
-void QTrendPlot::addGraphList(QList<QTreeWidgetItem*> itemList)
+void QTrendPlot::addGraphList(QList<zmqBuffer *> bufferList)
 {    
     bool new_trend = true;
     if(this->graphCount()) new_trend = false;
 
-    itemList = itemList.toSet().toList(); //remove duplicates
-    qSort(itemList.begin(),itemList.end(),sortQTreeWidgetItem); //sort by legend name
+    bufferList = bufferList.toSet().toList(); //remove duplicates
+    qSort(bufferList.begin(),bufferList.end(),sortZmqBuffer); //sort by legend name
 
-    foreach (QTreeWidgetItem* item, itemList) this->addGraph((QTreeBuffer*)item);
+    foreach (zmqBuffer* item, bufferList) this->addGraph(item);
 
     if(new_trend){
         this->rescaleAxes();
@@ -80,8 +79,13 @@ void QTrendPlot::addGraphList(QList<QTreeWidgetItem*> itemList)
 
 void QTrendPlot::removeGraph(QCPGraph *graph){
     this->QCustomPlot::removeGraph(graph);
-    disconnect(connectionMap[graph],0,this,0);
-    connectionMap.remove(graph);
+    disconnect(_connectionMap[graph],0,this,0);
+    _connectionMap.remove(graph);
+}
+
+zmqBuffer *QTrendPlot::link(QCPGraph *graph)
+{
+    return _connectionMap[graph];
 }
 
 void QTrendPlot::removeSelectedGraphs(){
@@ -89,23 +93,15 @@ void QTrendPlot::removeSelectedGraphs(){
 }
 
 void QTrendPlot::addSelectedGraphs(){
-    QList<QTreeWidgetItem*> selectedList = casuTree->selectedItems();
 
-    foreach(QTreeWidgetItem* item, groupTree->selectedItems()){
-        QTreeWidgetItem* parent = item->parent();
-        while(parent->parent()) parent = parent->parent();
-        QColor color = parent->textColor(0);
-        QString name = item->text(0);
-        QString parentName = parent->text(0);
+    QList<zmqBuffer *> bufferList;
 
-        foreach (QGraphicsItem* casuItem, arenaScene->items()) {
-            if(casuItem->childItems().size()) continue;
-            if(((QCasuSceneItem*)casuItem)->groupColor != color && !QString::compare(parentName, "CASU group")) continue;
-            if(!casuItem->isSelected() && !QString::compare(parentName, "Selected CASUs")) continue;
-            selectedList.append(((QCasuSceneItem*)casuItem)->treeItem->widgetMap[name]);
-        }
-    }
-    this->addGraphList(selectedList);
+    for(int k=0; k < casuTree->topLevelItemCount(); k++)
+        bufferList.append(dynamic_cast<QAbstractTreeItem *>(casuTree->topLevelItem(k))->getBuffers());
+    for(int k=0; k < groupTree->topLevelItemCount(); k++)
+        bufferList.append(dynamic_cast<QAbstractTreeItem *>(groupTree->topLevelItem(k))->getBuffers());
+
+    this->addGraphList(bufferList);
 
     this->replot();
 }

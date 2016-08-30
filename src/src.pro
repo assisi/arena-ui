@@ -10,7 +10,8 @@ QT       += core gui\
 
 TARGET = arena-ui
 TEMPLATE = app
-CONFIG += warn_on
+CONFIG += warn_on\
+          c++11
 
 DESTDIR = ../build/bin
 MOC_DIR = ../build/moc
@@ -30,7 +31,6 @@ SOURCES += main.cpp\
         qcasusceneitem.cpp \
         qcasutreeitem.cpp \
         qtrendplot.cpp \
-        qtreebuffer.cpp \
         qdialogsettings.cpp \
         qdialogconnect.cpp \
         globalHeader.cpp \
@@ -40,7 +40,11 @@ SOURCES += main.cpp\
 #        qgstreamerview.cpp
         qcasuscenegroup.cpp \
     qgraphicsviewzoom.cpp \
-    qarenascene.cpp
+    qarenascene.cpp \
+    qcasuzmq.cpp \
+    qcasutreegroup.cpp \
+    qabstractsceneitem.cpp \
+    qabstracttreeitem.cpp
 
 
 HEADERS  += arenaui.h\
@@ -49,7 +53,6 @@ HEADERS  += arenaui.h\
         qcasusceneitem.h \
         qcasutreeitem.h \
         qtrendplot.h \
-        qtreebuffer.h \
         qdialogsettings.h \
         qdialogconnect.h \
         globalHeader.h \
@@ -59,7 +62,11 @@ HEADERS  += arenaui.h\
 #        qgstreamerview.h
     qcasuscenegroup.h \
     qgraphicsviewzoom.h \
-    qarenascene.h
+    qarenascene.h \
+    qcasuzmq.h \
+    qabstractsceneitem.h \
+    qabstracttreeitem.h \
+    qcasutreegroup.h
 
 
 FORMS    += arenaui.ui

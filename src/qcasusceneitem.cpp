@@ -1,25 +1,48 @@
 #include "qcasusceneitem.h"
+#include "qabstracttreeitem.h"
 
-QCasuSceneItem::QCasuSceneItem(QObject *parent, int x, int y, double yaw, QCasuTreeItem *widget) : QObject(parent),
-    //ANIMATION
-    airflowAngle(0),
-    vibrAngle(0),
-    //CASU PARAMETERS
-    x_center(x),
-    y_center(y),
-    yaw_((int)(yaw*180/PI)),
-    inGroup(false),
-    //WIDGET
-    treeItem(widget)
+bool QCasuSceneItem::isGroup() const
 {
-    this->setFlag(QGraphicsItem::ItemIsSelectable);
+    return false;
+}
+
+QList<zmqBuffer *> QCasuSceneItem::getBuffers(dataType key)
+{
+    QList<zmqBuffer *> out;
+    out.append(_zmqObject->getBuffer(key));
+    return out;
+}
+
+QVector<QPointF> QCasuSceneItem::getCoordinateVector()
+{
+    QVector<QPointF> out;
+    out.append(_coordinates);
+    return out;
+}
+
+void QCasuSceneItem::sendSetpoint(QList<QByteArray> message)
+{
+    _zmqObject->sendSetpoint(message);
+}
+
+QCasuSceneItem::QCasuSceneItem(QPointF coordinates, double yaw, QCasuZMQ *zmqObject) :
+    _coordinates(coordinates),
+    _yaw((int)(yaw*180/PI)),
+    _airflowAngle(0),
+    _vibrAngle(0),
+    _zmqObject(zmqObject)
+{
     FPScheck = new QElapsedTimer();
 }
 
+QCasuZMQ *QCasuSceneItem::getZmqObject()
+{
+    return _zmqObject;
+}
 
 QRectF QCasuSceneItem::boundingRect() const
 {
-    return QRectF(x_center-10,y_center-10,20,20);
+    return QRectF(_coordinates.x()-10,_coordinates.y()-10,20,20);
 }
 
 void QCasuSceneItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
@@ -27,7 +50,7 @@ void QCasuSceneItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *op
     Q_UNUSED(option)
     Q_UNUSED(widget)
 
-    int FPSrepaint = FPScheck->elapsed() < 30 ? 0 : 1;
+    bool FPSrepaint = FPScheck->elapsed() < 30 ? false : true;
 
     painter->setRenderHints(QPainter::Antialiasing | QPainter::SmoothPixmapTransform, true);
 
@@ -43,22 +66,22 @@ void QCasuSceneItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *op
 
     //paint IR sensor readings
     if(settings->value("IR_on").toBool()){
-        for(int k = 0; k < 6; k++){
+        for(int k = 0; k < _IR_num; k++){
             brush.setColor(Qt::black);
             painter->setBrush(brush);
-            double value;
-            // Scale sensor reading pie to be ~18cm (~3x the edge of CASU ring) at maximum reading value (2^16)
-            if(treeItem->connected) value = treeItem->widget_IR_children[k]->data(1,Qt::DisplayRole).toDouble() / 65536 * 1.8;
-            else value = 0;
-            painter->drawPie(QIRTriangle(QPointF(x_center, y_center),yaw_ + k*60, value), (yaw_ + k*60 - 25)*16, 50*16); // 0° is at 3 o'clock, ccw direction
+            double tempIR;
+
+            if (_zmqObject->isConnected()) tempIR = _zmqObject->getValue(static_cast<dataType>(k)) / 65536;
+            else tempIR = 0;
+            painter->drawPie(QIRTriangle(_coordinates,_yaw + k*60, tempIR), (_yaw + k*60 - 25)*16, 50*16); // 0° is at 3 o'clock, ccw direction
         }
     }
 
     //paint Temp sensor readings
     if(settings->value("temp_on").toBool()){
         for(int k = 0; k < 4; k++){
-            if(treeItem->connected){
-                double tempTemp = treeItem->widget_temp_children[k]->data(1,Qt::DisplayRole).toDouble();
+            if(_zmqObject->isConnected()){
+                double tempTemp = _zmqObject->getValue(static_cast<dataType>(6 + k));
                 if (tempTemp > 50) tempTemp = 50;
                 if (tempTemp < 20) tempTemp = 20;
 
@@ -72,13 +95,10 @@ void QCasuSceneItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *op
 
             painter->setPen(pen);
 
-            QTempArc arc(QPointF(x_center, y_center), yaw_ - k*90); // 0° is at 3 o'clock, ccw direction
+            QTempArc arc(_coordinates, _yaw + k*90); // 0° is at 3 o'clock, ccw direction
             painter->drawArc(arc.rect, arc.start ,arc.span);
         }
     }
-
-    //paint main CASU object
-    QRectF model = QRectF(x_center-10,y_center-10,20,20);;
 
     // - WORKAROUND - drawing with white fill so seethrough patter doesnt show underlaying drawings
     pen.setWidth(0);
@@ -86,55 +106,48 @@ void QCasuSceneItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *op
     brush.setStyle(Qt::SolidPattern);
     painter->setPen(pen);
     painter->setBrush(brush);
-    painter->drawEllipse(model);
+    painter->drawEllipse(boundingRect());
 
     // - Configurating pen and brush parameters
     pen.setWidth(2);
-    if(this->isSelected() && inGroup)pen.setColor(groupColor);
-    else if(treeItem->connected)pen.setColor(Qt::green);
+    if(isSelected() && _inGroup)pen.setColor(_groupColor);
+    else if(_zmqObject->isConnected())pen.setColor(Qt::green);
     else pen.setColor(Qt::red);
 
+    if(isSelected()) pen.setStyle(Qt::DotLine);
+    else pen.setStyle(Qt::SolidLine);
 
-    if(this->isSelected()){
-        pen.setStyle(Qt::DotLine);
-        treeItem->setHidden(false);
-    }
-    else{
-        pen.setStyle(Qt::SolidLine);
-        treeItem->setHidden(true);
-        treeItem->resetSelection();
-    }
-
-    if(treeItem->ledON)brush.setColor(treeItem->ledColor);
-    else brush.setColor(Qt::gray);
-    if(treeItem->child_selected)brush.setStyle(Qt::Dense2Pattern);
+    brush.setColor(_zmqObject->getLedColor());
+    if(dynamic_cast<QAbstractTreeItem *>(_treeItem)->isChildSelected()) brush.setStyle(Qt::Dense2Pattern);
 
     painter->setPen(pen);
     painter->setBrush(brush);
-    painter->drawEllipse(model);
-    painter->drawLine(x_center + 5*cos(-yaw_*PI/180),
-                      y_center + 5*sin(-yaw_*PI/180),
-                      x_center + 9*cos(-yaw_*PI/180),
-                      y_center + 9*sin(-yaw_*PI/180));
+    painter->drawEllipse(boundingRect());
+    painter->drawLine(_coordinates.x() + 5*cos(-_yaw*PI/180),
+                      _coordinates.y() + 5*sin(-_yaw*PI/180),
+                      _coordinates.x() + 9*cos(-_yaw*PI/180),
+                      _coordinates.y() + 9*sin(-_yaw*PI/180));
 
     //paint airflow marker
-    if(settings->value("air_on").toBool() && treeItem->connected && treeItem->airflowON){
-        double value = treeItem->widget_setpoints_children[1]->data(1,Qt::DisplayRole).toDouble();
+    if(settings->value("air_on").toBool() && _zmqObject->isConnected() && _zmqObject->getState(Airflow)){
+        double value = _zmqObject->getValue(Airflow);
 
         pen.setColor(Qt::transparent);
         brush.setColor(QColor(250, 218, 94, 96));
         painter->setPen(pen);
         painter->setBrush(brush);
-        airflowAngle = fmod(airflowAngle + value * 6 * FPSrepaint, 360); // 30 FPS, max_speed = 6 deg/frame -> w = 0.5 rpm __ CURRENTLY THERE IS ONLY ONE INTENSITY, WHEN INTESITY RANGE WILL BE ENABLED, MAX_SPEED SHOULD BE 12
-        painter->drawPath(QPetal(QPointF(x_center,y_center),airflowAngle));       // petal 1
-        painter->drawPath(QPetal(QPointF(x_center,y_center),airflowAngle + 120)); // petal 2
-        painter->drawPath(QPetal(QPointF(x_center,y_center),airflowAngle - 120)); // petal 3
+        // 30 FPS, max_speed = 6 deg/frame -> w = 0.5 rpm
+        // CURRENTLY THERE IS ONLY ONE INTENSITY, WHEN INTESITY RANGE WILL BE ENABLED, MAX_SPEED SHOULD BE 12
+        _airflowAngle = fmod(_airflowAngle + value * 6 * FPSrepaint, 360);
+        painter->drawPath(QPetal(_coordinates,_airflowAngle));       // petal 1
+        painter->drawPath(QPetal(_coordinates,_airflowAngle + 120)); // petal 2
+        painter->drawPath(QPetal(_coordinates,_airflowAngle - 120)); // petal 3
     }
 
     //paint vibration marker
-    if(settings->value("vibr_on").toBool() && treeItem->connected && treeItem->vibrON){
-        double freq = treeItem->widget_setpoints_vibr_children[0]->data(1,Qt::DisplayRole).toDouble();
-        //double amplitude = treeItem->widget_setpoints_vibr_children[1]->data(1,Qt::DisplayRole).toDouble();
+    if(settings->value("vibr_on").toBool() && _zmqObject->isConnected() && _zmqObject->getState(Speaker)){
+        double freq = _zmqObject->getValue(Frequency);
+        double amplitude = _zmqObject->getValue(Amplitude);
 
         pen.setColor(QColor(255,255,255,96));
         pen.setWidth(2);
@@ -142,9 +155,11 @@ void QCasuSceneItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *op
         brush.setColor(Qt::transparent);
         painter->setPen(pen);
         painter->setBrush(brush);
-        vibrAngle = fmod(vibrAngle - /*amplitude/100* */12*FPSrepaint, 360); // 30 FPS, max_speed = 12 deg/frame -> w = 1 rpm
-        int wawesNum = 6+9*freq/1500; // wawesNum = [6 .. 15]
-        QVibratingCircle tempItem = QVibratingCircle(QPointF(x_center,y_center), wawesNum,vibrAngle);
+        // 30 FPS, max_speed = 12 deg/frame -> w = 1 rpm
+        _vibrAngle = fmod(_vibrAngle - amplitude/50* 12*FPSrepaint, 360);
+        // wawesNum = [6 .. 15]
+        int wawesNum = 6+9*freq/1500;
+        QVibratingCircle tempItem = QVibratingCircle(_coordinates, wawesNum, _vibrAngle);
         painter->drawPath(tempItem);
         pen.setColor(QColor(128,128,128,96));
         painter->setPen(pen);
@@ -157,7 +172,7 @@ void QCasuSceneItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *op
 
 QIRTriangle::QIRTriangle(QPointF center, double angle, double value)
 {
-    double side = 5+18*value; //
+    double side = 5 + 32 * value; // Scale sensor reading pie to be ~18cm (~3x the edge of CASU ring) at maximum reading value (2^16)
     double offset = 3; // center offset from center of CASU
 
     angle = angle * PI/180;
@@ -167,8 +182,8 @@ QIRTriangle::QIRTriangle(QPointF center, double angle, double value)
 
     QRectF out(topLeft,bottomRight);
 
-    this->setTopLeft(topLeft);
-    this->setBottomRight(bottomRight);
+    setTopLeft(topLeft);
+    setBottomRight(bottomRight);
 }
 
 
@@ -185,8 +200,8 @@ QPetal::QPetal(QPointF center, double angle){
     double leftAngle = (angle+45) * PI/180;
     double rightAngle = (angle-45) * PI/180;
 
-    this->moveTo(center);
-    this->cubicTo(center + QPointF(35*cos(leftAngle),-35*sin(leftAngle)),
+    moveTo(center);
+    cubicTo(center + QPointF(35*cos(leftAngle),-35*sin(leftAngle)),
                   center + QPointF(35*cos(rightAngle),-35*sin(rightAngle)),
                   center);
 }
@@ -194,12 +209,12 @@ QPetal::QPetal(QPointF center, double angle){
 QVibratingCircle::QVibratingCircle(QPointF center, int waves, double angle){
     angle = angle * PI/180;
 
-    this->moveTo(center + QPointF(16+2*sin(angle),0));
+    moveTo(center + QPointF(16+2*sin(angle),0));
 
     for(int k=1; k <= 360; k++){
         double coordAngle = k*PI/180;
         double amp = 16 + 2*sin(angle + waves*coordAngle);
-        this->lineTo(center + QPointF(amp*cos(coordAngle),amp*sin(coordAngle)));
+        lineTo(center + QPointF(amp*cos(coordAngle),amp*sin(coordAngle)));
         if((k+9)%18 == 0) points[(k+9)/18-1] = center + QPointF(amp*cos(coordAngle),amp*sin(coordAngle));
     }
 

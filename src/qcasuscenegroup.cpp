@@ -1,92 +1,130 @@
 #include "qcasuscenegroup.h"
+#include "qcasusceneitem.h"
 
 QVariant QCasuSceneGroup::itemChange(QGraphicsItem::GraphicsItemChange change, const QVariant &value)
 {
+    QAbstractSceneItem::itemChange(change,value);
+
     if(change==QGraphicsItem::ItemChildAddedChange || change==QGraphicsItem::ItemChildRemovedChange){
         QPainterPath newLine, newShape;
 
-        childCoords.clear();
+        _childCoordinates.clear();
 
-        foreach (QGraphicsItem* item, childItems()) {
-            if(item->childItems().size())
-                foreach (QPointF subItem, ((QCasuSceneGroup*)item)->childCoords)
-                    childCoords.append(subItem);
-            else childCoords.append(QPointF(((QCasuSceneItem*)item)->x_center,((QCasuSceneItem*)item)->y_center));
+        foreach (QGraphicsItem *item, childItems()) {
+            foreach (QPointF point, dynamic_cast<QAbstractSceneItem *>(item)->getCoordinateVector())
+                _childCoordinates.append(point);
             newShape.addPath(item->shape());
         }
 
-        if(childCoords.size()<2)return QGraphicsItem::itemChange(change, value);
+        if(_childCoordinates.size()<2) return QGraphicsItem::itemChange(change, value);
 
-        QVector<QLineF> mst = Prim(childCoords);
+        QVector<QLineF> mst = Prim(_childCoordinates);
 
         foreach (QLineF line, mst) {
             newLine.moveTo(line.p1());
             newLine.lineTo(line.p2());
         }
 
-        groupLine = newLine;
-        groupShape = newShape;
+        _groupLine = newLine;
+        _groupShape = newShape;
     }
 
     return QGraphicsItem::itemChange(change, value);
 }
 
-QCasuSceneGroup::QCasuSceneGroup(QGraphicsItem* parent, QCasuTreeItem* widget) : QGraphicsItemGroup(parent),
-    groupColor(Qt::black),
-    isTopLevel(true),
-    treeItem(widget)
+bool QCasuSceneGroup::isGroup() const
 {
+    return true;
 }
 
-QCasuSceneGroup::~QCasuSceneGroup()
+QList<zmqBuffer *> QCasuSceneGroup::getBuffers(dataType key)
 {
-    delete treeItem;
+    QList<zmqBuffer *> out;
+    foreach (QGraphicsItem *item, childItems()) {
+        out.append(dynamic_cast<QAbstractSceneItem *>(item)->getBuffers(key));
+    }
+    return out;
 }
 
-QRectF QCasuSceneGroup::boundingRect() const
+QVector<QPointF> QCasuSceneGroup::getCoordinateVector()
+{
+    return _childCoordinates;
+}
+
+void QCasuSceneGroup::sendSetpoint(QList<QByteArray> message)
+{
+    foreach(QGraphicsItem *item, childItems())
+        dynamic_cast<QAbstractSceneItem *>(item)->sendSetpoint(message);
+}
+
+void QCasuSceneGroup::setGroupColor(QColor color)
+{
+    _groupColor = color;
+    _treeItem->setTextColor(0, _groupColor);
+    foreach (QGraphicsItem *item, childItems())
+        dynamic_cast<QAbstractSceneItem *>(item)->setGroupColor(color);
+}
+
+void QCasuSceneGroup::addToGroup(QGraphicsItem *item)
+{
+    QGraphicsItemGroup::addToGroup(item);
+    dynamic_cast<QAbstractSceneItem *>(item)->setInGroup(true);
+}
+
+void QCasuSceneGroup::addToGroup(QList<QGraphicsItem *> itemList)
+{
+    foreach(QGraphicsItem* item, itemList) addToGroup(item);
+}
+
+void QCasuSceneGroup::removeFromGroup(QGraphicsItem *item)
+{
+    QGraphicsItemGroup::removeFromGroup(item);
+    item->setSelected(false);
+    item->setSelected(true);
+    dynamic_cast<QAbstractSceneItem *>(item)->setInGroup(false);
+}
+
+void QCasuSceneGroup::removeFromGroup(QList<QGraphicsItem *> itemList)
+{
+    foreach(QGraphicsItem* item, itemList) removeFromGroup(item);
+}
+
+QCasuSceneGroup::QCasuSceneGroup()
+{
+
+}
+
+QRectF QCasuSceneGroup::boundingRect()
 {
     return childrenBoundingRect();
 }
-
 
 void QCasuSceneGroup::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
 {
     Q_UNUSED(option)
     Q_UNUSED(widget)
 
-    if(this->isSelected() && isTopLevel)treeItem->setHidden(false);
-    else treeItem->setHidden(true);
-
-    if(!this->isSelected() || !isTopLevel)return;
+    if(!isSelected() || _inGroup)return;
 
     painter->setRenderHints(QPainter::Antialiasing | QPainter::SmoothPixmapTransform, true);
 
     QPen pen;
     pen.setStyle(Qt::DashLine);
-    pen.setColor(groupColor);
+    pen.setColor(_groupColor);
     pen.setWidth(2);
     painter->setPen(pen);
-    painter->drawPath(groupLine);
-}
-
-void QCasuSceneGroup::setGroupColor(QColor color)
-{
-    groupColor = color;
-    foreach (QGraphicsItem* item, childItems())
-        if(item->childItems().size()) ((QCasuSceneGroup*)item)->setGroupColor(color);
-        else ((QCasuSceneItem*)item)->groupColor = color;
-
+    painter->drawPath(_groupLine);
 }
 
 QPainterPath QCasuSceneGroup::shape() const
 {
-    return groupShape;
+    return _groupShape;
 }
 
-QPainterPath QCasuSceneGroup::completeShape() const
+QPainterPath QCasuSceneGroup::completeShape()
 {
-    QPainterPath tempShape = groupShape;
-    tempShape.addPath(groupLine);
+    QPainterPath tempShape = _groupShape;
+    tempShape.addPath(_groupLine);
     return tempShape;
 }
 
