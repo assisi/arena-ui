@@ -182,8 +182,8 @@ void ArenaUI::sortGraphicsScene()
 
     for(int k = 0; k+1 < _arenaScene->selectedItems().size(); k++)
         for(int i = k+1; i < _arenaScene->selectedItems().size(); i++){
-            QAbstractSceneItem *item1 = dynamic_cast<QAbstractSceneItem *>(_arenaScene->selectedItems()[k]);
-            QAbstractSceneItem *item2 = dynamic_cast<QAbstractSceneItem *>(_arenaScene->selectedItems()[i]);
+            QAbstractSceneItem *item1 = sCast(_arenaScene->selectedItems()[k]);
+            QAbstractSceneItem *item2 = sCast(_arenaScene->selectedItems()[i]);
 
             QPainterPath path1 = std::move(item1->completeShape());
             QPainterPath path2 = std::move(item2->completeShape());
@@ -207,7 +207,7 @@ void ArenaUI::sortGraphicsScene()
     pp = pp.subtracted(pp);
     pp.addRect(0,0,0,0);
     _arenaScene->setSelectionArea(pp);
-    foreach(QGraphicsItem* item, tempSelection) item->setSelected(true); // after saving items and groups, return selection as was before
+    for(auto& item : tempSelection) item->setSelected(true); // after saving items and groups, return selection as was before
 
 }
 
@@ -229,7 +229,7 @@ bool MouseClickHandler::eventFilter(QObject* obj, QEvent* event)
     }
     else
     if (event->type() == QEvent::GraphicsSceneMouseMove){
-        foreach(QGraphicsItem* item, selectedList) item->setSelected(true);
+        for(auto& item : selectedList) item->setSelected(true);
         drag_true = true;
         scene_->update();
 
@@ -238,7 +238,7 @@ bool MouseClickHandler::eventFilter(QObject* obj, QEvent* event)
     else
     if (event->type() == QEvent::GraphicsSceneMouseRelease)
     {
-        foreach(QGraphicsItem* item, selectedList) item->setSelected(true);
+        for(auto& item : selectedList) item->setSelected(true);
 
         QGraphicsSceneMouseEvent* mouse_click = static_cast<QGraphicsSceneMouseEvent *>(event);
         QGraphicsItem * itemAtMouse= scene_->itemAt(mouse_click->scenePos().x(),mouse_click->scenePos().y(), QTransform());
@@ -398,7 +398,7 @@ void ArenaUI::on_actionOpenArena_triggered()
             for(int i = 0; i < graphSize; i++){
                 loadSession.setArrayIndex(i);
                 QString casuName = loadSession.value("casuName").toString();
-                dataType key = static_cast<dataType>(loadSession.value("key").toInt());
+                dataType key = dCast(loadSession.value("key").toInt());
                 toAdd.append(linker[casuName]->getBuffer(key));
             }
             if(toAdd.size()){
@@ -442,11 +442,11 @@ void ArenaUI::on_actionGroup_triggered()
 void ArenaUI::on_actionUngroup_triggered()
 {
     QList<QGraphicsItem *> itemList= _arenaScene->selectedItems();
-    foreach(QGraphicsItem* item, itemList)
-        if(dynamic_cast<QAbstractSceneItem *>(item)->isGroup()){
-            dynamic_cast<QCasuSceneGroup *>(item)->removeFromGroup(item->childItems());
-            dynamic_cast<QAbstractSceneItem *>(item)->deleteTreeItem();
-            _arenaScene->destroyItemGroup(dynamic_cast<QAbstractSceneItem *>(item));
+    for(auto& item : itemList)
+        if(sCast(item)->isGroup()){
+            sgCast(item)->removeFromGroup(item->childItems());
+            sCast(item)->deleteTreeItem();
+            _arenaScene->destroyItemGroup(sCast(item));
         }
     this->sortGraphicsScene();
 }
@@ -455,7 +455,7 @@ void ArenaUI::on_actionConnect_triggered()
 {
     bool error = false;
     if (_arenaScene->selectedItems().size() != 1) error = true; //Check if excactly one object is selected
-    if(dynamic_cast<QAbstractSceneItem *>(_arenaScene->selectedItems().first())->isGroup()) error = true; // Check if object is single casu (no children)
+    if(sCast(_arenaScene->selectedItems().first())->isGroup()) error = true; // Check if object is single casu (no children)
     if(error){
         QMessageBox msgBox;
         msgBox.setWindowTitle("ERROR");
@@ -494,11 +494,11 @@ void ArenaUI::on_actionPlot_selected_in_different_trends_triggered()
     QList<zmqBuffer *> bufferList;
 
     for(int k=0; k < ui->casuTree->topLevelItemCount(); k++)
-        bufferList.append(dynamic_cast<QAbstractTreeItem *>(ui->casuTree->topLevelItem(k))->getBuffers());
+        bufferList.append(tCast(ui->casuTree->topLevelItem(k))->getBuffers());
     for(int k=0; k < ui->groupTree->topLevelItemCount(); k++)
-        bufferList.append(dynamic_cast<QAbstractTreeItem *>(ui->groupTree->topLevelItem(k))->getBuffers());
+        bufferList.append(tCast(ui->groupTree->topLevelItem(k))->getBuffers());
 
-    foreach(zmqBuffer* buffer, bufferList){
+    for(auto& buffer : bufferList){
         QList<zmqBuffer*> tempList;
         tempList.append(buffer);
 
@@ -613,8 +613,8 @@ void ArenaUI::sendSetpoint(QString actuator)
 {
     QDialogSetpoint* dialog = new QDialogSetpoint(actuator,_arenaScene->selectedItems());
     if(dialog->exec())
-        foreach(QGraphicsItem* item, _arenaScene->selectedItems())
-            dynamic_cast<QAbstractSceneItem *>(item)->sendSetpoint(dialog->getMessage());
+        for(auto& item : _arenaScene->selectedItems())
+            sCast(item)->sendSetpoint(dialog->getMessage());
 }
 
 void ArenaUI::groupSave(QSettings *saveState, QList<QGraphicsItem *> group, QString groupName)
@@ -622,7 +622,7 @@ void ArenaUI::groupSave(QSettings *saveState, QList<QGraphicsItem *> group, QStr
     saveState->beginWriteArray(groupName);
     for(int k=0; k < group.size() ; k++){
         saveState->setArrayIndex(k);
-        if(!dynamic_cast<QAbstractSceneItem *>(group[k])->isGroup()) saveState->setValue("casuName",dynamic_cast<QCasuSceneItem *>(group[k])->getZmqObject()->getName());
+        if(!sCast(group[k])->isGroup()) saveState->setValue("casuName",siCast(group[k])->getZmqObject()->getName());
         else groupSave(saveState, group[k]->childItems(), "group");
     }
     saveState->endArray();
@@ -710,7 +710,7 @@ void ArenaUI::on_actionSave_triggered()
     pp = pp.subtracted(pp);
     pp.addRect(0,0,0,0);
     _arenaScene->setSelectionArea(pp);
-    foreach(QGraphicsItem* item, tempSelection) item->setSelected(true); // after saving items and groups, return selection as was before
+    for(auto& item : tempSelection) item->setSelected(true); // after saving items and groups, return selection as was before
 
     //save trend position and graphs
 
@@ -735,11 +735,11 @@ void ArenaUI::on_actionSave_triggered()
     saveState.beginGroup("connectionSettings");
     saveState.beginWriteArray("addresses");
     int index = 0;
-    foreach(QGraphicsItem *item, _arenaScene->items())
-        if(!dynamic_cast<QAbstractSceneItem *>(item)->isGroup()){
+    for(auto& item : _arenaScene->items())
+        if(!sCast(item)->isGroup()){
             saveState.setArrayIndex(index++);
-            saveState.setValue("casuName",dynamic_cast<QCasuSceneItem *>(item)->getZmqObject()->getName());
-            QStringList addresses = std::move(dynamic_cast<QCasuSceneItem *>(item)->getZmqObject()->getAddresses());
+            saveState.setValue("casuName",siCast(item)->getZmqObject()->getName());
+            QStringList addresses = std::move(siCast(item)->getZmqObject()->getAddresses());
             saveState.setValue("sub_addr",addresses.at(0));
             saveState.setValue("pub_addr",addresses.at(1));
             saveState.setValue("msg_addr",addresses.at(2));

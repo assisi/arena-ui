@@ -65,9 +65,12 @@ void QTrendPlot::addGraphList(QList<zmqBuffer *> bufferList)
     if(this->graphCount()) new_trend = false;
 
     bufferList = bufferList.toSet().toList(); //remove duplicates
-    qSort(bufferList.begin(),bufferList.end(),sortZmqBuffer); //sort by legend name
+    qSort(bufferList.begin(),bufferList.end(),
+        [](zmqBuffer *b1, zmqBuffer *b2){
+            return QString::compare(b1->getLegendName(), b2->getLegendName()) < 0;
+        }); //sort by legend name
 
-    foreach (zmqBuffer* item, bufferList) this->addGraph(item);
+    for(auto& buffer : bufferList) addGraph(buffer);
 
     if(new_trend){
         this->rescaleAxes();
@@ -89,7 +92,8 @@ zmqBuffer *QTrendPlot::link(QCPGraph *graph)
 }
 
 void QTrendPlot::removeSelectedGraphs(){
-    while(this->selectedGraphs().count())this->removeGraph(this->selectedGraphs().first());
+    while(selectedGraphs().count())
+        removeGraph(selectedGraphs().first());
 }
 
 void QTrendPlot::addSelectedGraphs(){
@@ -97,9 +101,9 @@ void QTrendPlot::addSelectedGraphs(){
     QList<zmqBuffer *> bufferList;
 
     for(int k=0; k < casuTree->topLevelItemCount(); k++)
-        bufferList.append(dynamic_cast<QAbstractTreeItem *>(casuTree->topLevelItem(k))->getBuffers());
+        bufferList.append(tCast(casuTree->topLevelItem(k))->getBuffers());
     for(int k=0; k < groupTree->topLevelItemCount(); k++)
-        bufferList.append(dynamic_cast<QAbstractTreeItem *>(groupTree->topLevelItem(k))->getBuffers());
+        bufferList.append(tCast(groupTree->topLevelItem(k))->getBuffers());
 
     this->addGraphList(bufferList);
 
@@ -109,8 +113,8 @@ void QTrendPlot::addSelectedGraphs(){
 void QTrendPlot::saveToPDF()
 {
     QString path = QFileDialog::getSaveFileName(this,tr("Export trend graph as PDF"),QString(), tr("*.pdf"));
-    if(!path.endsWith(".pdf",Qt::CaseInsensitive))path+=".pdf";
-    if(path.size())this->savePdf(path);
+    if(!path.endsWith(".pdf",Qt::CaseInsensitive)) path+=".pdf";
+    if(path.size()) savePdf(path);
 }
 
 void QTrendPlot::prettyPlot()

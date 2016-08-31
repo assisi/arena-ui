@@ -71,7 +71,7 @@ void QCasuSceneItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *op
             painter->setBrush(brush);
             double tempIR;
 
-            if (_zmqObject->isConnected()) tempIR = _zmqObject->getValue(static_cast<dataType>(k)) / 65536;
+            if (_zmqObject->isConnected()) tempIR = _zmqObject->getValue(dCast(k)) / 65536;
             else tempIR = 0;
             painter->drawPie(QIRTriangle(_coordinates,_yaw + k*60, tempIR), (_yaw + k*60 - 25)*16, 50*16); // 0° is at 3 o'clock, ccw direction
         }
@@ -81,7 +81,7 @@ void QCasuSceneItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *op
     if(settings->value("temp_on").toBool()){
         for(int k = 0; k < 4; k++){
             if(_zmqObject->isConnected()){
-                double tempTemp = _zmqObject->getValue(static_cast<dataType>(6 + k));
+                double tempTemp = _zmqObject->getValue(dCast(6 + k));
                 if (tempTemp > 50) tempTemp = 50;
                 if (tempTemp < 20) tempTemp = 20;
 
@@ -118,7 +118,7 @@ void QCasuSceneItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *op
     else pen.setStyle(Qt::SolidLine);
 
     brush.setColor(_zmqObject->getLedColor());
-    if(dynamic_cast<QAbstractTreeItem *>(_treeItem)->isChildSelected()) brush.setStyle(Qt::Dense2Pattern);
+    if(tCast(_treeItem)->isChildSelected()) brush.setStyle(Qt::Dense2Pattern);
 
     painter->setPen(pen);
     painter->setBrush(brush);

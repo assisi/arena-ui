@@ -4,8 +4,8 @@ QCasuZMQ::QCasuZMQ(QObject *parent, QString casuName) :
     QObject(parent),
     _name(casuName)
 {
-    for(int k = 0; k < _IR_num + _Temp_num; k++) _buffers.insert(static_cast<dataType>(k), new zmqBuffer(_name, static_cast<dataType>(k)));
-    for(int k = _IR_num + _Temp_num; k < _dataType_num; k++)_state.insert(static_cast<dataType>(k), false);
+    for(int k = 0; k < _IR_num + _Temp_num; k++) _buffers.insert(dCast(k), new zmqBuffer(_name, dCast(k)));
+    for(int k = _IR_num + _Temp_num; k < _dataType_num; k++)_state.insert(dCast(k), false);
 
     _connectionTimer = new QTimer(this);
 
@@ -48,7 +48,7 @@ int QCasuZMQ::getAvgSamplingTime()
     double result = 0;
     double itemNum = 0;
 
-    foreach(double oldTime, _lastDataTime){
+    for(auto& oldTime : _lastDataTime){
         dataType key = _lastDataTime.key(oldTime, LED);
         if(key == LED) continue;
         if(key >= _IR_num + _Temp_num) result += _values[key].key - oldTime;
@@ -156,24 +156,24 @@ void QCasuZMQ::messageReceived(const QList<QByteArray> &message)
     if (device == "IR"){
         AssisiMsg::RangeArray ranges;
         ranges.ParseFromString(data);
-        _lastDataTime[static_cast<dataType>(0)] = _buffers[static_cast<dataType>(0)]->getLastTime();
+        _lastDataTime[dCast(0)] = _buffers[dCast(0)]->getLastTime();
         for (int k = 0; k < ranges.raw_value_size(); k++){
             if( k == _IR_num) break;
             newData.value = ranges.raw_value(k);
-            this->addToBuffer(static_cast<dataType>(k), newData);
-            emit updated(static_cast<dataType>(k));
+            this->addToBuffer(dCast(k), newData);
+            emit updated(dCast(k));
             if(settings->value("log_on").toBool()) _logFile << ";" << newData.value;
         }
     }
     if (device == "Temp"){
         AssisiMsg::TemperatureArray temperatures;
         temperatures.ParseFromString(data);
-        _lastDataTime[static_cast<dataType>(_IR_num)] = _buffers[static_cast<dataType>(_IR_num)]->getLastTime();
+        _lastDataTime[dCast(_IR_num)] = _buffers[dCast(_IR_num)]->getLastTime();
         for (int k = 0; k < temperatures.temp_size(); k++){
             if( k == _Temp_num) break;
             newData.value = temperatures.temp(k);
-            this->addToBuffer(static_cast<dataType>(k+_IR_num), newData);
-            emit updated(static_cast<dataType>(k+_IR_num));
+            this->addToBuffer(dCast(k+_IR_num), newData);
+            emit updated(dCast(k+_IR_num));
             if(settings->value("log_on").toBool()) _logFile << ";" << newData.value;
         }
     }

@@ -7,10 +7,10 @@ QDialogSetpoint::QDialogSetpoint(QString command, QList<QGraphicsItem *> group) 
     QCasuSceneItem *tempItem;
 
     if(group.size() > 1) groupSelected = true;
-    else if(dynamic_cast<QAbstractSceneItem *>(group.first())->isGroup()) groupSelected = true;
+    else if(sCast(group.first())->isGroup()) groupSelected = true;
     else {
         groupSelected = false;
-        tempItem = dynamic_cast<QCasuSceneItem *>(group.first());
+        tempItem = siCast(group.first());
     }
 
     this->setWindowTitle(command + " data to send to CASUs");

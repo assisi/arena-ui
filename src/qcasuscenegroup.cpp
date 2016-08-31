@@ -10,8 +10,8 @@ QVariant QCasuSceneGroup::itemChange(QGraphicsItem::GraphicsItemChange change, c
 
         _childCoordinates.clear();
 
-        foreach (QGraphicsItem *item, childItems()) {
-            foreach (QPointF point, dynamic_cast<QAbstractSceneItem *>(item)->getCoordinateVector())
+        for(auto& item : childItems()) {
+            for(auto& point : sCast(item)->getCoordinateVector())
                 _childCoordinates.append(point);
             newShape.addPath(item->shape());
         }
@@ -20,7 +20,7 @@ QVariant QCasuSceneGroup::itemChange(QGraphicsItem::GraphicsItemChange change, c
 
         QVector<QLineF> mst = Prim(_childCoordinates);
 
-        foreach (QLineF line, mst) {
+        for (QLineF& line : mst) {
             newLine.moveTo(line.p1());
             newLine.lineTo(line.p2());
         }
@@ -40,9 +40,8 @@ bool QCasuSceneGroup::isGroup() const
 QList<zmqBuffer *> QCasuSceneGroup::getBuffers(dataType key)
 {
     QList<zmqBuffer *> out;
-    foreach (QGraphicsItem *item, childItems()) {
-        out.append(dynamic_cast<QAbstractSceneItem *>(item)->getBuffers(key));
-    }
+    for(auto& item : childItems())
+        out.append(sCast(item)->getBuffers(key));
     return out;
 }
 
@@ -53,27 +52,27 @@ QVector<QPointF> QCasuSceneGroup::getCoordinateVector()
 
 void QCasuSceneGroup::sendSetpoint(QList<QByteArray> message)
 {
-    foreach(QGraphicsItem *item, childItems())
-        dynamic_cast<QAbstractSceneItem *>(item)->sendSetpoint(message);
+    for(auto& item : childItems())
+        sCast(item)->sendSetpoint(message);
 }
 
 void QCasuSceneGroup::setGroupColor(QColor color)
 {
     _groupColor = color;
     _treeItem->setTextColor(0, _groupColor);
-    foreach (QGraphicsItem *item, childItems())
-        dynamic_cast<QAbstractSceneItem *>(item)->setGroupColor(color);
+    for(auto& item : childItems())
+        sCast(item)->setGroupColor(color);
 }
 
 void QCasuSceneGroup::addToGroup(QGraphicsItem *item)
 {
     QGraphicsItemGroup::addToGroup(item);
-    dynamic_cast<QAbstractSceneItem *>(item)->setInGroup(true);
+    sCast(item)->setInGroup(true);
 }
 
 void QCasuSceneGroup::addToGroup(QList<QGraphicsItem *> itemList)
 {
-    foreach(QGraphicsItem* item, itemList) addToGroup(item);
+    for(auto& item : itemList) addToGroup(item);
 }
 
 void QCasuSceneGroup::removeFromGroup(QGraphicsItem *item)
@@ -81,12 +80,12 @@ void QCasuSceneGroup::removeFromGroup(QGraphicsItem *item)
     QGraphicsItemGroup::removeFromGroup(item);
     item->setSelected(false);
     item->setSelected(true);
-    dynamic_cast<QAbstractSceneItem *>(item)->setInGroup(false);
+    sCast(item)->setInGroup(false);
 }
 
 void QCasuSceneGroup::removeFromGroup(QList<QGraphicsItem *> itemList)
 {
-    foreach(QGraphicsItem* item, itemList) removeFromGroup(item);
+    for(auto& item : itemList) removeFromGroup(item);
 }
 
 QCasuSceneGroup::QCasuSceneGroup()
@@ -128,17 +127,18 @@ QPainterPath QCasuSceneGroup::completeShape()
     return tempShape;
 }
 
-bool lineCompare(QLineF a, QLineF b){return a.length()<b.length();}
 QVector<QLineF> QCasuSceneGroup::Prim(QVector<QPointF> list)
 {
     QVector<QLineF> allLines;
     QVector<QLineF> mst;
     QVector<QPointF> visited;
 
-    for(int k = 0; k<list.size(); k++)
-        for(int i = k+1; i<list.size(); i++)
-            allLines.append(QLineF(list[k],list[i]));
-    qSort(allLines.begin(),allLines.end(),lineCompare);
+    // NOTE: experimental nested range-for
+    for(auto& point1 : list)
+        for(auto& point2 : list.mid(&point1-&list.first()+1))
+            allLines.append(QLineF(point1,point2));
+
+    qSort(allLines.begin(),allLines.end(),[](QLineF a, QLineF b){return a.length()<b.length();});
 
     mst.append(allLines.first());
     visited.append(allLines.first().p1());
@@ -146,7 +146,7 @@ QVector<QLineF> QCasuSceneGroup::Prim(QVector<QPointF> list)
 
     while(visited.size() != list.size()){
         QLineF next(QPointF(0,0),QPointF(800,800));
-        foreach (QLineF line, allLines) {
+        for(auto& line : allLines) {
             int i1 = visited.indexOf(line.p1());
             int i2 = visited.indexOf(line.p2());
             if((2*i1+1)*(2*i2+1) > 0) continue;

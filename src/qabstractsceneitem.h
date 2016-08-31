@@ -1,6 +1,11 @@
 #ifndef QABSTRACTSCENEITEM_H
 #define QABSTRACTSCENEITEM_H
 
+#define sCast dynamic_cast<QAbstractSceneItem *>
+#define siCast dynamic_cast<QCasuSceneItem *>
+#define sgCast dynamic_cast<QCasuSceneGroup *>
+
+
 #include <memory>
 
 #include <QGraphicsItemGroup>

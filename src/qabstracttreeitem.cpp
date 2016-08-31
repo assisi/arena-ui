@@ -19,14 +19,14 @@ void QAbstractTreeItem::setSceneItem(QGraphicsItem *sceneItem)
 
 bool QAbstractTreeItem::isChildSelected(){
     bool childSelected = false;
-    for(int k = 0; k < _IR_num + _Temp_num; k++) childSelected |= _widgetMap[static_cast<dataType>(k)]->isSelected();
+    for(int k = 0; k < _IR_num + _Temp_num; k++) childSelected |= _widgetMap[dCast(k)]->isSelected();
     return childSelected;
 }
 
 QList<zmqBuffer *> QAbstractTreeItem::getBuffers(){
     QList<zmqBuffer *> outList;
     for(int k = 0; k < _IR_num + _Temp_num; k++)
-        if(_widgetMap[static_cast<dataType>(k)]->isSelected())
-            outList.append((dynamic_cast<QAbstractSceneItem *>(_sceneItem))->getBuffers(static_cast<dataType>(k)));
+        if(_widgetMap[dCast(k)]->isSelected())
+            outList.append((sCast(_sceneItem))->getBuffers(dCast(k)));
     return outList;
 }

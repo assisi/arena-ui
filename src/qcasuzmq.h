@@ -1,6 +1,8 @@
 #ifndef QCASUZMQ_H
 #define QCASUZMQ_H
 
+#define dCast static_cast<dataType>
+
 #include <QObject>
 #include <QTime>
 

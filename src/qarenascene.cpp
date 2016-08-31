@@ -59,10 +59,10 @@ void QArenaScene::drawForeground(QPainter *painter, const QRectF &rect)
 
     int time = 0;
     int connectedItems = 0;
-    foreach(QGraphicsItem *item, items())
-        if(!dynamic_cast<QAbstractSceneItem *>(item)->isGroup())
-            if(dynamic_cast<QCasuSceneItem *>(item)->getZmqObject()->isConnected()){
-                time += dynamic_cast<QCasuSceneItem *>(item)->getZmqObject()->getAvgSamplingTime();
+    for(auto& item : items())
+        if(!sCast(item)->isGroup())
+            if(siCast(item)->getZmqObject()->isConnected()){
+                time += siCast(item)->getZmqObject()->getAvgSamplingTime();
                 connectedItems++;
             }
     if(connectedItems && settings->value("avgTime_on").toBool()){
@@ -84,7 +84,7 @@ void QArenaScene::mousePressEvent(QGraphicsSceneMouseEvent *event)
     else QGraphicsScene::mousePressEvent(event);
 }
 
-void QArenaScene::setTreeItem(QSelectionTreeItem *treeItem)
+void QArenaScene::setTreeItem(QTreeWidgetItem *treeItem)
 {
     _treeItem = treeItem;
     _treeItem->setHidden(true);
@@ -98,7 +98,7 @@ void QArenaScene::checkSelection()
 
     int color = 14;
 
-    foreach(QGraphicsItem *item, tempList)
-        if(dynamic_cast<QAbstractSceneItem *>(item)->isGroup())
-            dynamic_cast<QAbstractSceneItem *>(item)->setGroupColor(static_cast<Qt::GlobalColor>(color++));
+    for(auto& item : tempList)
+        if(sCast(item)->isGroup())
+            sCast(item)->setGroupColor(static_cast<Qt::GlobalColor>(color++));
 }
