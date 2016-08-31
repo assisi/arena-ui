@@ -56,7 +56,6 @@ public:
     void removeGraph(QCPGraph* graph);
 
     zmqBuffer *link(QCPGraph *graph);
-
 protected:
     /*!
      * \brief Overloaded function which is responsible for constat 9:16 size ratio
@@ -65,52 +64,18 @@ protected:
      */
     virtual int heightForWidth(int width) const {return width*9/16;}
 
-signals:
-
 public slots:
     /*!
-     * \brief Enables auto positioning on double click event
+     * \brief Adds selected graphs to this trend
      */
-    void enableAutoPosition();
-    /*!
-     * \brief Disables auto positioning on mouse drag event
-     */
-    void disableAutoPosition(QMouseEvent *event);
-    /*!
-     * \brief Sets zoom flags (x and/or y axis) corresponding to pressed keys (Ctrl & Shift)
-     */
-    void setZoomFlags(QWheelEvent *event);
-    /*!
-     * \brief Synchronizes graph selecting in legend and on plot
-     */
-    void selectionChanged();
+    void addSelectedGraphs();
+
+private slots:
     /*!
      * \brief Shows QTrendPLot context menu
      * \param position
      */
     void showContextMenu(QPoint position);
-    /*!
-     * \brief Toggles legend visibility status
-     */
-    void toggleLegend();
-    /*!
-     * \brief Toggles between docked and undocked state
-     */
-    void dock_undock();
-    /*!
-     * \brief Context menu action for removing selected graphs
-     */
-    void removeSelectedGraphs();
-    /*!
-     * \brief Context menu action for adding selected graphs
-     */
-    void addSelectedGraphs();
-    /*!
-     * \brief Saves current plot to PDF in vectorized format
-     */
-    void saveToPDF();
-
-private slots:
     /*!
      * \brief Called before plotting
      *

@@ -81,18 +81,14 @@ QCasuTreeItem::QCasuTreeItem(QCasuZMQ *zmqObject) :
 
     setFlags(Qt::ItemIsEnabled);
 
-    connect (_zmqObject,SIGNAL(updated(dataType)),this,SLOT(updateData(dataType)));
-}
-
-
-void QCasuTreeItem::updateData(dataType key)
-{
-    if(key == LED){
-        if(_zmqObject->getState(LED)) _widgetMap[key]->setData(1, Qt::DisplayRole, QVariant(_zmqObject->getLedColor().name()));
-        else _widgetMap[key]->setData(1, Qt::DisplayRole, QVariant());
-        _widgetMap[key]->setTextColor(1, _zmqObject->getLedColor());
-        return;
-    }
-    _widgetMap[key]->setData(1, Qt::DisplayRole, QVariant(_zmqObject->getValue(key)));
-    if(key >= 14) _widgetMap[key]->setTextColor(1, _zmqObject->getState(key)? Qt::green : Qt::red);
+    connect (_zmqObject,&QCasuZMQ::updated,[&](dataType key){
+        if(key == LED){
+            if(_zmqObject->getState(LED)) _widgetMap[key]->setData(1, Qt::DisplayRole, QVariant(_zmqObject->getLedColor().name()));
+            else _widgetMap[key]->setData(1, Qt::DisplayRole, QVariant());
+            _widgetMap[key]->setTextColor(1, _zmqObject->getLedColor());
+            return;
+        }
+        _widgetMap[key]->setData(1, Qt::DisplayRole, QVariant(_zmqObject->getValue(key)));
+        if(key >= 14) _widgetMap[key]->setTextColor(1, _zmqObject->getState(key)? Qt::green : Qt::red);
+    });
 }

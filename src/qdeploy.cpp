@@ -30,7 +30,7 @@ void QDeploy::appendText(QString text)
 
 bool QDeploy::isSimulatorStarted()
 {
-    QString tempString = settings->value("simulator").toString();
+    auto tempString = settings->value("simulator").toString();
     tempString = tempString.right(tempString.size() - tempString.lastIndexOf("/") - 1);
     tempString = tempString.left(15);
 

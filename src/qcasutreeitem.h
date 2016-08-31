@@ -14,9 +14,6 @@ private:
 
 public:
     QCasuTreeItem(QCasuZMQ *zmqObject);
-
-private slots:
-    void updateData(dataType key);
 };
 
 #endif // CASUTREEITEM_H

@@ -25,10 +25,33 @@ QTrendPlot::QTrendPlot(QTreeWidget* tree1,QTreeWidget* tree2 , QWidget *parent) 
 
    setContextMenuPolicy(Qt::CustomContextMenu);
 
-   connect(this,&QTrendPlot::mouseDoubleClick,this,&QTrendPlot::enableAutoPosition);
-   connect(this,&QTrendPlot::mouseMove,this,&QTrendPlot::disableAutoPosition);
-   connect(this,&QTrendPlot::mouseWheel,this,&QTrendPlot::setZoomFlags);
-   connect(this,&QTrendPlot::selectionChangedByUser,this,&QTrendPlot::selectionChanged);
+   connect(this,&QTrendPlot::mouseDoubleClick, [&](){
+       autoPosition = true;
+   });
+   connect(this,&QTrendPlot::mouseMove, [&](QMouseEvent *event){
+       if(event->buttons() == Qt::LeftButton)autoPosition = false;
+   });
+   connect(this,&QTrendPlot::mouseWheel, [&](QWheelEvent *event){
+       if(event->modifiers() & Qt::ShiftModifier){
+           axisRect()->setRangeZoom(Qt::Horizontal);
+       }
+       else
+       if(event->modifiers() & Qt::ControlModifier){
+           axisRect()->setRangeZoom(Qt::Vertical);
+       }
+       else{
+           axisRect()->setRangeZoom(Qt::Horizontal | Qt::Vertical);
+       }
+   });
+   connect(this,&QTrendPlot::selectionChangedByUser, [&](){
+       for (int k=0; k<graphCount(); k++){
+           auto item = legend->itemWithPlottable(graph(k));
+           if (item->selected() || graph(k)->selected()){
+             item->setSelected(true);
+             graph(k)->setSelected(true);
+           }
+         }
+   });
    connect(this,&QTrendPlot::customContextMenuRequested,this,&QTrendPlot::showContextMenu);
    connect(this,&QTrendPlot::beforeReplot,this,&QTrendPlot::prettyPlot);
 }
@@ -88,11 +111,6 @@ zmqBuffer *QTrendPlot::link(QCPGraph *graph)
     return _connectionMap[graph];
 }
 
-void QTrendPlot::removeSelectedGraphs(){
-    while(selectedGraphs().count())
-        removeGraph(selectedGraphs().first());
-}
-
 void QTrendPlot::addSelectedGraphs(){
 
     QList<zmqBuffer *> bufferList;
@@ -105,13 +123,6 @@ void QTrendPlot::addSelectedGraphs(){
     addGraphList(bufferList);
 
     replot();
-}
-
-void QTrendPlot::saveToPDF()
-{
-    auto path = QFileDialog::getSaveFileName(this,tr("Export trend graph as PDF"),QString(), tr("*.pdf"));
-    if(!path.endsWith(".pdf",Qt::CaseInsensitive)) path+=".pdf";
-    if(path.size()) savePdf(path);
 }
 
 void QTrendPlot::prettyPlot()
@@ -142,68 +153,45 @@ void QTrendPlot::prettyPlot()
     }
 }
 
-void QTrendPlot::enableAutoPosition(){
-    autoPosition = true;
-}
-
-void QTrendPlot::disableAutoPosition(QMouseEvent *event){
-    if(event->buttons() == Qt::LeftButton)autoPosition = false;
-}
-
-void QTrendPlot::setZoomFlags(QWheelEvent *event){
-    if(event->modifiers() & Qt::ShiftModifier){
-        axisRect()->setRangeZoom(Qt::Horizontal);
-    }
-    else
-    if(event->modifiers() & Qt::ControlModifier){
-        axisRect()->setRangeZoom(Qt::Vertical);
-    }
-    else{
-        axisRect()->setRangeZoom(Qt::Horizontal | Qt::Vertical);
-    }
-}
-
-void QTrendPlot::selectionChanged(){
-    for (int k=0; k<graphCount(); k++){
-        auto item = legend->itemWithPlottable(graph(k));
-        if (item->selected() || graph(k)->selected()){
-          item->setSelected(true);
-          graph(k)->setSelected(true);
-        }
-      }
-}
 
 void QTrendPlot::showContextMenu(QPoint position){
     auto menu = new QMenu(this);
-    QAction* temp;
+    QAction* tempAction;
 
     menu->setAttribute(Qt::WA_DeleteOnClose);
 
-    menu->addAction((docked? "Undock from main window" : "Dock to main window"),this,SLOT(dock_undock()));
+    tempAction = menu->addAction((docked? "Undock from main window" : "Dock to main window"));
+    connect(tempAction, &QAction::triggered, [&](){
+        docked = !docked;
+        setParent(parentWidget(), docked ? Qt::Widget : Qt::Window);
+        show();
+    });
 
-    menu->addAction((showLegend? "Hide legend" : "Show legend"),this,SLOT(toggleLegend()));
+    tempAction = menu->addAction((showLegend? "Hide legend" : "Show legend"));
+    connect(tempAction, &QAction::triggered, [&](){
+        showLegend = !showLegend;
+        legend->setVisible(showLegend);
+        replot();
+    });
 
-    temp = menu->addAction("Remove selected graphs",this,SLOT(removeSelectedGraphs()));
-    if(!selectedGraphs().count()) temp->setEnabled(false);
+    tempAction = menu->addAction("Remove selected graphs");
+    if(!selectedGraphs().count()) tempAction->setEnabled(false);
+    connect(tempAction, &QAction::triggered, [&](){
+        while(selectedGraphs().count())
+            removeGraph(selectedGraphs().first());
+    });
 
-    temp=menu->addAction("Add graphs (selected in tree)",this,SLOT(addSelectedGraphs()));
-    if(!casuTree->selectedItems().count() && !groupTree->selectedItems().size()) temp->setEnabled(false);
+    tempAction = menu->addAction("Add graphs (selected in tree)");
+    if(!casuTree->selectedItems().count() && !groupTree->selectedItems().size()) tempAction->setEnabled(false);
 
-    menu->addAction("Save to pdf",this,SLOT(saveToPDF()));
+    tempAction = menu->addAction("Save to pdf");
+    connect(tempAction, &QAction::triggered, [&](){
+        auto path = QFileDialog::getSaveFileName(this,tr("Export trend graph as PDF"),QString(), tr("*.pdf"));
+        if(!path.endsWith(".pdf",Qt::CaseInsensitive)) path+=".pdf";
+        if(path.size()) savePdf(path);
+    });
 
     menu->addAction("Close trend",this,SLOT(close()));
 
     menu->popup(mapToGlobal(position));
-}
-
-void QTrendPlot::toggleLegend(){
-    showLegend = !showLegend;
-    legend->setVisible(showLegend);
-}
-
-void QTrendPlot::dock_undock(){
-    if(docked)setParent(parentWidget(), Qt::Window);
-    if(!docked)setParent(parentWidget(), Qt::Widget);
-    show();
-    docked = !docked;
 }
