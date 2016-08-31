@@ -426,6 +426,7 @@ void ArenaUI::on_actionGroup_triggered()
 
     QCasuTreeGroup* tempTreeGroup = new QCasuTreeGroup();
     QCasuSceneGroup* tempSceneGroup = new QCasuSceneGroup();
+
     tempTreeGroup->setSceneItem(tempSceneGroup);
     tempSceneGroup->setTreeItem(tempTreeGroup);
 
@@ -620,10 +621,11 @@ void ArenaUI::sendSetpoint(QString actuator)
 void ArenaUI::groupSave(QSettings *saveState, QList<QGraphicsItem *> group, QString groupName)
 {
     saveState->beginWriteArray(groupName);
-    for(int k=0; k < group.size() ; k++){
-        saveState->setArrayIndex(k);
-        if(!sCast(group[k])->isGroup()) saveState->setValue("casuName",siCast(group[k])->getZmqObject()->getName());
-        else groupSave(saveState, group[k]->childItems(), "group");
+    int k = 0;
+    for(auto& item : group){
+        saveState->setArrayIndex(k++);
+        if(!sCast(item)->isGroup()) saveState->setValue("casuName",siCast(item)->getZmqObject()->getName());
+        else groupSave(saveState, item->childItems(), "group");
     }
     saveState->endArray();
 }
