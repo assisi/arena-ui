@@ -73,9 +73,21 @@ void QArenaScene::drawForeground(QPainter *painter, const QRectF &rect)
     }
 }
 
-QArenaScene::QArenaScene(QWidget *parent) : QGraphicsScene(parent){
+QArenaScene::QArenaScene(QWidget *parent) : QGraphicsScene(parent)
+{
     this->setItemIndexMethod(QGraphicsScene::NoIndex);
-    connect(this,SIGNAL(selectionChanged()),SLOT(checkSelection()));
+
+    connect(this, &QGraphicsScene::selectionChanged, [&](){
+        auto tempList = this->selectedItems();
+        if(tempList.size()>1) _treeItem->setHidden(false);
+        else _treeItem->setHidden(true);
+
+        int color = 14;
+
+        for(auto& item : tempList)
+            if(sCast(item)->isGroup())
+                sCast(item)->setGroupColor(static_cast<Qt::GlobalColor>(color++));
+    });
 }
 
 void QArenaScene::mousePressEvent(QGraphicsSceneMouseEvent *event)
@@ -88,17 +100,4 @@ void QArenaScene::setTreeItem(QTreeWidgetItem *treeItem)
 {
     _treeItem = treeItem;
     _treeItem->setHidden(true);
-}
-
-void QArenaScene::checkSelection()
-{
-    auto tempList = this->selectedItems();
-    if(tempList.size()>1) _treeItem->setHidden(false);
-    else _treeItem->setHidden(true);
-
-    int color = 14;
-
-    for(auto& item : tempList)
-        if(sCast(item)->isGroup())
-            sCast(item)->setGroupColor(static_cast<Qt::GlobalColor>(color++));
 }

@@ -22,8 +22,6 @@ public:
     QArenaScene(QWidget *parent);
     void mousePressEvent(QGraphicsSceneMouseEvent *event);
     void setTreeItem(QTreeWidgetItem *treeItem);
-private slots:
-    void checkSelection();
 };
 
 #endif // QARENASCENE_H

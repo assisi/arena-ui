@@ -105,7 +105,6 @@ signals:
 
 private slots:
     void messageReceived(const QList<QByteArray>& message);
-    void connectionTimeout();
 };
 
 #endif // QCASUZMQ_H

@@ -15,7 +15,10 @@ QCasuZMQ::QCasuZMQ(QObject *parent, QString casuName) :
     _pubSock = _context->createSocket(ZMQSocket::TYP_PUB, this);
 
     connect(_subSock, SIGNAL(messageReceived(const QList<QByteArray>&)), SLOT(messageReceived(const QList<QByteArray>&)));
-    connect(_connectionTimer, SIGNAL(timeout()),SLOT(connectionTimeout()));
+    connect(_connectionTimer, &QTimer::timeout,[&](){
+        _connected = false;
+        _connectionTimer->stop();
+    });
 }
 
 zmqBuffer *QCasuZMQ::getBuffer(dataType key)
@@ -234,12 +237,6 @@ void QCasuZMQ::messageReceived(const QList<QByteArray> &message)
     }
 
     _logFile << endl;
-}
-
-void QCasuZMQ::connectionTimeout()
-{
-    _connected = false;
-    _connectionTimer->stop();
 }
 
 // ----------------------------------------------------------------
