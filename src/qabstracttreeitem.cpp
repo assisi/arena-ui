@@ -1,11 +1,6 @@
 #include "qabstracttreeitem.h"
 #include "qabstractsceneitem.h"
 
-QAbstractTreeItem::QAbstractTreeItem()
-{
-
-}
-
 void QAbstractTreeItem::resetSelection(){
     for(int k=0;k<this->childCount();k++)
         for(int i=0;i<this->child(k)->childCount();i++)

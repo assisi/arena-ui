@@ -15,12 +15,12 @@ QDialogSetpoint::QDialogSetpoint(QString command, QList<QGraphicsItem *> group) 
 
     this->setWindowTitle(command + " data to send to CASUs");
 
-    QGroupBox* on_off = new QGroupBox("Select device state");
-    QGridLayout *tempLayout = new QGridLayout;
+    auto on_off = new QGroupBox("Select device state");
+    auto tempLayout = new QGridLayout;
 
-    QDoubleValidator* validator1 = new QDoubleValidator;
+    auto validator1 = new QDoubleValidator;
+    auto validator2 = new QDoubleValidator;
     validator1->setNotation(QDoubleValidator::StandardNotation);
-    QDoubleValidator* validator2 = new QDoubleValidator;
     validator2->setNotation(QDoubleValidator::StandardNotation);
 
     radioON = new QRadioButton("ON");
@@ -33,7 +33,7 @@ QDialogSetpoint::QDialogSetpoint(QString command, QList<QGraphicsItem *> group) 
     tempLayout = new QGridLayout;
     tempLayout->addWidget(on_off,0,0,1,2);
 
-    QDialogButtonBox *buttons = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel);
+    auto buttons = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel);
 
     if(command == "Temperature"){
         tempLayout->addWidget(new QLabel("Temperature setpoint:"),1,0);
@@ -96,7 +96,7 @@ QDialogSetpoint::QDialogSetpoint(QString command, QList<QGraphicsItem *> group) 
         tempLayout->addWidget(value1,1,1,1,2);
 
         QIcon icon(":/images/icons/open_folder_yellow.png");
-        QPushButton* chooseColor = new QPushButton();
+        auto chooseColor = new QPushButton();
         chooseColor->setIcon(icon);
         chooseColor->setFixedSize(25,25);
 

@@ -23,7 +23,7 @@ void QArenaScene::drawForeground(QPainter *painter, const QRectF &rect)
 
     painter->setRenderHints(QPainter::Antialiasing | QPainter::SmoothPixmapTransform, true);
 
-    QGraphicsView* _view = this->views().first();
+    auto _view = this->views().first();
     double scale = _view->transform().m11();
 
     QRectF model(_view->mapToScene(QPoint(10,10)),QSizeF(180,15)/scale);
@@ -50,7 +50,7 @@ void QArenaScene::drawForeground(QPainter *painter, const QRectF &rect)
     painter->drawLine(_view->mapToScene(QPoint(100,25)),_view->mapToScene(QPoint(100,30)));
     painter->drawLine(_view->mapToScene(QPoint(190,25)),_view->mapToScene(QPoint(190,30)));
 
-    QFont font = painter->font();
+    auto font = painter->font();
     font.setPointSizeF(11 / scale);
     painter->setFont(font);
     painter->drawText(_view->mapToScene(QPoint(11,36)), "20 °C");
@@ -66,9 +66,9 @@ void QArenaScene::drawForeground(QPainter *painter, const QRectF &rect)
                 connectedItems++;
             }
     if(connectedItems && settings->value("avgTime_on").toBool()){
-        QPoint samplingTimePosition = _view->rect().topRight() - QPoint(180,-20);
+        auto samplingTimePosition = _view->rect().topRight() - QPoint(180,-20);
         if(_view->verticalScrollBar()->isVisible()) samplingTimePosition -= QPoint(20,0);
-        QString tempText = QString("Avg. sample time: ") + QString::number(time/connectedItems) + QString("ms");
+        auto tempText = QString("Avg. sample time: ") + QString::number(time/connectedItems) + QString("ms");
         painter->drawText(_view->mapToScene(samplingTimePosition), tempText);
     }
 }
@@ -92,7 +92,7 @@ void QArenaScene::setTreeItem(QTreeWidgetItem *treeItem)
 
 void QArenaScene::checkSelection()
 {
-    QList<QGraphicsItem *> tempList = this->selectedItems();
+    auto tempList = this->selectedItems();
     if(tempList.size()>1) _treeItem->setHidden(false);
     else _treeItem->setHidden(true);
 

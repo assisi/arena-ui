@@ -18,7 +18,7 @@ QVariant QCasuSceneGroup::itemChange(QGraphicsItem::GraphicsItemChange change, c
 
         if(_childCoordinates.size()<2) return QGraphicsItem::itemChange(change, value);
 
-        QVector<QLineF> mst = Prim(_childCoordinates);
+        auto mst = Prim(_childCoordinates);
 
         for (QLineF& line : mst) {
             newLine.moveTo(line.p1());
@@ -122,7 +122,7 @@ QPainterPath QCasuSceneGroup::shape() const
 
 QPainterPath QCasuSceneGroup::completeShape()
 {
-    QPainterPath tempShape = _groupShape;
+    auto tempShape = _groupShape;
     tempShape.addPath(_groupLine);
     return tempShape;
 }
@@ -145,18 +145,18 @@ QVector<QLineF> QCasuSceneGroup::Prim(QVector<QPointF> list)
     visited.append(allLines.first().p2());
 
     while(visited.size() != list.size()){
-        QLineF next(QPointF(0,0),QPointF(800,800));
+        QLineF nextLine(QPointF(0,0),QPointF(800,800));
         for(auto& line : allLines) {
             int i1 = visited.indexOf(line.p1());
             int i2 = visited.indexOf(line.p2());
             if((2*i1+1)*(2*i2+1) > 0) continue;
-            if (line.length()>next.length()) continue;
-            next = line;
+            if (line.length()>nextLine.length()) continue;
+            nextLine = line;
         }
 
-        mst.append(next);
-        if(visited.indexOf(next.p1()) == -1) visited.append(next.p1());
-        else visited.append(next.p2());
+        mst.append(nextLine);
+        if(visited.indexOf(nextLine.p1()) == -1) visited.append(nextLine.p1());
+        else visited.append(nextLine.p2());
     }
 
     return mst;

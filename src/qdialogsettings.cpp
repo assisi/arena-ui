@@ -3,7 +3,7 @@
 QDialogSettings::QDialogSettings()
 {
     this->setWindowTitle("Settings");
-    QGridLayout* temp = new QGridLayout;
+    auto temp = new QGridLayout;
 
     temp->addWidget(new QtempLabel("Trend buffer size[mm:ss]:"),0,0);
     temp->addWidget(new QtempLabel("Trend sample time[ms]:"),1,0);
@@ -42,10 +42,10 @@ QDialogSettings::QDialogSettings()
 
     QIcon icon(":/images/icons/open_folder_yellow.png");
 
-    QPushButton* searchArena = new QPushButton();
-    QPushButton* searchLog = new QPushButton();
-    QPushButton* searchCam = new QPushButton();
-    QPushButton* searchSim = new QPushButton();
+    auto searchArena = new QPushButton();
+    auto searchLog = new QPushButton();
+    auto searchCam = new QPushButton();
+    auto searchSim = new QPushButton();
 
     searchArena->setIcon(icon);
     searchLog->setIcon(icon);
@@ -62,7 +62,7 @@ QDialogSettings::QDialogSettings()
     temp->addWidget(searchLog,4,5);
     temp->addWidget(searchSim,5,5);
 
-    QDialogButtonBox *buttons = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel);
+    auto buttons = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel);
     temp->addWidget(buttons,6,3);
     this->setLayout(temp);
 

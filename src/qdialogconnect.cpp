@@ -4,7 +4,7 @@ QDialogConnect::QDialogConnect(QStringList addresses)
 {
     this->setWindowTitle("CASU address");
 
-    QGridLayout *temp = new QGridLayout;
+    auto temp = new QGridLayout;
     _subAddr = new QLineEdit(addresses.at(0));
     _pubAddr = new QLineEdit(addresses.at(1));
     _msgAddr = new QLineEdit(addresses.at(2));
@@ -16,7 +16,7 @@ QDialogConnect::QDialogConnect(QStringList addresses)
     temp->addWidget(_subAddr,0,1);
     temp->addWidget(_pubAddr,1,1);
     temp->addWidget(_msgAddr,2,1);
-    QDialogButtonBox *buttons = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel);
+    auto buttons = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel);
     temp->addWidget(buttons,3,1);
     this->setLayout(temp);
 

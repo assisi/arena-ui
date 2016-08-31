@@ -16,7 +16,7 @@ protected:
     QMap<dataType, QTreeWidgetItem*> _widgetMap;
     QGraphicsItem *_sceneItem;
 public:
-    QAbstractTreeItem();
+    QAbstractTreeItem() = default;
     void resetSelection();
     void setSceneItem(QGraphicsItem *sceneItem);
 
