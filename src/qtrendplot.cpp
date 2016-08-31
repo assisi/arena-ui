@@ -75,7 +75,7 @@ void QTrendPlot::addGraph(zmqBuffer *buffer){
         }
     }
     // NOTE: QCustomPlot::replot() has default value
-    QCustomPlot::connect(buffer, &zmqBuffer::updatePlot, this, [&](){ replot(); });
+    connect(buffer, &zmqBuffer::updatePlot, [&](){ replot(); });
     _connectionMap.insert(graph(), buffer);
 }
 
@@ -160,6 +160,7 @@ void QTrendPlot::showContextMenu(QPoint position){
 
     menu->setAttribute(Qt::WA_DeleteOnClose);
 
+    // FIXME: Qt 5.6 QMenu::addAction accepts Qt5 style connect (possible lambda expressions)
     tempAction = menu->addAction((docked? "Undock from main window" : "Dock to main window"));
     connect(tempAction, &QAction::triggered, [&](){
         docked = !docked;

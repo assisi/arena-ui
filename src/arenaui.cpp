@@ -43,8 +43,8 @@ ArenaUI::ArenaUI(QWidget *parent) :
             ui->actionPlot_selected_in_different_trends->setEnabled(false);
         }
     };
-    connect(ui->casuTree, &QTreeWidget::itemSelectionChanged, this, tempLambda);
-    connect(ui->groupTree, &QTreeWidget::itemSelectionChanged, this, tempLambda);
+    connect(ui->casuTree, &QTreeWidget::itemSelectionChanged, tempLambda);
+    connect(ui->groupTree, &QTreeWidget::itemSelectionChanged, tempLambda);
 
 
     //TREND TAB SCROLLABLE LAYOUT
@@ -70,14 +70,13 @@ ArenaUI::ArenaUI(QWidget *parent) :
     auto click_handler = new MouseClickHandler(_arenaScene, this);
     _arenaScene->installEventFilter(click_handler);
 
-    connect(ui->arenaSpace,&QGraphicsView::customContextMenuRequested,this,&ArenaUI::customContextMenu);
+    connect(ui->arenaSpace, &QGraphicsView::customContextMenuRequested, this, &ArenaUI::customContextMenu);
 
     // - 30fps update
 
     _sceneUpdate = new QTimer(this);
     // NOTE: QGraphicsScene::update() has default value
-    connect(_sceneUpdate, &QTimer::timeout, this,[&](){ _arenaScene->update(); });
-    _sceneUpdate->start(34);
+    connect(_sceneUpdate, &QTimer::timeout, [&](){ _arenaScene->update(); });
 
     //DEPLOYMENT - TODO: remove all this excesive code and reimplement it
     ui->tabDeploy->setLayout(new QVBoxLayout);

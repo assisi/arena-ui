@@ -20,8 +20,8 @@ QDialogConnect::QDialogConnect(QStringList addresses)
     temp->addWidget(buttons,3,1);
     this->setLayout(temp);
 
-    QObject::connect(buttons, &QDialogButtonBox::accepted, this, &QDialogConnect::accept);
-    QObject::connect(buttons, &QDialogButtonBox::rejected, this, &QDialogConnect::reject);
+    QObject::connect(buttons, &QDialogButtonBox::accepted, this, &QDialog::accept);
+    QObject::connect(buttons, &QDialogButtonBox::rejected, this, &QDialog::reject);
 }
 
 QStringList QDialogConnect::getAddresses()

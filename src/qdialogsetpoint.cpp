@@ -100,7 +100,7 @@ QDialogSetpoint::QDialogSetpoint(QString command, QList<QGraphicsItem *> group) 
         chooseColor->setIcon(icon);
         chooseColor->setFixedSize(25,25);
 
-        connect(chooseColor, &QPushButton::clicked , this, &QDialogSetpoint::colorDialog);
+        connect(chooseColor, &QPushButton::clicked, this, &QDialogSetpoint::colorDialog);
 
         tempLayout->addWidget(chooseColor,1,2);
         tempLayout->addWidget(buttons,2,0);
@@ -138,8 +138,8 @@ QDialogSetpoint::QDialogSetpoint(QString command, QList<QGraphicsItem *> group) 
 
     this->setLayout(tempLayout);
 
-    QObject::connect(buttons, &QDialogButtonBox::accepted, this, &QDialogSetpoint::prepareMessage);
-    QObject::connect(buttons, &QDialogButtonBox::rejected, this, &QDialogSetpoint::reject);
+    connect(buttons, &QDialogButtonBox::accepted, this, &QDialogSetpoint::prepareMessage);
+    connect(buttons, &QDialogButtonBox::rejected, this, &QDialogSetpoint::reject);
 
 }
 

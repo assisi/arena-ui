@@ -77,7 +77,7 @@ QDialogSettings::QDialogSettings()
     connect(searchSim,  &QPushButton::clicked, this, &QDialogSettings::findFolder);
 
     connect(buttons, &QDialogButtonBox::accepted, this, &QDialogSettings::saveConfig);
-    connect(buttons, &QDialogButtonBox::rejected, this, &QDialogSettings::reject);
+    connect(buttons, &QDialogButtonBox::rejected, this, &QDialog::reject);
 }
 
 void QDialogSettings::findFolder()
