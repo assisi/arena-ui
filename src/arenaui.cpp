@@ -33,8 +33,18 @@ ArenaUI::ArenaUI(QWidget *parent) :
     ui->groupTree->addAction(ui->actionPlot_selected_in_same_trend);
     ui->groupTree->addAction(ui->actionPlot_selected_in_different_trends);
 
-    connect(ui->casuTree,SIGNAL(itemSelectionChanged()),this,SLOT(updateTreeSelection()));
-    connect(ui->groupTree,SIGNAL(itemSelectionChanged()),this,SLOT(updateTreeSelection()));
+    auto tempLambda = [&](){
+        if(ui->casuTree->selectedItems().size() || ui->groupTree->selectedItems().size()){
+            ui->actionPlot_selected_in_same_trend->setEnabled(true);
+            ui->actionPlot_selected_in_different_trends->setEnabled(true);
+        }
+        else{
+            ui->actionPlot_selected_in_same_trend->setEnabled(false);
+            ui->actionPlot_selected_in_different_trends->setEnabled(false);
+        }
+    };
+    connect(ui->casuTree, &QTreeWidget::itemSelectionChanged, this, tempLambda);
+    connect(ui->groupTree, &QTreeWidget::itemSelectionChanged, this, tempLambda);
 
 
     //TREND TAB SCROLLABLE LAYOUT
@@ -60,12 +70,13 @@ ArenaUI::ArenaUI(QWidget *parent) :
     auto click_handler = new MouseClickHandler(_arenaScene, this);
     _arenaScene->installEventFilter(click_handler);
 
-    connect(ui->arenaSpace,SIGNAL(customContextMenuRequested(QPoint)),this,SLOT(customContextMenu(QPoint)));
+    connect(ui->arenaSpace,&QGraphicsView::customContextMenuRequested,this,&ArenaUI::customContextMenu);
 
     // - 30fps update
 
     _sceneUpdate = new QTimer(this);
-    connect(_sceneUpdate, SIGNAL(timeout()),_arenaScene,SLOT(update()));
+    // NOTE: QGraphicsScene::update() has default value
+    connect(_sceneUpdate, &QTimer::timeout, this,[&](){ _arenaScene->update(); });
     _sceneUpdate->start(34);
 
     //DEPLOYMENT - TODO: remove all this excesive code and reimplement it
@@ -148,7 +159,10 @@ ArenaUI::ArenaUI(QWidget *parent) :
 
     ui->tabDeploy->layout()->addWidget(_deployScroll);
 
-    connect(_deployScroll->verticalScrollBar(),SIGNAL(rangeChanged(int,int)),this,SLOT(moveDeployScroll(int,int)));
+    connect(_deployScroll->verticalScrollBar(),&QScrollBar::rangeChanged,this,[&](int min, int max){
+        Q_UNUSED(min)
+        _deployScroll->verticalScrollBar()->setValue(max);
+    });
 
     tempWidget = new QWidget;
     tempWidget->setLayout(new FlowLayout);
@@ -518,47 +532,10 @@ void ArenaUI::on_actionSettings_triggered()
     settingsDiag->exec();
 }
 
-void ArenaUI::toggleIR()
-{
-    settings->setValue("IR_on",!settings->value("IR_on").toBool());
-}
-
-void ArenaUI::toggleTemp()
-{
-    settings->setValue("temp_on",!settings->value("temp_on").toBool());
-}
-
-void ArenaUI::toggleAir()
-{
-    settings->setValue("air_on",!settings->value("air_on").toBool());
-}
-
-void ArenaUI::toggleVibr()
-{
-    settings->setValue("vibr_on",!settings->value("vibr_on").toBool());
-}
-
-void ArenaUI::toggleAvgTime()
-{
-    settings->setValue("avgTime_on",!settings->value("avgTime_on").toBool());
-}
-
-void ArenaUI::updateTreeSelection()
-{
-    if(ui->casuTree->selectedItems().size() || ui->groupTree->selectedItems().size()){
-        ui->actionPlot_selected_in_same_trend->setEnabled(true);
-        ui->actionPlot_selected_in_different_trends->setEnabled(true);
-    }
-    else{
-        ui->actionPlot_selected_in_same_trend->setEnabled(false);
-        ui->actionPlot_selected_in_different_trends->setEnabled(false);
-    }
-}
-
 void ArenaUI::customContextMenu(QPoint pos)
 {
     auto menu = new QMenu(); //no parent because it inherits background image from QGraphicsView
-    QAction* temp;
+    QAction* tempAction;
 
     menu->setAttribute(Qt::WA_DeleteOnClose);
 
@@ -569,19 +546,37 @@ void ArenaUI::customContextMenu(QPoint pos)
 
     bool error_selected = !_arenaScene->selectedItems().size();
 
-    menu->addAction(settings->value("IR_on").toBool() ? "Hide proximity sensors" : "Show proximity sensors",this,SLOT(toggleIR()));
-    menu->addAction(settings->value("temp_on").toBool() ? "Hide temperature sensors" : "Show temperature sensors",this,SLOT(toggleTemp()));
-    menu->addAction(settings->value("vibr_on").toBool() ? "Hide vibration marker" : "Show vibration marker",this,SLOT(toggleVibr()));
-    menu->addAction(settings->value("air_on").toBool() ? "Hide airflow marker" : "Show airflow marker",this,SLOT(toggleAir()));
-    menu->addAction(settings->value("avgTime_on").toBool() ? "Hide avg. sample time" : "Show avg. sample time",this,SLOT(toggleAvgTime()));
+    // FIXME: Qt 5.6 QMenu::addAction accepts Qt5 style connect (possible lambda expressions)
+    tempAction = menu->addAction(settings->value("IR_on").toBool() ? "Hide proximity sensors" : "Show proximity sensors");
+    connect(tempAction, &QAction::triggered, [&](){
+        settings->setValue("IR_on",!settings->value("IR_on").toBool());
+    });
+    tempAction = menu->addAction(settings->value("temp_on").toBool() ? "Hide temperature sensors" : "Show temperature sensors");
+    connect(tempAction, &QAction::triggered, [&](){
+        settings->setValue("temp_on",!settings->value("temp_on").toBool());
+    });
+    tempAction = menu->addAction(settings->value("vibr_on").toBool() ? "Hide vibration marker" : "Show vibration marker");
+    connect(tempAction, &QAction::triggered, [&](){
+        settings->setValue("vibr_on",!settings->value("vibr_on").toBool());
+    });
+    tempAction = menu->addAction(settings->value("air_on").toBool() ? "Hide airflow marker" : "Show airflow marker");
+    connect(tempAction, &QAction::triggered, [&](){
+        settings->setValue("air_on",!settings->value("air_on").toBool());
+    });
+    tempAction = menu->addAction(settings->value("avgTime_on").toBool() ? "Hide avg. sample time" : "Show avg. sample time");
+    connect(tempAction, &QAction::triggered, [&](){
+        settings->setValue("avgTime_on",!settings->value("avgTime_on").toBool());
+    });
+
     menu->addSeparator();
-    temp = menu->addAction("Group selected",this,SLOT(on_actionGroup_triggered()));
-    if(error_selected) temp->setEnabled(false);
-    temp = menu->addAction("Ungroup selected",this,SLOT(on_actionUngroup_triggered()));
-    if(error_selected) temp->setEnabled(false);
+
+    tempAction = menu->addAction("Group selected", this,SLOT(on_actionGroup_triggered()));
+    if(error_selected) tempAction->setEnabled(false);
+    tempAction = menu->addAction("Ungroup selected", this,SLOT(on_actionUngroup_triggered()));
+    if(error_selected) tempAction->setEnabled(false);
     menu->addSeparator();
-    temp = menu->addAction("Set connection",this,SLOT(on_actionConnect_triggered()));
-    if(error_single) temp->setEnabled(false);
+    tempAction = menu->addAction("Set connection", this,SLOT(on_actionConnect_triggered()));
+    if(error_single) tempAction->setEnabled(false);
 
     auto sendMenu = new QMenu("Setpoint");
     if(error_selected) sendMenu->setEnabled(false);
@@ -589,34 +584,25 @@ void ArenaUI::customContextMenu(QPoint pos)
 
     auto signalMapper = new QSignalMapper(menu);
 
-    temp = sendMenu->addAction("Temperature",signalMapper,SLOT(map()));
-    signalMapper->setMapping(temp,"Temperature");
-    temp = sendMenu->addAction("Vibration",signalMapper,SLOT(map()));
-    signalMapper->setMapping(temp,"Vibration");
-    temp = sendMenu->addAction("Airflow",signalMapper,SLOT(map()));
-    signalMapper->setMapping(temp,"Airflow");
-    temp = sendMenu->addAction("LED",signalMapper,SLOT(map()));
-    signalMapper->setMapping(temp,"LED");
-    temp = sendMenu->addAction("IR Proximity",signalMapper,SLOT(map()));
-    signalMapper->setMapping(temp,"IR Proximity");
+    tempAction = sendMenu->addAction("Temperature",signalMapper,SLOT(map()));
+    signalMapper->setMapping(tempAction,"Temperature");
+    tempAction = sendMenu->addAction("Vibration",signalMapper,SLOT(map()));
+    signalMapper->setMapping(tempAction,"Vibration");
+    tempAction = sendMenu->addAction("Airflow",signalMapper,SLOT(map()));
+    signalMapper->setMapping(tempAction,"Airflow");
+    tempAction = sendMenu->addAction("LED",signalMapper,SLOT(map()));
+    signalMapper->setMapping(tempAction,"LED");
+    tempAction = sendMenu->addAction("IR Proximity",signalMapper,SLOT(map()));
+    signalMapper->setMapping(tempAction,"IR Proximity");
 
-    connect(signalMapper,SIGNAL(mapped(QString)),this,SLOT(sendSetpoint(QString)));
+    connect(signalMapper, static_cast<void (QSignalMapper::*)(const QString &)>(&QSignalMapper::mapped), this,[&](QString actuator){
+        auto dialog = new QDialogSetpoint(actuator,_arenaScene->selectedItems());
+        if(dialog->exec())
+            for(auto& item : _arenaScene->selectedItems())
+                sCast(item)->sendSetpoint(dialog->getMessage());
+    });
 
     menu->popup(ui->arenaSpace->mapToGlobal(pos));
-}
-
-void ArenaUI::moveDeployScroll(int min, int max)
-{
-    Q_UNUSED(min)
-    _deployScroll->verticalScrollBar()->setValue(max);
-}
-
-void ArenaUI::sendSetpoint(QString actuator)
-{
-    auto dialog = new QDialogSetpoint(actuator,_arenaScene->selectedItems());
-    if(dialog->exec())
-        for(auto& item : _arenaScene->selectedItems())
-            sCast(item)->sendSetpoint(dialog->getMessage());
 }
 
 void ArenaUI::groupSave(QSettings *saveState, QList<QGraphicsItem *> group, QString groupName)

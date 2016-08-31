@@ -71,21 +71,24 @@ QDialogSettings::QDialogSettings()
     link[searchCam] = camFolder;
     link[searchSim] = simFile;
 
-    connect(searchArena,SIGNAL(clicked()),this,SLOT(findFolder()));
-    connect(searchLog,SIGNAL(clicked()),this,SLOT(findFolder()));
-    connect(searchCam,SIGNAL(clicked()),this,SLOT(findFolder()));
-    connect(searchSim,SIGNAL(clicked()),this,SLOT(findFolder()));
+    connect(searchArena,&QPushButton::clicked, this, &QDialogSettings::findFolder);
+    connect(searchLog,  &QPushButton::clicked, this, &QDialogSettings::findFolder);
+    connect(searchCam,  &QPushButton::clicked, this, &QDialogSettings::findFolder);
+    connect(searchSim,  &QPushButton::clicked, this, &QDialogSettings::findFolder);
 
-    connect(buttons, SIGNAL(accepted()), this, SLOT(saveConfig()));
-    connect(buttons, SIGNAL(rejected()), this, SLOT(reject()));
+    connect(buttons, &QDialogButtonBox::accepted, this, &QDialogSettings::saveConfig);
+    connect(buttons, &QDialogButtonBox::rejected, this, &QDialogSettings::reject);
 }
 
 void QDialogSettings::findFolder()
 {
     QString temp;
     if(link[(QPushButton*)QObject::sender()] == simFile){
-        temp = QFileDialog::getOpenFileName(this,tr("Select simulator"), link[(QPushButton*)QObject::sender()]->text());
-    }else temp = QFileDialog::getExistingDirectory(this,tr("Select folder"), link[(QPushButton*)QObject::sender()]->text(), QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks);
+        temp = QFileDialog::getOpenFileName(this,tr("Select simulator"),
+                                  link[(QPushButton*)QObject::sender()]->text());
+    }
+    else temp = QFileDialog::getExistingDirectory(this,tr("Select folder"),
+                                  link[(QPushButton*)QObject::sender()]->text(), QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks);
     if(temp.size())link[(QPushButton*)QObject::sender()]->setText(temp);
 }
 

@@ -74,8 +74,8 @@ void QTrendPlot::addGraph(zmqBuffer *buffer){
             break;
         }
     }
-
-    QCustomPlot::connect(buffer,SIGNAL(updatePlot()),this,SLOT(replot()));
+    // NOTE: QCustomPlot::replot() has default value
+    QCustomPlot::connect(buffer, &zmqBuffer::updatePlot, this, [&](){ replot(); });
     _connectionMap.insert(graph(), buffer);
 }
 
@@ -191,7 +191,8 @@ void QTrendPlot::showContextMenu(QPoint position){
         if(path.size()) savePdf(path);
     });
 
-    menu->addAction("Close trend",this,SLOT(close()));
+    tempAction = menu->addAction("Close trend");
+    connect(tempAction, &QAction::triggered, this, &QTrendPlot::close);
 
     menu->popup(mapToGlobal(position));
 }

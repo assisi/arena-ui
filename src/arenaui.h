@@ -159,39 +159,9 @@ private slots:
     void on_actionCamera_toggled(bool arg1);
 
     /*!
-     * \brief Action for toggling QCasuSceneItem graphics elements
-     */
-    void toggleIR();
-    /*!
-     * \brief Action for toggling QCasuSceneItem graphics elements
-     */
-    void toggleTemp();
-    /*!
-     * \brief Action for toggling QCasuSceneItem graphics elements
-     */
-    void toggleAir();
-    /*!
-     * \brief Action for toggling QCasuSceneItem graphics elements
-     */
-    void toggleVibr();
-    void toggleAvgTime();
-    /*!
-     * \brief Updates selected QCasuTreeItem elements in tabCasus
-     */
-    void updateTreeSelection();
-    /*!
      * \brief Custom context menu dialog for arenaScene
      */
     void customContextMenu(QPoint pos);
-    /*!
-     * \brief Scrolls shell output window on tabDeploy according to updates
-     */
-    void moveDeployScroll(int min, int max);
-
-    /*!
-     * \brief Opens a dialog for configuring setpoint parameters of selected actuator and sends them to selected CASUs
-     */
-    void sendSetpoint(QString actuator);
 };
 
 
