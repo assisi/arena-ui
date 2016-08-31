@@ -119,10 +119,8 @@ void QDeploy::appendErr()
     appendText(_shell->readAllStandardError());
 }
 
-void QDeploy::toggleOutput(int state){
+void QDeploy::toggleOutput(bool state){
     if(state){
-        _shell->readAllStandardError();
-        _shell->readAllStandardOutput();
         connect(_shell, SIGNAL(readyReadStandardOutput()), this, SLOT(appendOut()));
         connect(_shell, SIGNAL(readyReadStandardError()), this, SLOT(appendErr()));
     }

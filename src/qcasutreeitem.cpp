@@ -81,7 +81,12 @@ QCasuTreeItem::QCasuTreeItem(QCasuZMQ *zmqObject) :
 
     setFlags(Qt::ItemIsEnabled);
 
-    connect (_zmqObject,&QCasuZMQ::updated,[&](dataType key){
+    /* BUG 73: this is sometimes called when object doesn't exist
+     * - if simulator is running and project is opened over existing one
+     */
+
+    _zmqObjectConnection = connect (_zmqObject,&QCasuZMQ::updated,[&](dataType key){
+        if(_widgetMap.isEmpty()) return;
         if(key == LED){
             if(_zmqObject->getState(LED)) _widgetMap[key]->setData(1, Qt::DisplayRole, QVariant(_zmqObject->getLedColor().name()));
             else _widgetMap[key]->setData(1, Qt::DisplayRole, QVariant());
@@ -91,4 +96,9 @@ QCasuTreeItem::QCasuTreeItem(QCasuZMQ *zmqObject) :
         _widgetMap[key]->setData(1, Qt::DisplayRole, QVariant(_zmqObject->getValue(key)));
         if(key >= 14) _widgetMap[key]->setTextColor(1, _zmqObject->getState(key)? Qt::green : Qt::red);
     });
+}
+
+QCasuTreeItem::~QCasuTreeItem()
+{
+    disconnect();
 }

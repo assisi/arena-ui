@@ -11,9 +11,6 @@
 
 #include "globalHeader.h"
 
-//3rd party class implementations
-#include "flowlayout.h"
-
 #include "qarenascene.h"
 #include "qdialogconnect.h"
 #include "qdialogsettings.h"
@@ -25,6 +22,7 @@
 #include "qcasutreegroup.h"
 
 #include "qtrendplot.h"
+#include "flowlayout.h"
 #include "qdeploy.h"
 #include "qgraphicsviewzoom.h"
 //#include "qgstreamerview.h"
@@ -64,29 +62,7 @@ private:
      * \brief Tab in which trend plots are docked
      */
     QVBoxLayout* _trendTab;
-    /*!
-     * \brief Custom widget for deployment
-     */
-    QDeploy* _deployWidget;
-    /*!
-     * \brief Pointer to shell output scroll area
-     */
-    QScrollArea* _deployScroll;
-    /*!
-     * \brief Pointer to QLabel for showing loaded associated file
-     */
-    QLabel* _deployArena;
-    /*!
-     * \brief Pointer to QLabel for showing loaded associated file
-     */
-    QLabel* _deployFile;
-    /*!
-     * \brief Pointer to QLabel for showing loaded associated file
-     */
-    QLabel* _deployNeighborhood;
-    /*!
-     * \brief Custom widget for video streaming
-     */
+
     //QGstreamerView* videoStream;
 
     /*!

@@ -68,7 +68,7 @@ public slots:
      * \brief Toggle QProcess output collecting
      * \param state
      */
-    void toggleOutput(int state);
+    void toggleOutput(bool state);
 
     /*!
      * \brief Start simulator and spawn CASUs from loaded arena file (*.arena)
