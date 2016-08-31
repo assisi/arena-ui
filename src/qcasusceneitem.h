@@ -28,23 +28,16 @@ private:
     QCasuZMQ *_zmqObject;
 
 public:
-    bool isGroup() const;
-    QList<zmqBuffer *> getBuffers(dataType key);
-    QVector<QPointF> getCoordinateVector();
-    void sendSetpoint(QList<QByteArray> message);
-
     QCasuSceneItem(QPointF coordinates, double yaw, QCasuZMQ *zmqObject);
 
-    QCasuZMQ *getZmqObject();
+    bool isGroup() const Q_DECL_OVERRIDE;
+    QList<zmqBuffer *> getBuffers(dataType key) Q_DECL_OVERRIDE;
+    QVector<QPointF> getCoordinateVector() Q_DECL_OVERRIDE;
+    void sendSetpoint(QList<QByteArray> message) Q_DECL_OVERRIDE;
+    QRectF boundingRect() const Q_DECL_OVERRIDE;
+    void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) Q_DECL_OVERRIDE;
 
-    QRectF boundingRect() const;
-
-    /*!
-     * \brief Overloaded inherited function responsible for drawing this item
-     *
-     * All graphical elements are implemented in this
-     */
-    void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
+    QCasuZMQ *getZmqObject();    
 };
 
 /*!

@@ -15,12 +15,12 @@ class QArenaScene : public QGraphicsScene
 {
     Q_OBJECT
 protected:
-    void drawBackground(QPainter *painter, const QRectF &rect);
-    void drawForeground(QPainter *painter, const QRectF &rect);
+    void drawBackground(QPainter *painter, const QRectF &rect) Q_DECL_OVERRIDE;
+    void drawForeground(QPainter *painter, const QRectF &rect) Q_DECL_OVERRIDE;
     QTreeWidgetItem *_treeItem;
 public:
     QArenaScene(QWidget *parent);
-    void mousePressEvent(QGraphicsSceneMouseEvent *event);
+    void mousePressEvent(QGraphicsSceneMouseEvent *event) Q_DECL_OVERRIDE;
     void setTreeItem(QTreeWidgetItem *treeItem);
 };
 

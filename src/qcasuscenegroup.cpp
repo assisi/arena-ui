@@ -88,12 +88,7 @@ void QCasuSceneGroup::removeFromGroup(QList<QGraphicsItem *> itemList)
     for(auto& item : itemList) removeFromGroup(item);
 }
 
-QCasuSceneGroup::QCasuSceneGroup()
-{
-
-}
-
-QRectF QCasuSceneGroup::boundingRect()
+QRectF QCasuSceneGroup::boundingRect() const
 {
     return childrenBoundingRect();
 }
