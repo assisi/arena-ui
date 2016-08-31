@@ -178,7 +178,8 @@ void ArenaUI::sortGraphicsScene()
     pp.addRect(_arenaScene->sceneRect()); // select all -- selectedItems() doesnt return group children which is a case with items()
     _arenaScene->setSelectionArea(pp);
 
-    for(int k = 0; k < _arenaScene->selectedItems().size(); k++)_arenaScene->selectedItems()[k]->setZValue(k+1);
+    for(int k = 0; k < _arenaScene->selectedItems().size(); k++)
+        _arenaScene->selectedItems()[k]->setZValue(k+1);
 
     for(int k = 0; k+1 < _arenaScene->selectedItems().size(); k++)
         for(int i = k+1; i < _arenaScene->selectedItems().size(); i++){
@@ -225,7 +226,7 @@ bool MouseClickHandler::eventFilter(QObject* obj, QEvent* event)
             selectedList = scene_->selectedItems();
         else selectedList.clear();
 
-        return true;
+        return QObject::eventFilter(obj, event);;
     }
     else
     if (event->type() == QEvent::GraphicsSceneMouseMove){
@@ -233,7 +234,7 @@ bool MouseClickHandler::eventFilter(QObject* obj, QEvent* event)
         drag_true = true;
         scene_->update();
 
-        return true;
+        return QObject::eventFilter(obj, event);;
     }
     else
     if (event->type() == QEvent::GraphicsSceneMouseRelease)
@@ -259,7 +260,7 @@ bool MouseClickHandler::eventFilter(QObject* obj, QEvent* event)
         drag_true = false;
         scene_->update();
 
-        return true;
+        return QObject::eventFilter(obj, event);;
     }
     else
     {
