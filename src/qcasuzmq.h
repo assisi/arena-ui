@@ -102,6 +102,7 @@ private:
 
 signals:
     void updated(dataType key);
+    void connectMsg(QString message);
 
 private slots:
     void messageReceived(const QList<QByteArray>& message);

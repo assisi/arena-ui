@@ -1,26 +1,24 @@
 #ifndef QDIALOGCONNECT_H
 #define QDIALOGCONNECT_H
 
-#include <QDialogButtonBox>
 #include <QDialog>
-#include <QString>
-#include <QGridLayout>
-#include <QLabel>
-#include <QLineEdit>
 
-/*!
- * \brief Connection settings dialog window for individual CASU
- */
+namespace Ui {
+class QDialogConnect;
+}
+
 class QDialogConnect : public QDialog
 {
     Q_OBJECT
-private:
-    QLineEdit* _subAddr;
-    QLineEdit* _pubAddr;
-    QLineEdit* _msgAddr;
+
 public:
-    QDialogConnect(QStringList addresses);
+    explicit QDialogConnect(QWidget *parent = 0, QStringList addresses = QStringList());
+    ~QDialogConnect();
+
     QStringList getAddresses();
+
+private:
+    Ui::QDialogConnect *ui;
 };
 
 #endif // QDIALOGCONNECT_H

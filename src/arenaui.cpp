@@ -254,8 +254,9 @@ void ArenaUI::on_actionOpenArena_triggered()
         progress.show();
         progress.move(ui->arenaSpace->mapToGlobal(QPoint(400-progress.width()/2,400-progress.height()/2)));
 
-        for(auto it=arenaNode[assisiFile.arenaLayer.toStdString()].begin(); it!=arenaNode[assisiFile.arenaLayer.toStdString()].end(); it++){
-            auto name = QString::fromStdString(it->first.as<std::string>());
+        //for(auto it=arenaNode[assisiFile.arenaLayer.toStdString()].begin(); it!=arenaNode[assisiFile.arenaLayer.toStdString()].end(); it++){
+        for(auto casu : arenaNode[assisiFile.arenaLayer.toStdString()]){
+            auto name = QString::fromStdString(casu.first.as<std::string>());
             QPointF coordinates;
             coordinates.setX(400 + 10 * arenaNode[assisiFile.arenaLayer.toStdString()][name.toStdString()]["pose"]["x"].as<double>());
             coordinates.setY(400 - 10 * arenaNode[assisiFile.arenaLayer.toStdString()][name.toStdString()]["pose"]["y"].as<double>());
@@ -264,6 +265,8 @@ void ArenaUI::on_actionOpenArena_triggered()
             auto tempZMQ = new QCasuZMQ(this, name);
             auto tempTreeItem = new QCasuTreeItem(tempZMQ);
             auto tempSceneItem = new QCasuSceneItem(coordinates, yaw, tempZMQ);
+
+            connect(tempZMQ, &QCasuZMQ::connectMsg, ui->deployWidget, &QDeploy::append);
 
             tempTreeItem->setSceneItem(tempSceneItem);
             tempSceneItem->setTreeItem(tempTreeItem);
@@ -376,7 +379,6 @@ void ArenaUI::on_actionGroup_triggered()
     this->sortGraphicsScene();
 }
 
-
 void ArenaUI::on_actionUngroup_triggered()
 {
     auto itemList= _arenaScene->selectedItems();
@@ -403,7 +405,7 @@ void ArenaUI::on_actionConnect_triggered()
         return;
     }
     auto item = siCast(_arenaScene->selectedItems().first());
-    auto addrDiag = new QDialogConnect(item->getZmqObject()->getAddresses());
+    auto addrDiag = new QDialogConnect(this, item->getZmqObject()->getAddresses());
     if(addrDiag->exec()){
         item->getZmqObject()->setAddresses(addrDiag->getAddresses());
     }
@@ -556,6 +558,8 @@ QList<QGraphicsItem *> ArenaUI::groupLoad(YAML::Node* arenaNode, QSettings *load
             auto tempZMQ = new QCasuZMQ(this, name);
             auto tempTreeItem = new QCasuTreeItem(tempZMQ);
             auto tempSceneItem = new QCasuSceneItem(coordinates, yaw, tempZMQ);
+
+            connect(tempZMQ, &QCasuZMQ::connectMsg, ui->deployWidget, &QDeploy::append);
 
             tempTreeItem->setSceneItem(tempSceneItem);
             tempSceneItem->setTreeItem(tempTreeItem);

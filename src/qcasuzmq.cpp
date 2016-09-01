@@ -18,6 +18,7 @@ QCasuZMQ::QCasuZMQ(QObject *parent, QString casuName) :
     connect(_connectionTimer, &QTimer::timeout,[&](){
         _connected = false;
         _connectionTimer->stop();
+         emit connectMsg("[ZMQ][" + _name + "][ERR] Connection timeout!");
     });
 }
 
@@ -68,6 +69,12 @@ QString QCasuZMQ::getName()
 
 void QCasuZMQ::setAddresses(QString sub, QString pub, QString msg)
 {
+    if(_connected){
+        _subSock->unsubscribeFrom("casu");
+        _subSock->disconnectFrom(_subAddr);
+        _pubSock->disconnectFrom(_pubAddr);
+        emit connectMsg("[ZMQ][" + _name + "] Disconnected");
+    }
     _subAddr = sub;
     _pubAddr = pub;
     _msgAddr = msg;
@@ -129,10 +136,10 @@ void QCasuZMQ::connectZMQ()
         // Subscribe to everything!
         _subSock->subscribeTo("casu");
         _subSock->connectTo(_subAddr);
-        _connected = true;
         _connectionTimer->start(1000);
     }
     catch(zmq::error_t e){
+        emit connectMsg("[ZMQ][" + _name + "][ERR] Failed to connect: " + QString(e.what()));
         _connected = false;
     }
 }
@@ -141,7 +148,10 @@ void QCasuZMQ::messageReceived(const QList<QByteArray> &message)
 {
     string name(message.at(0).constData(), message.at(0).length());
     if(name != _name.toStdString()) return;
-    if(!_connected) _connected = true;
+    if(!_connected) {
+        _connected = true;
+         emit connectMsg("[ZMQ][" + _name + "] Connected");
+    }
     if(settings->value("log_on").toBool() & !_logOpen) openLogFile();
     if(!settings->value("log_on").toBool() & _logOpen) closeLogFile();
 
