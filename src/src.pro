@@ -70,7 +70,8 @@ HEADERS  += arenaui.h\
 
 
 FORMS    += arenaui.ui \
-    qdialogconnect.ui
+    qdialogconnect.ui \
+    qdialogsettings.ui
 
 LIBS += -lzmq\
         -lprotobuf\

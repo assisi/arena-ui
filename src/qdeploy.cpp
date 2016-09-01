@@ -45,33 +45,33 @@ void QDeploy::deploy()
 {
     if(_shell->state() == QProcess::NotRunning){
         _shell->start("deploy.py", QStringList(assisiFile.name));
-        append("[arenaUI] Starting 'deploy.py'\n");
+        append("[arenaUI] Starting 'deploy.py'");
     }
-    else append("[arenaUI] Already running a process\n");
+    else append("[arenaUI] Already running a process");
 }
 
 void QDeploy::run()
 {
     if(_shell->state() == QProcess::NotRunning){
         _shell->start("assisirun.py", QStringList(assisiFile.name));
-        append("[arenaUI] Starting 'assisirun.py'\n");
+        append("[arenaUI] Starting 'assisirun.py'");
     }
-    else append("[arenaUI] Already running a process\n");
+    else append("[arenaUI] Already running a process");
 }
 
 void QDeploy::stop()
 {
     if(_shell->state() != QProcess::NotRunning) _shell->close();
-    else append("[arenaUI] Process is not running\n");
+    else append("[arenaUI] Process is not running");
 }
 
 void QDeploy::collect()
 {
     if(_shell->state() == QProcess::NotRunning){
         _shell->start("collect_data.py", QStringList(assisiFile.name));
-        append("[arenaUI] Starting 'collect_data.py'\n");
+        append("[arenaUI] Starting 'collect_data.py'");
     }
-    else append("[arenaUI] Already running a process\n");
+    else append("[arenaUI] Already running a process");
 }
 
 void QDeploy::cleanLog()
@@ -83,14 +83,14 @@ void QDeploy::simulatorStart()
 {
     if(_shell->state() == QProcess::NotRunning){
         if(isSimulatorStarted()){
-            append("[Simulator] Simulator is already running (PID: " + QString::number(_simulatorPID) +")\n");
+            append("[Simulator] Simulator is already running (PID: " + QString::number(_simulatorPID) +")");
             return;
         }
         _shell->startDetached(settings->value("simulator").toString(), QStringList(), QString(), &_simulatorPID);
-        if(!_simulatorPID) append("[Simulator] Cannot start: " + settings->value("simulator").toString() + "\n");
-        else append("[Simulator] New simulator started (PID: " + QString::number(_simulatorPID) +")\n");
+        if(!_simulatorPID) append("[Simulator] Cannot start: " + settings->value("simulator").toString());
+        else append("[Simulator] New simulator started (PID: " + QString::number(_simulatorPID) +")");
     }
-    else append("[arenaUI] Already running a process\n");
+    else append("[arenaUI] Already running a process");
 
     _shell->start("sim.py", QStringList(assisiFile.arenaFile));
 }
@@ -99,7 +99,7 @@ void QDeploy::simulatorStop()
 {
     if(isSimulatorStarted()){
         _shell->execute(QString("kill ") + QString::number(_simulatorPID));
-        append("[Simulator] Simulator process is stopped.\n");
+        append("[Simulator] Simulator process is stopped.");
     }
 }
 
@@ -107,11 +107,11 @@ void QDeploy::toggleOutput(bool state){
     if(state){
 
         _shellOut1 = connect(_shell, &QProcess::readyReadStandardOutput, [&](){
-            append("[SHELL][OUT]");
+            append("\n[SHELL][OUT]");
             append(_shell->readAllStandardOutput());
         });
         _shellOut2 = connect(_shell, &QProcess::readyReadStandardError, [&](){
-            append("[SHELL][ERR]");
+            append("\n[SHELL][ERR]");
             append(_shell->readAllStandardError());
         });
     }

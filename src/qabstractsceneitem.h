@@ -1,9 +1,9 @@
 #ifndef QABSTRACTSCENEITEM_H
 #define QABSTRACTSCENEITEM_H
 
-#define sCast dynamic_cast<QAbstractSceneItem *>
-#define siCast dynamic_cast<QCasuSceneItem *>
-#define sgCast dynamic_cast<QCasuSceneGroup *>
+#define sCast(x) dynamic_cast<QAbstractSceneItem *>(x)
+#define siCast(x) dynamic_cast<QCasuSceneItem *>(x)
+#define sgCast(x) dynamic_cast<QCasuSceneGroup *>(x)
 
 
 #include <memory>

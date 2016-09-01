@@ -1,11 +1,13 @@
 #include "qdialogconnect.h"
 #include "ui_qdialogconnect.h"
 
-QDialogConnect::QDialogConnect(QWidget *parent, QStringList addresses) :
+QDialogConnect::QDialogConnect(QWidget *parent, QStringList addresses, QString name) :
     QDialog(parent),
     ui(new Ui::QDialogConnect)
 {
     ui->setupUi(this);
+
+    this->setWindowTitle(name + " addresses");
 
     ui->subAddr->setText(addresses.at(0));
     ui->pubAddr->setText(addresses.at(1));

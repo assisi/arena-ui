@@ -405,7 +405,7 @@ void ArenaUI::on_actionConnect_triggered()
         return;
     }
     auto item = siCast(_arenaScene->selectedItems().first());
-    auto addrDiag = new QDialogConnect(this, item->getZmqObject()->getAddresses());
+    auto addrDiag = new QDialogConnect(this, item->getZmqObject()->getAddresses(), item->getZmqObject()->getName());
     if(addrDiag->exec()){
         item->getZmqObject()->setAddresses(addrDiag->getAddresses());
     }
@@ -452,7 +452,7 @@ void ArenaUI::on_actionPlot_selected_in_different_trends_triggered()
 
 void ArenaUI::on_actionSettings_triggered()
 {
-    auto settingsDiag = new QDialogSettings();
+    auto settingsDiag = new QDialogSettings(this);
     settingsDiag->exec();
 }
 

@@ -1,9 +1,9 @@
 #ifndef QABSTRACTTREEITEM_H
 #define QABSTRACTTREEITEM_H
 
-#define tCast dynamic_cast<QAbstractTreeItem* >
-#define tiCast dynamic_cast<QCasuTreeItem *>
-#define tgCast dynamic_cast<QCasuTreeGroup *>
+#define tCast(x) dynamic_cast<QAbstractTreeItem* >(x)
+#define tiCast(x) dynamic_cast<QCasuTreeItem *>(x)
+#define tgCast(x) dynamic_cast<QCasuTreeGroup *>(x)
 
 #include <QTreeWidgetItem>
 

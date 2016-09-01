@@ -12,7 +12,7 @@ class QDialogConnect : public QDialog
     Q_OBJECT
 
 public:
-    explicit QDialogConnect(QWidget *parent = 0, QStringList addresses = QStringList());
+    explicit QDialogConnect(QWidget *parent, QStringList addresses, QString name);
     ~QDialogConnect();
 
     QStringList getAddresses();
