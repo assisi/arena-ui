@@ -88,7 +88,9 @@ void QTrendPlot::addGraphList(QList<zmqBuffer *> bufferList)
     if(graphCount()) new_trend = false;
 
     bufferList = bufferList.toSet().toList(); //remove duplicates
-    qSort(bufferList.begin(),bufferList.end(),[](zmqBuffer *b1, zmqBuffer *b2){return QString::compare(b1->getLegendName(), b2->getLegendName()) < 0;}); //sort by legend name
+    qSort(bufferList.begin(),bufferList.end(),[](zmqBuffer *b1, zmqBuffer *b2){
+        return QString::compare(b1->getLegendName(), b2->getLegendName()) < 0;
+    }); //sort by legend name
 
     for(auto& buffer : bufferList) addGraph(buffer);
 

@@ -68,11 +68,19 @@ ArenaUI::ArenaUI(QWidget *parent) :
     ui->deployButtons->setLayout(tempLayout);
     auto tempList = ui->deployButtons->children();
     tempList.removeLast();
+    qSort(tempList.begin(),tempList.end(),[](QObject *obj1, QObject *obj2){
+        // objects have names "_#objectName" where # is wanted position
+        return obj1->objectName().at(1) < obj2->objectName().at(1);
+    });
     for(auto& widget : tempList)
         ui->deployButtons->layout()->addWidget(qobject_cast<QWidget *>(widget));
 
     // - set deploy widget in scroll area
     ui->scrollArea->setWidget(ui->deployWidget);
+    connect(ui->scrollArea->verticalScrollBar(), &QScrollBar::rangeChanged,[&](int min, int max){
+        Q_UNUSED(min)
+        ui->scrollArea->verticalScrollBar()->setValue(max);
+    });
 
     // GRAPHICS SCENE
     _arenaScene = new QArenaScene(this);

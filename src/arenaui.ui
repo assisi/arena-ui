@@ -372,7 +372,7 @@
             </property>
             <layout class="QGridLayout" name="gridLayout">
              <item row="3" column="2">
-              <widget class="QPushButton" name="stopSim">
+              <widget class="QPushButton" name="_7stopSim">
                <property name="sizePolicy">
                 <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
                  <horstretch>0</horstretch>
@@ -385,7 +385,7 @@
               </widget>
              </item>
              <item row="0" column="0">
-              <widget class="QPushButton" name="runButton">
+              <widget class="QPushButton" name="_1runButton">
                <property name="sizePolicy">
                 <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
                  <horstretch>0</horstretch>
@@ -398,7 +398,7 @@
               </widget>
              </item>
              <item row="0" column="4">
-              <widget class="QPushButton" name="collectButton">
+              <widget class="QPushButton" name="_4collectButton">
                <property name="sizePolicy">
                 <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
                  <horstretch>0</horstretch>
@@ -411,7 +411,7 @@
               </widget>
              </item>
              <item row="3" column="0">
-              <widget class="QPushButton" name="cleanButton">
+              <widget class="QPushButton" name="_5cleanButton">
                <property name="sizePolicy">
                 <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
                  <horstretch>0</horstretch>
@@ -424,7 +424,7 @@
               </widget>
              </item>
              <item row="3" column="1">
-              <widget class="QPushButton" name="startSim">
+              <widget class="QPushButton" name="_6startSim">
                <property name="sizePolicy">
                 <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
                  <horstretch>0</horstretch>
@@ -437,7 +437,7 @@
               </widget>
              </item>
              <item row="0" column="1">
-              <widget class="QPushButton" name="stopButton">
+              <widget class="QPushButton" name="_2stopButton">
                <property name="sizePolicy">
                 <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
                  <horstretch>0</horstretch>
@@ -450,7 +450,7 @@
               </widget>
              </item>
              <item row="0" column="2">
-              <widget class="QPushButton" name="deployButton">
+              <widget class="QPushButton" name="_3deployButton">
                <property name="sizePolicy">
                 <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
                  <horstretch>0</horstretch>
@@ -732,7 +732,7 @@
  </resources>
  <connections>
   <connection>
-   <sender>deployButton</sender>
+   <sender>_3deployButton</sender>
    <signal>pressed()</signal>
    <receiver>deployWidget</receiver>
    <slot>deploy()</slot>
@@ -748,7 +748,7 @@
    </hints>
   </connection>
   <connection>
-   <sender>stopSim</sender>
+   <sender>_7stopSim</sender>
    <signal>pressed()</signal>
    <receiver>deployWidget</receiver>
    <slot>simulatorStop()</slot>
@@ -764,7 +764,7 @@
    </hints>
   </connection>
   <connection>
-   <sender>runButton</sender>
+   <sender>_1runButton</sender>
    <signal>pressed()</signal>
    <receiver>deployWidget</receiver>
    <slot>run()</slot>
@@ -780,7 +780,7 @@
    </hints>
   </connection>
   <connection>
-   <sender>startSim</sender>
+   <sender>_6startSim</sender>
    <signal>pressed()</signal>
    <receiver>deployWidget</receiver>
    <slot>simulatorStart()</slot>
@@ -796,7 +796,7 @@
    </hints>
   </connection>
   <connection>
-   <sender>cleanButton</sender>
+   <sender>_5cleanButton</sender>
    <signal>pressed()</signal>
    <receiver>deployWidget</receiver>
    <slot>cleanLog()</slot>
@@ -812,7 +812,7 @@
    </hints>
   </connection>
   <connection>
-   <sender>collectButton</sender>
+   <sender>_4collectButton</sender>
    <signal>pressed()</signal>
    <receiver>deployWidget</receiver>
    <slot>collect()</slot>

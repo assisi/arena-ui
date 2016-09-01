@@ -2,7 +2,7 @@
 #define QDEPLOY_H
 
 #include <QDebug>
-#include <QLabel>
+#include <QTextEdit>
 #include <QProcess>
 #include <QWindow>
 
@@ -17,7 +17,7 @@
  *
  * Simulator is started as individual process with spawning capabilities
  */
-class QDeploy : public QLabel
+class QDeploy : public QTextEdit
 {
     Q_OBJECT
 
@@ -34,11 +34,9 @@ private:
 
     qint64 _simulatorPID;
 
-    /*!
-     * \brief Appends shell output in UI
-     * \param text - colected shell output
-     */
-    void appendText(QString text);
+    QMetaObject::Connection _shellOut1;
+    QMetaObject::Connection _shellOut2;
+
     bool isSimulatorStarted();
 
 signals:
@@ -78,16 +76,6 @@ public slots:
      * \brief Close running simulator
      */
     void simulatorStop();
-
-private slots:
-    /*!
-     * \brief Collects shell ouput from QProcess
-     */
-    void appendOut();
-    /*!
-     * \brief Collects QProcess errors
-     */
-    void appendErr();
 };
 
 #endif // QDEPLOY_H

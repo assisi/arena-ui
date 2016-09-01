@@ -133,7 +133,9 @@ QVector<QLineF> QCasuSceneGroup::Prim(QVector<QPointF> list)
         for (int i = k+1; i < list.size(); i++)
             allLines.append(QLineF(list[k],list[i]));
 
-    qSort(allLines.begin(),allLines.end(),[](QLineF a, QLineF b){return a.length()<b.length();});
+    qSort(allLines.begin(),allLines.end(),[](QLineF a, QLineF b){
+        return a.length()<b.length();
+    });
 
     mst.append(allLines.first());
     visited.append(allLines.first().p1());

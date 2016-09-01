@@ -81,10 +81,6 @@ QCasuTreeItem::QCasuTreeItem(QCasuZMQ *zmqObject) :
 
     setFlags(Qt::ItemIsEnabled);
 
-    /* BUG 73: this is sometimes called when object doesn't exist
-     * - if simulator is running and project is opened over existing one
-     */
-
     _zmqObjectConnection = connect (_zmqObject,&QCasuZMQ::updated,[&](dataType key){
         if(_widgetMap.isEmpty()) return;
         if(key == LED){
@@ -100,5 +96,5 @@ QCasuTreeItem::QCasuTreeItem(QCasuZMQ *zmqObject) :
 
 QCasuTreeItem::~QCasuTreeItem()
 {
-    disconnect();
+    disconnect(_zmqObjectConnection);
 }
