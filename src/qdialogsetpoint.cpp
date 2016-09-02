@@ -114,6 +114,11 @@ QDialogSetpoint::QDialogSetpoint(QWidget *parent, QString command, QList<QGraphi
     this->adjustSize();
 }
 
+QDialogSetpoint::~QDialogSetpoint()
+{
+    delete ui;
+}
+
 QList<QByteArray> QDialogSetpoint::getMessage()
 {
     return _message;
