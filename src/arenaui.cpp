@@ -89,15 +89,14 @@ ArenaUI::ArenaUI(QWidget *parent) :
     ui->arenaSpace->setDragMode(QGraphicsView::RubberBandDrag);
     new QGraphicsViewZoom(ui->arenaSpace);
 
-
     auto click_handler = new MouseClickHandler(_arenaScene, this);
     _arenaScene->installEventFilter(click_handler);
 
     connect(ui->arenaSpace, &QGraphicsView::customContextMenuRequested, this, &ArenaUI::customContextMenu);
 
     // - 30fps update
-
     _sceneUpdate = new QTimer(this);
+    _sceneUpdate->start(33);
     // NOTE: QGraphicsScene::update() has default value
     connect(_sceneUpdate, &QTimer::timeout, [&](){ _arenaScene->update(); });
 }
@@ -520,7 +519,7 @@ void ArenaUI::customContextMenu(QPoint pos)
     signalMapper->setMapping(tempAction,"IR Proximity");
 
     connect(signalMapper, static_cast<void (QSignalMapper::*)(const QString &)>(&QSignalMapper::mapped), this,[&](QString actuator){
-        auto dialog = new QDialogSetpoint(actuator,_arenaScene->selectedItems());
+        auto dialog = new QDialogSetpoint(this, actuator,_arenaScene->selectedItems());
         if(dialog->exec())
             for(auto& item : _arenaScene->selectedItems())
                 sCast(item)->sendSetpoint(dialog->getMessage());

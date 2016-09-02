@@ -21,6 +21,10 @@
 #include "qcasutreeitem.h"
 #include "dev_msgs.pb.h"
 
+namespace Ui{
+    class QDialogSetpoint;
+}
+
 /*!
  * \brief Setpoint configuration dialog window
  *
@@ -29,16 +33,15 @@
 class QDialogSetpoint : public QDialog
 {
     Q_OBJECT
-private:
-    QRadioButton *radioON;
-    QLineEdit* value1;
-    QLineEdit* value2;
-    QString command_;
-    QList<QByteArray> message;
-
 public:
-    QDialogSetpoint(QString command, QList<QGraphicsItem *> group);
+    QDialogSetpoint(QWidget *parent, QString command, QList<QGraphicsItem *> group);
     QList<QByteArray> getMessage();
+
+private:
+    Ui::QDialogSetpoint *ui;
+
+    QString _command;
+    QList<QByteArray> _message;
 
 private slots:
     void prepareMessage();
