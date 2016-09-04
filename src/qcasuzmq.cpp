@@ -6,8 +6,12 @@ QCasuZMQ::QCasuZMQ(QObject *parent, QString casuName) :
     QObject(parent),
     m_name(casuName)
 {
-    for(int k = 0; k < m_IR_NUM + m_temp_NUM; k++) m_buffers.insert(dCast(k), new zmqBuffer(m_name, dCast(k)));
-    for(int k = m_IR_NUM + m_temp_NUM; k < m_dataType_NUM; k++) m_state.insert(dCast(k), false);
+    for(int k = 0; k < m_IR_NUM + m_temp_NUM; k++){
+        m_buffers.insert(dCast(k), new zmqBuffer(m_name, dCast(k)));
+    }
+    for(int k = m_IR_NUM + m_temp_NUM; k < m_dataType_NUM; k++){
+        m_state.insert(dCast(k), false);
+    }
 
     m_connectionTimer = new QTimer(this);
 
@@ -57,8 +61,11 @@ int QCasuZMQ::getAvgSamplingTime() const
     for(auto& oldTime : m_lastDataTime){
         dataType key = m_lastDataTime.key(oldTime, LED);
         if(key == LED) continue;
-        if(key >= m_IR_NUM + m_temp_NUM) result += m_values[key].key - oldTime;
-        else result += m_buffers[key]->getLastTime() - oldTime;
+        if(key >= m_IR_NUM + m_temp_NUM){
+            result += m_values[key].key - oldTime;
+        } else {
+            result += m_buffers[key]->getLastTime() - oldTime;
+        }
         itemNum++;
     }
     return itemNum && m_connected ? result*1000/itemNum : 0;
@@ -126,7 +133,9 @@ void QCasuZMQ::closeLogFile()
 void QCasuZMQ::addToBuffer(dataType key, QCPData data)
 {
     m_buffers[key]->insert(data.key, data);
-    while(data.key - m_buffers[key]->firstKey() > QTime(0,0,0).secsTo(g_settings->value("trendTimeSpan").toTime())) m_buffers[key]->erase(m_buffers[key]->begin()); //Delete data older than $timeSpan
+    while(data.key - m_buffers[key]->firstKey() > QTime(0,0,0).secsTo(g_settings->value("trendTimeSpan").toTime())){
+        m_buffers[key]->erase(m_buffers[key]->begin()); //Delete data older than $timeSpan
+    }
 
     emit updated(key);
 }
@@ -177,7 +186,9 @@ void QCasuZMQ::messageReceived(const QList<QByteArray> &message)
             newData.value = ranges.raw_value(k);
             this->addToBuffer(dCast(k), newData);
             emit updated(dCast(k));
-            if(g_settings->value("log_on").toBool()) m_logFile << ";" << newData.value;
+            if(g_settings->value("log_on").toBool()){
+                m_logFile << ";" << newData.value;
+            }
         }
     }
     if (device == "Temp"){
@@ -189,7 +200,9 @@ void QCasuZMQ::messageReceived(const QList<QByteArray> &message)
             newData.value = temperatures.temp(k);
             this->addToBuffer(dCast(k+m_IR_NUM), newData);
             emit updated(dCast(k+m_IR_NUM));
-            if(g_settings->value("log_on").toBool()) m_logFile << ";" << newData.value;
+            if(g_settings->value("log_on").toBool()){
+                m_logFile << ";" << newData.value;
+            }
         }
     }
 
@@ -203,8 +216,10 @@ void QCasuZMQ::messageReceived(const QList<QByteArray> &message)
         m_values[Peltier] = newData;
         m_state[Peltier] = command == "On";
         emit updated(Peltier);
-        if(g_settings->value("log_on").toBool()) m_logFile << ";" << m_values[Peltier].value
-                                                       << ";" << m_state[Peltier];
+        if(g_settings->value("log_on").toBool()){
+            m_logFile << ";" << m_values[Peltier].value
+                      << ";" << m_state[Peltier];
+        }
      }
     if (device == "Airflow"){
         AssisiMsg::Airflow air;
@@ -214,8 +229,10 @@ void QCasuZMQ::messageReceived(const QList<QByteArray> &message)
         m_values[Airflow] = newData;
         m_state[Airflow] = command == "On";
         emit updated(Airflow);
-        if(g_settings->value("log_on").toBool()) m_logFile << ";" << m_values[Airflow].value
-                                                       << ";" << m_state[Airflow];
+        if(g_settings->value("log_on").toBool()){
+            m_logFile << ";" << m_values[Airflow].value
+                      << ";" << m_state[Airflow];
+        }
 
      }
     if (device == "Speaker"){
@@ -231,9 +248,11 @@ void QCasuZMQ::messageReceived(const QList<QByteArray> &message)
         m_state[Amplitude] = command == "On";
         emit updated(Frequency);
         emit updated(Amplitude);
-        if(g_settings->value("log_on").toBool()) m_logFile << ";" << m_values[Frequency].value
-                                                       << ";" << m_values[Amplitude].value
-                                                       << ";" << m_state[Speaker];
+        if(g_settings->value("log_on").toBool()){
+            m_logFile << ";" << m_values[Frequency].value
+                      << ";" << m_values[Amplitude].value
+                      << ";" << m_state[Speaker];
+        }
     }
     if (device == "DiagnosticLed")
     {
@@ -244,8 +263,10 @@ void QCasuZMQ::messageReceived(const QList<QByteArray> &message)
                           LEDcolor.color().blue());
         m_state[LED] = command == "On";
         emit updated(LED);
-        if(g_settings->value("log_on").toBool()) m_logFile << ";" << m_ledColor.name().toStdString()
-                                                       << ";" << m_state[LED];
+        if(g_settings->value("log_on").toBool()){
+            m_logFile << ";" << m_ledColor.name().toStdString()
+                      << ";" << m_state[LED];
+        }
     }
 
     m_logFile << std::endl;
@@ -259,22 +280,22 @@ zmqBuffer::zmqBuffer(QString casuName, dataType key) :
     m_key(key)
 {
     switch(key){
-    case IR_F  : m_legendName += ": IR - F";  break;
-    case IR_FL : m_legendName += ": IR - FL"; break;
-    case IR_FR : m_legendName += ": IR - FR"; break;
-    case IR_B  : m_legendName += ": IR - B";  break;
-    case IR_BR : m_legendName += ": IR - BR"; break;
-    case IR_BL : m_legendName += ": IR - BL"; break;
+        case IR_F  : m_legendName += ": IR - F";  break;
+        case IR_FL : m_legendName += ": IR - FL"; break;
+        case IR_FR : m_legendName += ": IR - FR"; break;
+        case IR_B  : m_legendName += ": IR - B";  break;
+        case IR_BR : m_legendName += ": IR - BR"; break;
+        case IR_BL : m_legendName += ": IR - BL"; break;
 
-    case Temp_F : m_legendName += ": Temp - F"; break;
-    case Temp_R : m_legendName += ": Temp - R"; break;
-    case Temp_B : m_legendName += ": Temp - B"; break;
-    case Temp_L : m_legendName += ": Temp - L"; break;
-    case Temp_Top : m_legendName += ": Temp - F"; break;
-    case Temp_Pcb : m_legendName += ": Temp - R"; break;
-    case Temp_Ring : m_legendName += ": Temp - B"; break;
-    case Temp_Wax : m_legendName += ": Temp - L"; break;
-    default: break;
+        case Temp_F : m_legendName += ": Temp - F"; break;
+        case Temp_R : m_legendName += ": Temp - R"; break;
+        case Temp_B : m_legendName += ": Temp - B"; break;
+        case Temp_L : m_legendName += ": Temp - L"; break;
+        case Temp_Top : m_legendName += ": Temp - F"; break;
+        case Temp_Pcb : m_legendName += ": Temp - R"; break;
+        case Temp_Ring : m_legendName += ": Temp - B"; break;
+        case Temp_Wax : m_legendName += ": Temp - L"; break;
+        default: break;
     }
 }
 

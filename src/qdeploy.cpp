@@ -6,8 +6,6 @@ QDeploy::QDeploy(QWidget *parent) :
 {
     setReadOnly(true);
     setAlignment(Qt::AlignLeft | Qt::AlignTop);
-   // setTextFormat(Qt::PlainText);
-   // setWordWrap(true);
 
     m_shell = new QProcess;
 }
@@ -55,14 +53,18 @@ void QDeploy::run()
     if(m_shell->state() == QProcess::NotRunning){
         m_shell->start("assisirun.py", QStringList(g_assisiFile.name));
         append("[arenaUI] Starting 'assisirun.py'");
+    } else {
+        append("[arenaUI] Already running a process");
     }
-    else append("[arenaUI] Already running a process");
 }
 
 void QDeploy::stop()
 {
-    if(m_shell->state() != QProcess::NotRunning) m_shell->close();
-    else append("[arenaUI] Process is not running");
+    if(m_shell->state() != QProcess::NotRunning){
+        m_shell->close();
+    } else {
+        append("[arenaUI] Process is not running");
+    }
 }
 
 void QDeploy::collect()
@@ -70,8 +72,9 @@ void QDeploy::collect()
     if(m_shell->state() == QProcess::NotRunning){
         m_shell->start("collect_data.py", QStringList(g_assisiFile.name));
         append("[arenaUI] Starting 'collect_data.py'");
+    } else {
+        append("[arenaUI] Already running a process");
     }
-    else append("[arenaUI] Already running a process");
 }
 
 void QDeploy::cleanLog()
@@ -87,8 +90,11 @@ void QDeploy::simulatorStart()
             return;
         }
         m_shell->startDetached(g_settings->value("simulator").toString(), QStringList(), QString(), &m_simulatorPID);
-        if(!m_simulatorPID) append("[Simulator] Cannot start: " + g_settings->value("simulator").toString());
-        else append("[Simulator] New simulator started (PID: " + QString::number(m_simulatorPID) +")");
+        if(!m_simulatorPID){
+            append("[Simulator] Cannot start: " + g_settings->value("simulator").toString());
+        } else {
+            append("[Simulator] New simulator started (PID: " + QString::number(m_simulatorPID) +")");
+        }
     }
     else append("[arenaUI] Already running a process");
 
@@ -105,7 +111,6 @@ void QDeploy::simulatorStop()
 
 void QDeploy::toggleOutput(bool state){
     if(state){
-
         m_shellOut1 = connect(m_shell, &QProcess::readyReadStandardOutput, [&](){
             append("\n[SHELL][OUT]");
             append(m_shell->readAllStandardOutput());

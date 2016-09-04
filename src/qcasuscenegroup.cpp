@@ -54,16 +54,18 @@ QVector<QPointF> QCasuSceneGroup::getCoordinateVector() const
 
 void QCasuSceneGroup::sendSetpoint(const QList<QByteArray> &message) const
 {
-    for(auto& item : childItems())
+    for(auto& item : childItems()){
         sCast(item)->sendSetpoint(message);
+    }
 }
 
 void QCasuSceneGroup::setGroupColor(const QColor &color)
 {
     m_groupColor = color;
     m_treeItem->setTextColor(0, m_groupColor);
-    for(auto& item : childItems())
+    for(auto& item : childItems()){
         sCast(item)->setGroupColor(color);
+    }
 }
 
 void QCasuSceneGroup::addToGroup(QGraphicsItem *item)
@@ -74,7 +76,9 @@ void QCasuSceneGroup::addToGroup(QGraphicsItem *item)
 
 void QCasuSceneGroup::addToGroup(QList<QGraphicsItem *> itemList)
 {
-    for(auto& item : itemList) addToGroup(item);
+    for(auto& item : itemList){
+        addToGroup(item);
+    }
 }
 
 void QCasuSceneGroup::removeFromGroup(QGraphicsItem *item)
@@ -87,7 +91,9 @@ void QCasuSceneGroup::removeFromGroup(QGraphicsItem *item)
 
 void QCasuSceneGroup::removeFromGroup(QList<QGraphicsItem *> itemList)
 {
-    for(auto& item : itemList) removeFromGroup(item);
+    for(auto& item : itemList){
+        removeFromGroup(item);
+    }
 }
 
 QRectF QCasuSceneGroup::boundingRect() const
@@ -100,7 +106,7 @@ void QCasuSceneGroup::paint(QPainter *painter, const QStyleOptionGraphicsItem *o
     Q_UNUSED(option)
     Q_UNUSED(widget)
 
-    if(!isSelected() || m_inGroup)return;
+    if(!isSelected() || m_inGroup) return;
 
     painter->setRenderHints(QPainter::Antialiasing | QPainter::SmoothPixmapTransform, true);
 
@@ -131,9 +137,11 @@ QVector<QLineF> QCasuSceneGroup::Prim(const QVector<QPointF> &list)
     QVector<QPointF> visited;
 
     // NOTE: experimental nested range-for
-    for (int k = 0; k < list.size(); k++)
-        for (int i = k+1; i < list.size(); i++)
+    for (int k = 0; k < list.size(); k++){
+        for (int i = k+1; i < list.size(); i++){
             allLines.append(QLineF(list[k],list[i]));
+        }
+    }
 
     qSort(allLines.begin(),allLines.end(),[](QLineF a, QLineF b){
         return a.length()<b.length();
@@ -154,8 +162,11 @@ QVector<QLineF> QCasuSceneGroup::Prim(const QVector<QPointF> &list)
         }
 
         mst.append(nextLine);
-        if(visited.indexOf(nextLine.p1()) == -1) visited.append(nextLine.p1());
-        else visited.append(nextLine.p2());
+        if(visited.indexOf(nextLine.p1()) == -1){
+            visited.append(nextLine.p1());
+        } else {
+            visited.append(nextLine.p2());
+        }
     }
 
     return mst;

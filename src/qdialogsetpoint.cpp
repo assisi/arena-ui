@@ -14,12 +14,14 @@ QDialogSetpoint::QDialogSetpoint(QWidget *parent, QString command, QList<QGraphi
 
     QCasuSceneItem *tempItem;
 
-    if(group.size() > 1) groupSelected = true;
-    else if(sCast(group.first())->isGroup()) groupSelected = true;
-    else {
+    if(group.size() > 1){
+        groupSelected = true;
+    } else if(sCast(group.first())->isGroup()){
+            groupSelected = true;
+        } else {
         groupSelected = false;
         tempItem = siCast(group.first());
-    }
+        }
 
     this->setWindowTitle(command + " data to send to CASUs");
 
@@ -50,10 +52,11 @@ QDialogSetpoint::QDialogSetpoint(QWidget *parent, QString command, QList<QGraphi
         if(groupSelected) ui->value1->setText("26.00");
         else{
             double temp = tempItem->getZmqObject()->getValue(Peltier);
-            if(temp > 26)
+            if(temp > 26){
                 ui->value1->setText(QString::number(temp,'f',2));
-            else
+            } else {
                 ui->value1->setText("26.00");
+            }
         }
     }
 
@@ -71,16 +74,14 @@ QDialogSetpoint::QDialogSetpoint(QWidget *parent, QString command, QList<QGraphi
         if(groupSelected){
             ui->value1->setText("500.00");
             ui->value2->setText("50.00");
-        }
-        else{
+        } else {
             double temp1 = tempItem->getZmqObject()->getValue(Frequency);
             double temp2 = tempItem->getZmqObject()->getValue(Amplitude);
 
             if(temp1 >= 50){
                 ui->value1->setText(QString::number(temp1,'f',2));
                 ui->value1->setText(QString::number(temp2,'f',2));
-            }
-            else{
+            } else {
                 ui->value1->setText("500.00");
                 ui->value2->setText("50.00");
             }

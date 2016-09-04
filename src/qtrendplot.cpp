@@ -36,11 +36,9 @@ QTrendPlot::QTrendPlot(QTreeWidget* tree1,QTreeWidget* tree2 , QWidget *parent) 
    connect(this,&QTrendPlot::mouseWheel, [&](QWheelEvent *event){
        if(event->modifiers() & Qt::ShiftModifier){
            axisRect()->setRangeZoom(Qt::Horizontal);
-       }
-       else
-       if(event->modifiers() & Qt::ControlModifier){
-           axisRect()->setRangeZoom(Qt::Vertical);
-       }
+       } else if(event->modifiers() & Qt::ControlModifier){
+                axisRect()->setRangeZoom(Qt::Vertical);
+            }
        else{
            axisRect()->setRangeZoom(Qt::Horizontal | Qt::Vertical);
        }
@@ -69,8 +67,9 @@ void QTrendPlot::addGraph(zmqBuffer *buffer){
 
     for(int k=7; k < 20; k++){
         bool color_used = false;
-        for(int i = 0; i < graphCount() ; i++)
+        for(int i = 0; i < graphCount() ; i++){
             if(graph(i)->pen().color() == (Qt::GlobalColor) k) color_used = true;
+        }
         if(!color_used){
             graph()->setPen(QPen((Qt::GlobalColor) k));
             break;
@@ -95,7 +94,9 @@ void QTrendPlot::addGraphList(QList<zmqBuffer *> &bufferList)
         return QString::compare(b1->getLegendName(), b2->getLegendName()) < 0;
     }); //sort by legend name
 
-    for(auto& buffer : bufferList) addGraph(buffer);
+    for(auto& buffer : bufferList){
+        addGraph(buffer);
+    }
 
     if(new_trend){
         rescaleAxes();
@@ -151,8 +152,9 @@ void QTrendPlot::prettyPlot()
         }
         if(!temp.key) return;
 
-        if(temp.value < yRange.lower || temp.value > yRange.upper)
+        if(temp.value < yRange.lower || temp.value > yRange.upper){
             yAxis->setRange(yRange.center(), abs(yRange.center()- temp.value)*2+4, Qt::AlignCenter);
+        }
 
         xAxis->setRange(temp.key + 1, xRange.size(), Qt::AlignRight);
     }

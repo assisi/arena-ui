@@ -116,12 +116,21 @@ void QCasuSceneItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *op
 
     // - Configurating pen and brush parameters
     pen.setWidth(2);
-    if(isSelected() && m_inGroup)pen.setColor(m_groupColor);
-    else if(m_zmqObject->isConnected())pen.setColor(Qt::green);
-    else pen.setColor(Qt::red);
+    if(isSelected() && m_inGroup){
+        pen.setColor(m_groupColor);
+    } else {
+        if(m_zmqObject->isConnected()) {
+            pen.setColor(Qt::green);
+        } else {
+            pen.setColor(Qt::red);
+        }
+    }
 
-    if(isSelected()) pen.setStyle(Qt::DotLine);
-    else pen.setStyle(Qt::SolidLine);
+    if(isSelected()){
+        pen.setStyle(Qt::DotLine);
+    } else {
+        pen.setStyle(Qt::SolidLine);
+    }
 
     brush.setColor(m_zmqObject->getLedColor());
     if(tCast(m_treeItem)->isChildSelected()) brush.setStyle(Qt::Dense2Pattern);

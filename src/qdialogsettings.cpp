@@ -31,9 +31,11 @@ QDialogSettings::~QDialogSettings()
 void QDialogSettings::findFolder()
 {
     QString temp;
-    if(link[qobject_cast<QPushButton *>(QObject::sender())] == ui->simFile)
+    if(link[qobject_cast<QPushButton *>(QObject::sender())] == ui->simFile){
         temp = QFileDialog::getOpenFileName(this,tr("Select simulator"), link[qobject_cast<QPushButton *>(QObject::sender())]->text());
-    else temp = QFileDialog::getExistingDirectory(this,tr("Select folder"), link[qobject_cast<QPushButton *>(QObject::sender())]->text(), QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks);
+    } else {
+        temp = QFileDialog::getExistingDirectory(this,tr("Select folder"), link[qobject_cast<QPushButton *>(QObject::sender())]->text(), QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks);
+    }
     if(temp.size()) link[qobject_cast<QPushButton *>(QObject::sender())]->setText(temp);
 }
 

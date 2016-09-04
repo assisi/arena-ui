@@ -61,12 +61,14 @@ void QArenaScene::drawForeground(QPainter *painter, const QRectF &rect)
 
     int time = 0;
     int connectedItems = 0;
-    for(auto& item : items())
-        if(!sCast(item)->isGroup())
+    for(auto& item : items()){
+        if(!sCast(item)->isGroup()){
             if(siCast(item)->getZmqObject()->isConnected()){
                 time += siCast(item)->getZmqObject()->getAvgSamplingTime();
                 connectedItems++;
             }
+        }
+    }
     if(connectedItems && g_settings->value("avgTime_on").toBool()){
         auto samplingTimePosition = m_view->rect().topRight() - QPoint(180,-20) - QPoint(20,0) * (m_view->verticalScrollBar()->isVisible()) ;
         auto tempText = QString("Avg. sample time: ") + QString::number(time/connectedItems) + QString("ms");
@@ -85,9 +87,11 @@ QArenaScene::QArenaScene(QWidget *parent) : QGraphicsScene(parent)
 
         int color = 14;
 
-        for(auto& item : tempList)
-            if(sCast(item)->isGroup())
+        for(auto& item : tempList){
+            if(sCast(item)->isGroup()){
                 sCast(item)->setGroupColor(static_cast<Qt::GlobalColor>(color++));
+            }
+        }
     });
 }
 

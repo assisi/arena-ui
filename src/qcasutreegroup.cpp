@@ -54,9 +54,12 @@ QSelectionTreeItem::QSelectionTreeItem(QGraphicsScene *scene) :
 QList<zmqBuffer *> QSelectionTreeItem::getBuffers() const
 {
     QList<zmqBuffer *> outList;
-    for(int k = 0; k < m_IR_NUM + m_temp_NUM; k++)
-        if(m_widgetMap[dCast(k)]->isSelected())
-            for(auto& item : m_scene->selectedItems())
+    for(int k = 0; k < m_IR_NUM + m_temp_NUM; k++){
+        if(m_widgetMap[dCast(k)]->isSelected()){
+            for(auto& item : m_scene->selectedItems()){
                 outList.append((sCast(item))->getBuffers(dCast(k)));
+            }
+        }
+    }
     return outList;
 }

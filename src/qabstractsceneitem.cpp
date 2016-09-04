@@ -6,8 +6,9 @@ using namespace zmqData;
 void QAbstractSceneItem::recursiveSetHidden(bool state)
 {
     if (isGroup())
-        for(auto& item : childItems())
+        for(auto& item : childItems()){
             sCast(item)->recursiveSetHidden(state);
+        }
     else {
         m_treeItem->setHidden(state);
         if(state) tCast(m_treeItem)->resetSelection();

@@ -32,8 +32,7 @@ ArenaUI::ArenaUI(QWidget *parent) :
         if(ui->casuTree->selectedItems().size() || ui->groupTree->selectedItems().size()){
             ui->actionPlot_selected_in_same_trend->setEnabled(true);
             ui->actionPlot_selected_in_different_trends->setEnabled(true);
-        }
-        else{
+        } else {
             ui->actionPlot_selected_in_same_trend->setEnabled(false);
             ui->actionPlot_selected_in_different_trends->setEnabled(false);
         }
@@ -151,10 +150,12 @@ MouseClickHandler::MouseClickHandler(QGraphicsScene* scene, QObject *parent) :
 bool MouseClickHandler::eventFilter(QObject* obj, QEvent* event)
 {
     if (event->type() == QEvent::GraphicsSceneMousePress){
-        if(((QGraphicsSceneMouseEvent*)event)->button() == Qt::RightButton) return QObject::eventFilter(obj, event);
-        if(QApplication::keyboardModifiers() == Qt::ControlModifier)
+        if(((QGraphicsSceneMouseEvent*)event)->button() == Qt::RightButton){
+            return QObject::eventFilter(obj, event);
+        }
+        if(QApplication::keyboardModifiers() == Qt::ControlModifier){
             selectedList = scene_->selectedItems();
-        else selectedList.clear();
+        } else selectedList.clear();
 
         return QObject::eventFilter(obj, event);;
     }
@@ -174,18 +175,20 @@ bool MouseClickHandler::eventFilter(QObject* obj, QEvent* event)
         auto mouse_click = static_cast<QGraphicsSceneMouseEvent *>(event);
         auto itemAtMouse= scene_->itemAt(mouse_click->scenePos().x(),mouse_click->scenePos().y(), QTransform());
 
-        if (itemAtMouse && !drag_true)
+        if (itemAtMouse && !drag_true){
             if(QApplication::keyboardModifiers() == Qt::ControlModifier){
-                if(itemAtMouse->isSelected())itemAtMouse->setSelected(0);
-                else itemAtMouse->setSelected(1);
+                if(itemAtMouse->isSelected()){
+                        itemAtMouse->setSelected(0);
+                } else {
+                itemAtMouse->setSelected(1);
             }
-            else{
+            } else {
                 scene_->clearSelection();
                 itemAtMouse->setSelected(1);
             }
-        else if(QApplication::keyboardModifiers() != Qt::ControlModifier && !drag_true)
-            scene_->clearSelection();
-
+        } else if(QApplication::keyboardModifiers() != Qt::ControlModifier && !drag_true){
+                scene_->clearSelection();
+            }
 
         drag_true = false;
         scene_->update();
@@ -241,8 +244,11 @@ void ArenaUI::on_actionOpenArena_triggered()
         QList<QString> layers;
         for(auto it=arenaNode.begin(); it!=arenaNode.end(); it++) layers.append(QString::fromStdString(it->first.as<std::string>()));
 
-        if(layers.size() > 1) g_assisiFile.arenaLayer = QInputDialog::getItem(this,tr("Select arena layer"),"",QStringList(layers));
-        else g_assisiFile.arenaLayer = layers[0];
+        if(layers.size() > 1){
+            g_assisiFile.arenaLayer = QInputDialog::getItem(this,tr("Select arena layer"),"",QStringList(layers));
+        } else {
+            g_assisiFile.arenaLayer = layers[0];
+        }
 
         progress.setMaximum(arenaNode[g_assisiFile.arenaLayer.toStdString()].size());
         progress.show();
@@ -388,8 +394,10 @@ void ArenaUI::on_actionUngroup_triggered()
 void ArenaUI::on_actionConnect_triggered()
 {
     bool error = false;
-    if (m_arenaScene->selectedItems().size() != 1) error = true; //Check if excactly one object is selected
-    if(sCast(m_arenaScene->selectedItems().first())->isGroup()) error = true; // Check if object is single casu (no children)
+    if (m_arenaScene->selectedItems().size() != 1 || //Check if excactly one object is selected
+            sCast(m_arenaScene->selectedItems().first())->isGroup()){ // Check if object is single casu (no children)
+        error = true;
+    }
     if(error){
         QMessageBox msgBox;
         msgBox.setWindowTitle("ERROR");
@@ -410,7 +418,7 @@ void ArenaUI::on_actionToggleLog_triggered()
     ui->actionToggleLog->setChecked(g_settings->value("log_on").toBool());
     auto question = QString("Are you sure you want to turn ") + (g_settings->value("log_on").toBool() ? QString("OFF") : QString("ON")) + QString(" logging?");
     auto reply = QMessageBox::question(this, "Toggle Log", question , QMessageBox::Yes|QMessageBox::No);
-    if(reply == QMessageBox::Yes)g_settings->setValue("log_on", !g_settings->value("log_on").toBool());
+    if(reply == QMessageBox::Yes) g_settings->setValue("log_on", !g_settings->value("log_on").toBool());
     ui->actionToggleLog->setChecked(g_settings->value("log_on").toBool());
 }
 
@@ -427,10 +435,12 @@ void ArenaUI::on_actionPlot_selected_in_different_trends_triggered()
 {
     QList<zmqBuffer *> bufferList;
 
-    for(int k=0; k < ui->casuTree->topLevelItemCount(); k++)
+    for(int k=0; k < ui->casuTree->topLevelItemCount(); k++){
         bufferList.append(tCast(ui->casuTree->topLevelItem(k))->getBuffers());
-    for(int k=0; k < ui->groupTree->topLevelItemCount(); k++)
+    }
+    for(int k=0; k < ui->groupTree->topLevelItemCount(); k++){
         bufferList.append(tCast(ui->groupTree->topLevelItem(k))->getBuffers());
+    }
 
     for(auto& buffer : bufferList){
         QList<zmqBuffer*> tempList;
@@ -458,11 +468,13 @@ void ArenaUI::customContextMenu(QPoint pos)
     menu->setAttribute(Qt::WA_DeleteOnClose);
 
     bool error_single = false;
-    if (m_arenaScene->selectedItems().size() != 1) error_single = true; //Check if excactly one object is selected
-    if (m_arenaScene->selectedItems().size() == 1)
-        if(m_arenaScene->selectedItems()[0]->childItems().size()) error_single = true; // Check if object is single casu (no children)
+    if (m_arenaScene->selectedItems().size() != 1 ||
+            (m_arenaScene->selectedItems().size() == 1 &&
+             m_arenaScene->selectedItems()[0]->childItems().size())){
+        error_single = true; // Check if object is single casu
+    }
 
-    bool error_selected = !m_arenaScene->selectedItems().size();
+    bool error_multiple = m_arenaScene->selectedItems().size() > 1;
 
     // FIXME: Qt 5.6 QMenu::addAction accepts Qt5 style connect (possible lambda expressions)
     tempAction = menu->addAction(g_settings->value("IR_on").toBool() ? "Hide proximity sensors" : "Show proximity sensors");
@@ -489,15 +501,15 @@ void ArenaUI::customContextMenu(QPoint pos)
     menu->addSeparator();
 
     tempAction = menu->addAction("Group selected", this,SLOT(on_actionGroup_triggered()));
-    if(error_selected) tempAction->setEnabled(false);
+    if(error_multiple) tempAction->setEnabled(false);
     tempAction = menu->addAction("Ungroup selected", this,SLOT(on_actionUngroup_triggered()));
-    if(error_selected) tempAction->setEnabled(false);
+    if(error_multiple) tempAction->setEnabled(false);
     menu->addSeparator();
     tempAction = menu->addAction("Set connection", this,SLOT(on_actionConnect_triggered()));
     if(error_single) tempAction->setEnabled(false);
 
     auto sendMenu = new QMenu("Setpoint");
-    if(error_selected) sendMenu->setEnabled(false);
+    if(error_multiple && error_single) sendMenu->setEnabled(false);
     menu->addMenu(sendMenu);
 
     auto signalMapper = new QSignalMapper(menu);
@@ -516,8 +528,9 @@ void ArenaUI::customContextMenu(QPoint pos)
     connect(signalMapper, static_cast<void (QSignalMapper::*)(const QString &)>(&QSignalMapper::mapped), this,[&](QString actuator){
         auto dialog = new QDialogSetpoint(this, actuator, m_arenaScene->selectedItems());
         if(dialog->exec())
-            for(auto& item : m_arenaScene->selectedItems())
+            for(auto& item : m_arenaScene->selectedItems()){
                 sCast(item)->sendSetpoint(dialog->getMessage());
+            }
     });
 
     menu->popup(ui->arenaSpace->mapToGlobal(pos));
@@ -529,8 +542,11 @@ void ArenaUI::groupSave(QSettings *saveState, const QList<QGraphicsItem *> &grou
     int k = 0;
     for(auto& item : group){
         saveState->setArrayIndex(k++);
-        if(!sCast(item)->isGroup()) saveState->setValue("casuName",siCast(item)->getZmqObject()->getName());
-        else groupSave(saveState, item->childItems(), "group");
+        if(!sCast(item)->isGroup()){
+            saveState->setValue("casuName",siCast(item)->getZmqObject()->getName());
+        } else {
+            groupSave(saveState, item->childItems(), "group");
+        }
     }
     saveState->endArray();
 }
@@ -605,7 +621,7 @@ void ArenaUI::on_actionSave_triggered()
     saveState.setValue("assisiFile",g_assisiFile.name);
     saveState.setValue("arenaLayer",g_assisiFile.arenaLayer);
 
-    //save CASU graphics scene
+    // - save CASU graphics scene
 
     auto tempSelection = m_arenaScene->selectedItems(); // save active selection
     QPainterPath pp;
@@ -619,9 +635,11 @@ void ArenaUI::on_actionSave_triggered()
     pp = pp.subtracted(pp);
     pp.addRect(0,0,0,0);
     m_arenaScene->setSelectionArea(pp);
-    for(auto& item : tempSelection) item->setSelected(true); // after saving items and groups, return selection as was before
+    for(auto& item : tempSelection){
+        item->setSelected(true); // after saving items and groups, return selection as was before
+    }
 
-    //save trend position and graphs
+    // - save trend position and graphs
 
     saveState.beginGroup("trendGraphs");
     saveState.beginWriteArray("plot");
@@ -644,7 +662,7 @@ void ArenaUI::on_actionSave_triggered()
     saveState.beginGroup("connectionSettings");
     saveState.beginWriteArray("addresses");
     int index = 0;
-    for(auto& item : m_arenaScene->items())
+    for(auto& item : m_arenaScene->items()){
         if(!sCast(item)->isGroup()){
             saveState.setArrayIndex(index++);
             saveState.setValue("casuName",siCast(item)->getZmqObject()->getName());
@@ -653,6 +671,7 @@ void ArenaUI::on_actionSave_triggered()
             saveState.setValue("pub_addr",addresses.at(1));
             saveState.setValue("msg_addr",addresses.at(2));
         }
+    }
 
 
     saveState.endArray();

@@ -92,7 +92,9 @@ QCasuTreeItem::QCasuTreeItem(QCasuZMQ *zmqObject) :
             return;
         }
         m_widgetMap[key]->setData(1, Qt::DisplayRole, QVariant(m_zmqObject->getValue(key)));
-        if(key >= 14) m_widgetMap[key]->setTextColor(1, m_zmqObject->getState(key)? Qt::green : Qt::red);
+        if(key >= 14){
+            m_widgetMap[key]->setTextColor(1, m_zmqObject->getState(key)? Qt::green : Qt::red);
+        }
     });
 }
 
