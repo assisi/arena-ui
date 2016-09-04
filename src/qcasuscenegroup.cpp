@@ -39,7 +39,7 @@ bool QCasuSceneGroup::isGroup() const
     return true;
 }
 
-QList<zmqBuffer *> QCasuSceneGroup::getBuffers(dataType key)
+QList<zmqBuffer *> QCasuSceneGroup::getBuffers(dataType key) const
 {
     QList<zmqBuffer *> out;
     for(auto& item : childItems())
@@ -47,18 +47,18 @@ QList<zmqBuffer *> QCasuSceneGroup::getBuffers(dataType key)
     return out;
 }
 
-QVector<QPointF> QCasuSceneGroup::getCoordinateVector()
+QVector<QPointF> QCasuSceneGroup::getCoordinateVector() const
 {
     return _childCoordinates;
 }
 
-void QCasuSceneGroup::sendSetpoint(QList<QByteArray> message)
+void QCasuSceneGroup::sendSetpoint(const QList<QByteArray> &message) const
 {
     for(auto& item : childItems())
         sCast(item)->sendSetpoint(message);
 }
 
-void QCasuSceneGroup::setGroupColor(QColor color)
+void QCasuSceneGroup::setGroupColor(const QColor &color)
 {
     _groupColor = color;
     _treeItem->setTextColor(0, _groupColor);
@@ -117,14 +117,14 @@ QPainterPath QCasuSceneGroup::shape() const
     return _groupShape;
 }
 
-QPainterPath QCasuSceneGroup::completeShape()
+QPainterPath QCasuSceneGroup::completeShape() const
 {
     auto tempShape = _groupShape;
     tempShape.addPath(_groupLine);
     return tempShape;
 }
 
-QVector<QLineF> QCasuSceneGroup::Prim(QVector<QPointF> list)
+QVector<QLineF> QCasuSceneGroup::Prim(const QVector<QPointF> &list)
 {
     QVector<QLineF> allLines;
     QVector<QLineF> mst;

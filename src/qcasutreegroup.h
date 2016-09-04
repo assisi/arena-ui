@@ -16,7 +16,7 @@ class QSelectionTreeItem : public QCasuTreeGroup
 private:
     QGraphicsScene *_scene;
 public:
-    QSelectionTreeItem(QGraphicsScene *scene);
-    QList<zmqData::zmqBuffer *> getBuffers() Q_DECL_OVERRIDE;
+    explicit QSelectionTreeItem(QGraphicsScene *scene);
+    QList<zmqData::zmqBuffer *> getBuffers() const Q_DECL_OVERRIDE;
 };
 #endif // QCASUTREEGROUP_H

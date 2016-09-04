@@ -523,7 +523,7 @@ void ArenaUI::customContextMenu(QPoint pos)
     menu->popup(ui->arenaSpace->mapToGlobal(pos));
 }
 
-void ArenaUI::groupSave(QSettings *saveState, QList<QGraphicsItem *> group, QString groupName)
+void ArenaUI::groupSave(QSettings *saveState, const QList<QGraphicsItem *> &group, const QString &groupName)
 {
     saveState->beginWriteArray(groupName);
     int k = 0;
@@ -535,7 +535,7 @@ void ArenaUI::groupSave(QSettings *saveState, QList<QGraphicsItem *> group, QStr
     saveState->endArray();
 }
 
-QList<QGraphicsItem *> ArenaUI::groupLoad(YAML::Node* arenaNode, QSettings *loadState, int groupSize, QMap<QString, QCasuZMQ *> *linkMap, QProgressBar* progress)
+QList<QGraphicsItem *> ArenaUI::groupLoad(YAML::Node *arenaNode, QSettings *loadState, const int &groupSize, QMap<QString, QCasuZMQ *> *linkMap, QProgressBar *progress)
 {
     QList<QGraphicsItem *> returnGroup;
     for(int k=0; k < groupSize; k++){

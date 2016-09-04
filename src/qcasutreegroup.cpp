@@ -51,7 +51,7 @@ QSelectionTreeItem::QSelectionTreeItem(QGraphicsScene *scene) :
 {
 }
 
-QList<zmqBuffer *> QSelectionTreeItem::getBuffers()
+QList<zmqBuffer *> QSelectionTreeItem::getBuffers() const
 {
     QList<zmqBuffer *> outList;
     for(int k = 0; k < _IR_num + _Temp_num; k++)

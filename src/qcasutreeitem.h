@@ -14,7 +14,7 @@ private:
     QMetaObject::Connection _zmqObjectConnection;
 
 public:
-    QCasuTreeItem(QCasuZMQ *zmqObject);
+    explicit QCasuTreeItem(QCasuZMQ *zmqObject);
     ~QCasuTreeItem();
 };
 

@@ -19,7 +19,7 @@ protected:
     void drawForeground(QPainter *painter, const QRectF &rect) Q_DECL_OVERRIDE;
     QTreeWidgetItem *_treeItem;
 public:
-    QArenaScene(QWidget *parent);
+    explicit QArenaScene(QWidget *parent);
     void mousePressEvent(QGraphicsSceneMouseEvent *event) Q_DECL_OVERRIDE;
     void setTreeItem(QTreeWidgetItem *treeItem);
 };

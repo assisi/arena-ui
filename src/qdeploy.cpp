@@ -19,7 +19,7 @@ QDeploy::~QDeploy()
 }
 
 
-void QDeploy::setWorkingDirectory(QString dir)
+void QDeploy::setWorkingDirectory(const QString &dir)
 {
     _shell->setWorkingDirectory(dir);
 }

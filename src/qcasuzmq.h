@@ -35,10 +35,10 @@ namespace zmqData {
             zmqBuffer(QString casuName, dataType key);
             void insert(const double &key, const QCPData &value);
             void erase(QMap::iterator it);
-            QString getLegendName();
-            QString getCasuName();
-            dataType getDataType();
-            double getLastTime();
+            QString getLegendName() const;
+            QString getCasuName() const;
+            dataType getDataType() const;
+            double getLastTime() const;
         signals:
             void updatePlot();
         };
@@ -50,20 +50,21 @@ class QCasuZMQ : public QObject
     friend class QCasuSceneItem;
 public:
     explicit QCasuZMQ(QObject *parent = 0, QString casuName = QString());
-    zmqData::zmqBuffer* getBuffer(zmqData::dataType key);
-    double getValue(zmqData::dataType key);
-    QColor getLedColor();
-    bool getState(zmqData::dataType key);
-    int getAvgSamplingTime();
-    QString getName();
+
+    zmqData::zmqBuffer* getBuffer(zmqData::dataType key) const;
+    double getValue(zmqData::dataType key) const;
+    QColor getLedColor() const;
+    bool getState(zmqData::dataType key) const;
+    int getAvgSamplingTime() const;
+    QString getName() const;
+    QStringList getAddresses() const;
 
     void setAddresses(QString sub, QString pub, QString msg);
     void setAddresses(QStringList addresses);
 
-    QStringList getAddresses();
     bool sendSetpoint(QList<QByteArray> message);
 
-    bool isConnected();
+    bool isConnected() const;
 
 
 private:
@@ -98,10 +99,10 @@ private:
 
 signals:
     void updated(zmqData::dataType key);
-    void connectMsg(QString message);
+    void connectMsg(const QString &message);
 
 private slots:
-    void messageReceived(const QList<QByteArray>& message);
+    void messageReceived(const QList<QByteArray> &message);
 };
 
 #endif // QCASUZMQ_H

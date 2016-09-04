@@ -28,12 +28,12 @@ private:
     QCasuZMQ *_zmqObject;
 
 public:
-    QCasuSceneItem(QPointF coordinates, double yaw, QCasuZMQ *zmqObject);
+    explicit QCasuSceneItem(QPointF coordinates, double yaw, QCasuZMQ *zmqObject);
 
     bool isGroup() const Q_DECL_OVERRIDE;
-    QList<zmqData::zmqBuffer *> getBuffers(zmqData::dataType key) Q_DECL_OVERRIDE;
-    QVector<QPointF> getCoordinateVector() Q_DECL_OVERRIDE;
-    void sendSetpoint(QList<QByteArray> message) Q_DECL_OVERRIDE;
+    QList<zmqData::zmqBuffer *> getBuffers(zmqData::dataType key) const Q_DECL_OVERRIDE;
+    QVector<QPointF> getCoordinateVector() const Q_DECL_OVERRIDE;
+    void sendSetpoint(const QList<QByteArray> &message) const Q_DECL_OVERRIDE;
     QRectF boundingRect() const Q_DECL_OVERRIDE;
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) Q_DECL_OVERRIDE;
 

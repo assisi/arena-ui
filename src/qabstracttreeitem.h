@@ -16,13 +16,13 @@ protected:
     QMap<zmqData::dataType, QTreeWidgetItem*> _widgetMap;
     QGraphicsItem *_sceneItem;
 public:
-    QAbstractTreeItem() = default;
-    void resetSelection();
+    explicit QAbstractTreeItem() = default;
+    void resetSelection() const;
     void setSceneItem(QGraphicsItem *sceneItem);
 
     //Public virtual methods
-    virtual bool isChildSelected();
-    virtual QList<zmqData::zmqBuffer *> getBuffers();
+    virtual bool isChildSelected() const;
+    virtual QList<zmqData::zmqBuffer *> getBuffers() const;
 };
 
 /*!

@@ -26,7 +26,7 @@ protected:
     //Protected virtual methods
     virtual QVariant itemChange(GraphicsItemChange change, const QVariant &value);
 public:
-    QAbstractSceneItem();
+    explicit QAbstractSceneItem();
 
     void setInGroup(bool state);
     void setTreeItem(QTreeWidgetItem *treeItem);
@@ -34,14 +34,14 @@ public:
 
     // Public pure virtual methods
     virtual bool isGroup() const = 0;
-    virtual QList<zmqData::zmqBuffer *> getBuffers(zmqData::dataType key) = 0;
-    virtual QVector<QPointF> getCoordinateVector() = 0;
-    virtual void sendSetpoint(QList<QByteArray> message) = 0;
+    virtual QList<zmqData::zmqBuffer *> getBuffers(zmqData::dataType key) const = 0;
+    virtual QVector<QPointF> getCoordinateVector() const = 0;
+    virtual void sendSetpoint(const QList<QByteArray> &message) const = 0;
 
     // Public virtual methods
-    virtual void setGroupColor(QColor color);
+    virtual void setGroupColor(const QColor &color);
     virtual QPainterPath shape() const;
-    virtual QPainterPath completeShape();
+    virtual QPainterPath completeShape() const;
 };
 
 #endif // QABSTRACTSCENEITEM_H

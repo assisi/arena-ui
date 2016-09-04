@@ -44,7 +44,7 @@ void QAbstractSceneItem::deleteTreeItem()
     delete _treeItem;
 }
 
-void QAbstractSceneItem::setGroupColor(QColor color){
+void QAbstractSceneItem::setGroupColor(const QColor &color){
     _groupColor = color;
 }
 
@@ -55,7 +55,7 @@ QPainterPath QAbstractSceneItem::shape() const
     return out;
 }
 
-QPainterPath QAbstractSceneItem::completeShape()
+QPainterPath QAbstractSceneItem::completeShape() const
 {
     return shape();
 }

@@ -15,7 +15,7 @@ public:
     explicit QDialogConnect(QWidget *parent, QStringList addresses, QString name);
     ~QDialogConnect();
 
-    QStringList getAddresses();
+    QStringList getAddresses() const;
 
 private:
     Ui::QDialogConnect *ui;

@@ -8,22 +8,24 @@ bool QCasuSceneItem::isGroup() const
     return false;
 }
 
-QList<zmqBuffer *> QCasuSceneItem::getBuffers(dataType key)
+QList<zmqBuffer *> QCasuSceneItem::getBuffers(dataType key) const
 {
     QList<zmqBuffer *> out;
     out.append(_zmqObject->getBuffer(key));
     return out;
 }
 
-QVector<QPointF> QCasuSceneItem::getCoordinateVector()
+QVector<QPointF> QCasuSceneItem::getCoordinateVector() const
 {
     QVector<QPointF> out;
     out.append(_coordinates);
     return out;
 }
 
-void QCasuSceneItem::sendSetpoint(QList<QByteArray> message)
+void QCasuSceneItem::sendSetpoint(const QList<QByteArray> &message) const
 {
+    // from context menu until here, message is passed as const and by reference
+    // QCasuZMQ has to add CASU name in front so message is passed by value (making a copy)
     _zmqObject->sendSetpoint(message);
 }
 

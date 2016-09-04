@@ -34,9 +34,9 @@ class QDialogSetpoint : public QDialog
 {
     Q_OBJECT
 public:
-    QDialogSetpoint(QWidget *parent, QString command, QList<QGraphicsItem *> group);
+    explicit QDialogSetpoint(QWidget *parent, QString command, QList<QGraphicsItem *> group);
     ~QDialogSetpoint();
-    QList<QByteArray> getMessage();
+    QList<QByteArray> getMessage() const;
 
 private:
     Ui::QDialogSetpoint *ui;

@@ -121,7 +121,7 @@ QDialogSetpoint::~QDialogSetpoint()
     delete ui;
 }
 
-QList<QByteArray> QDialogSetpoint::getMessage()
+QList<QByteArray> QDialogSetpoint::getMessage() const
 {
     return _message;
 }

@@ -19,7 +19,7 @@ QDialogConnect::~QDialogConnect()
     delete ui;
 }
 
-QStringList QDialogConnect::getAddresses()
+QStringList QDialogConnect::getAddresses() const
 {
     QStringList out;
     out.append(ui->subAddr->text());

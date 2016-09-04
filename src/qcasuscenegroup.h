@@ -16,23 +16,23 @@ private:
     QPainterPath _groupShape;
     QVector<QPointF> _childCoordinates;
 
-    QVector<QLineF> Prim(QVector<QPointF> list);
+    QVector<QLineF> Prim(const QVector<QPointF> &list);
 
 protected:
     QVariant itemChange(GraphicsItemChange change, const QVariant &value);
 
 public:
-    QCasuSceneGroup() = default;
+    explicit QCasuSceneGroup() = default;
 
     bool isGroup() const Q_DECL_OVERRIDE;
-    QList<zmqData::zmqBuffer *> getBuffers(zmqData::dataType key) Q_DECL_OVERRIDE;
-    QVector<QPointF> getCoordinateVector() Q_DECL_OVERRIDE;
-    void sendSetpoint(QList<QByteArray> message) Q_DECL_OVERRIDE;
-    void setGroupColor(QColor color) Q_DECL_OVERRIDE;
+    QList<zmqData::zmqBuffer *> getBuffers(zmqData::dataType key) const Q_DECL_OVERRIDE;
+    QVector<QPointF> getCoordinateVector() const Q_DECL_OVERRIDE;
+    void sendSetpoint(const QList<QByteArray> &message) const Q_DECL_OVERRIDE;
+    void setGroupColor(const QColor &color) Q_DECL_OVERRIDE;
     QRectF boundingRect() const Q_DECL_OVERRIDE;
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) Q_DECL_OVERRIDE;
     QPainterPath shape() const Q_DECL_OVERRIDE;
-    QPainterPath completeShape() Q_DECL_OVERRIDE;
+    QPainterPath completeShape() const Q_DECL_OVERRIDE;
 
     void addToGroup(QGraphicsItem *item);
     void addToGroup(QList<QGraphicsItem *> itemList);

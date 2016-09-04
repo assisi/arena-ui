@@ -48,7 +48,7 @@ public:
      * \brief Parse multiple QTreeBuffer items
      * \param itemList
      */
-    void addGraphList(QList<zmqData::zmqBuffer *> itemList);
+    void addGraphList(QList<zmqData::zmqBuffer *> &itemList);
     /*!
      * \brief Remove single QCPGraph and disconnect it from its source
      * \param graph

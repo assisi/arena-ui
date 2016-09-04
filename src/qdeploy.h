@@ -22,10 +22,10 @@ class QDeploy : public QTextEdit
     Q_OBJECT
 
 public:
-    QDeploy(QWidget *parent = 0);
+    explicit QDeploy(QWidget *parent = 0);
     ~QDeploy();
 
-    void setWorkingDirectory(QString dir);
+    void setWorkingDirectory(const QString &dir);
 private:
     /*!
      * \brief Individual process for executing shell commands

@@ -84,11 +84,12 @@ void QTrendPlot::addGraph(zmqBuffer *buffer){
 bool sortZmqBuffer(zmqBuffer *buffer1,zmqBuffer *buffer2){
     return QString::compare(buffer1->getLegendName(), buffer2->getLegendName()) < 0;
 }
-void QTrendPlot::addGraphList(QList<zmqBuffer *> bufferList)
+void QTrendPlot::addGraphList(QList<zmqBuffer *> &bufferList)
 {    
     bool new_trend = true;
     if(graphCount()) new_trend = false;
 
+    // even though bufferList is QList by reference, these changes are positive on whole QList
     bufferList = bufferList.toSet().toList(); //remove duplicates
     qSort(bufferList.begin(),bufferList.end(),[](zmqBuffer *b1, zmqBuffer *b2){
         return QString::compare(b1->getLegendName(), b2->getLegendName()) < 0;

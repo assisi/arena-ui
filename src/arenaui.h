@@ -76,17 +76,13 @@ private:
     void sortGraphicsScene();
 
     /*!
-     * \brief Recursive function to send setpoint to multiple and/or grouped CASUs
-     */
-    void groupSendSetpoint(QList<QGraphicsItem *> group, QList<QByteArray> message);
-    /*!
      * \brief Recursive function which saves grouping hieararchy of arenaScene items when saving a session
      */
-    void groupSave(QSettings *saveState, QList<QGraphicsItem*> items, QString groupName);
+    void groupSave(QSettings *saveState, const QList<QGraphicsItem *> &items, const QString &groupName);
     /*!
      * \brief Recursive function which loads grouping hieararchy of arenaScene items when loading a session
      */
-    QList<QGraphicsItem *> groupLoad(YAML::Node *arenaNode, QSettings *loadState, int groupSize, QMap<QString, QCasuZMQ*>* linkMap, QProgressBar *progress);
+    QList<QGraphicsItem *> groupLoad(YAML::Node *arenaNode, QSettings *loadState, const int &groupSize, QMap<QString, QCasuZMQ*>* linkMap, QProgressBar *progress);
 
 private slots:
     /*!
