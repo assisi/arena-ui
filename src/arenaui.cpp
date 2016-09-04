@@ -460,7 +460,7 @@ void ArenaUI::on_actionSettings_triggered()
     settingsDiag->exec();
 }
 
-void ArenaUI::customContextMenu(QPoint pos)
+void ArenaUI::customContextMenu(const QPoint &pos)
 {
     auto menu = new QMenu(); //no parent because it inherits background image from QGraphicsView
     QAction* tempAction;

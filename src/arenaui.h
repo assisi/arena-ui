@@ -133,7 +133,7 @@ private slots:
     /*!
      * \brief Custom context menu dialog for arenaScene
      */
-    void customContextMenu(QPoint pos);
+    void customContextMenu(const QPoint &pos);
 };
 
 

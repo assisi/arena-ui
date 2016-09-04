@@ -62,7 +62,7 @@ protected:
      * \param width
      * \return height
      */
-    virtual int heightForWidth(int width) const {return width*9/16;}
+    virtual int heightForWidth(int width) const Q_DECL_OVERRIDE {return width*9/16;}
 
 public slots:
     /*!

@@ -14,7 +14,7 @@
  * Information stored in this class is loaded from project file (*.assisi) or session file (*.arenaUI).
  * Associated files are loaded automaticaly from source file. If multiple arena layers are detected, user can choose which one to display.
  */
-class _assisi{
+class assisi_{
 public :
     /*!
      * \brief Loaded project file (*.assisi)
@@ -41,7 +41,7 @@ public :
 extern QSettings* g_settings;
 extern QString g_date_time_format;
 extern QString g_time_format;
-extern _assisi g_assisiFile;
+extern assisi_ g_assisiFile;
 
 void loadConfig();
 

@@ -3,7 +3,7 @@
 QSettings* g_settings;
 QString g_date_time_format = "yy-MM-dd_HH-mm_";
 QString g_time_format = "HH-mm-ss-zzz";
-_assisi g_assisiFile;
+assisi_ g_assisiFile;
 
 void loadConfig(){
 
