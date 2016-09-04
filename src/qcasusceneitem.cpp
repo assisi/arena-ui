@@ -1,6 +1,8 @@
 #include "qcasusceneitem.h"
 #include "qabstracttreeitem.h"
 
+using namespace zmqData;
+
 bool QCasuSceneItem::isGroup() const
 {
     return false;

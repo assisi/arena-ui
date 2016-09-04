@@ -13,7 +13,7 @@ class QAbstractSceneItem;
 class QAbstractTreeItem : public QTreeWidgetItem
 {
 protected:
-    QMap<dataType, QTreeWidgetItem*> _widgetMap;
+    QMap<zmqData::dataType, QTreeWidgetItem*> _widgetMap;
     QGraphicsItem *_sceneItem;
 public:
     QAbstractTreeItem() = default;
@@ -22,7 +22,7 @@ public:
 
     //Public virtual methods
     virtual bool isChildSelected();
-    virtual QList<zmqBuffer *> getBuffers();
+    virtual QList<zmqData::zmqBuffer *> getBuffers();
 };
 
 /*!
@@ -36,7 +36,7 @@ public:
      * \brief Calls QTreeWigdetItem constructor with same parameters
      * \param params
      */
-    QNoSortTreeItem(Params&&... params) : QTreeWidgetItem(forward<Params>(params)...) {}
+    QNoSortTreeItem(Params&&... params) : QTreeWidgetItem(std::forward<Params>(params)...) {}
     /*!
      * \brief reimplemented operator <
      * \param other [unused]

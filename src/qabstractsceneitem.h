@@ -34,7 +34,7 @@ public:
 
     // Public pure virtual methods
     virtual bool isGroup() const = 0;
-    virtual QList<zmqBuffer *> getBuffers(dataType key) = 0;
+    virtual QList<zmqData::zmqBuffer *> getBuffers(zmqData::dataType key) = 0;
     virtual QVector<QPointF> getCoordinateVector() = 0;
     virtual void sendSetpoint(QList<QByteArray> message) = 0;
 

@@ -1,6 +1,8 @@
 #include "qdialogsetpoint.h"
 #include "ui_qdialogsetpoint.h"
 
+using namespace zmqData;
+
 QDialogSetpoint::QDialogSetpoint(QWidget *parent, QString command, QList<QGraphicsItem *> group) :
     QDialog(parent),
     ui(new Ui::QDialogSetpoint),

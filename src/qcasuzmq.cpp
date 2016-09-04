@@ -1,5 +1,7 @@
 #include "qcasuzmq.h"
 
+using namespace zmqData;
+
 QCasuZMQ::QCasuZMQ(QObject *parent, QString casuName) :
     QObject(parent),
     _name(casuName)
@@ -9,12 +11,12 @@ QCasuZMQ::QCasuZMQ(QObject *parent, QString casuName) :
 
     _connectionTimer = new QTimer(this);
 
-    _context = createDefaultContext(this);
+    _context = nzmqt::createDefaultContext(this);
     _context->start();
-    _subSock = _context->createSocket(ZMQSocket::TYP_SUB, this);
-    _pubSock = _context->createSocket(ZMQSocket::TYP_PUB, this);
+    _subSock = _context->createSocket(nzmqt::ZMQSocket::TYP_SUB, this);
+    _pubSock = _context->createSocket(nzmqt::ZMQSocket::TYP_PUB, this);
 
-    connect(_subSock, &ZMQSocket::messageReceived, this, &QCasuZMQ::messageReceived);
+    connect(_subSock, &nzmqt::ZMQSocket::messageReceived, this, &QCasuZMQ::messageReceived);
     connect(_connectionTimer, &QTimer::timeout,[&](){
         _connected = false;
         _connectionTimer->stop();
@@ -111,7 +113,7 @@ bool QCasuZMQ::isConnected()
 void QCasuZMQ::openLogFile()
 {
     _logName = settings->value("logSubFolder").toString() + QDateTime::currentDateTime().toString(date_time_format) + _name + ".log";
-    _logFile.open(_logName.toStdString().c_str(), ofstream::out | ofstream::app);
+    _logFile.open(_logName.toStdString().c_str(), std::ofstream::out | std::ofstream::app);
     _logOpen = true;
 }
 
@@ -146,8 +148,8 @@ void QCasuZMQ::connectZMQ()
 
 void QCasuZMQ::messageReceived(const QList<QByteArray> &message)
 {
-    string name(message.at(0).constData(), message.at(0).length());
-    if(name != _name.toStdString()) return;
+    QString name(message.at(0));
+    if(name != _name) return;
     if(!_connected) {
         _connected = true;
          emit connectMsg("[ZMQ][" + _name + "] Connected");
@@ -157,18 +159,18 @@ void QCasuZMQ::messageReceived(const QList<QByteArray> &message)
 
     _connectionTimer->start(2000);
 
-    string device(message.at(1).constData(), message.at(1).length());
-    string command(message.at(2).constData(), message.at(2).length());
-    string data(message.at(3).constData(), message.at(3).length());
+    QString device(message.at(1));
+    QString command(message.at(2));
+    QString data(message.at(3));
 
     QCPData newData;
     newData.key = (double) QTime(0,0,0).msecsTo(QTime::currentTime())/1000;
 
-    _logFile << device << ";" << (float) QDateTime::currentDateTime().toMSecsSinceEpoch() / 1000 ;
+    _logFile << device.toStdString() << ";" << (float) QDateTime::currentDateTime().toMSecsSinceEpoch() / 1000 ;
 
     if (device == "IR"){
         AssisiMsg::RangeArray ranges;
-        ranges.ParseFromString(data);
+        ranges.ParseFromString(data.toStdString());
         _lastDataTime[dCast(0)] = _buffers[dCast(0)]->getLastTime();
         for (int k = 0; k < ranges.raw_value_size(); k++){
             if( k == _IR_num) break;
@@ -180,7 +182,7 @@ void QCasuZMQ::messageReceived(const QList<QByteArray> &message)
     }
     if (device == "Temp"){
         AssisiMsg::TemperatureArray temperatures;
-        temperatures.ParseFromString(data);
+        temperatures.ParseFromString(data.toStdString());
         _lastDataTime[dCast(_IR_num)] = _buffers[dCast(_IR_num)]->getLastTime();
         for (int k = 0; k < temperatures.temp_size(); k++){
             if( k == _Temp_num) break;
@@ -195,7 +197,7 @@ void QCasuZMQ::messageReceived(const QList<QByteArray> &message)
 
     if (device == "Peltier"){
         AssisiMsg::Temperature pelt;
-        pelt.ParseFromString(data);
+        pelt.ParseFromString(data.toStdString());
         newData.value = pelt.temp();
         _lastDataTime[Peltier] = _values[Peltier].key;
         _values[Peltier] = newData;
@@ -206,7 +208,7 @@ void QCasuZMQ::messageReceived(const QList<QByteArray> &message)
      }
     if (device == "Airflow"){
         AssisiMsg::Airflow air;
-        air.ParseFromString(data);
+        air.ParseFromString(data.toStdString());
         _lastDataTime[Airflow] = _values[Airflow].key;
         newData.value = air.intensity();
         _values[Airflow] = newData;
@@ -218,7 +220,7 @@ void QCasuZMQ::messageReceived(const QList<QByteArray> &message)
      }
     if (device == "Speaker"){
         AssisiMsg::VibrationSetpoint vibr;
-        vibr.ParseFromString(data);
+        vibr.ParseFromString(data.toStdString());
          _lastDataTime[Frequency] = _values[Frequency].key;
         newData.value = vibr.freq();
         _values[Frequency] = newData;
@@ -236,7 +238,7 @@ void QCasuZMQ::messageReceived(const QList<QByteArray> &message)
     if (device == "DiagnosticLed")
     {
         AssisiMsg::ColorStamped LEDcolor;
-        LEDcolor.ParseFromString(data);
+        LEDcolor.ParseFromString(data.toStdString());
         _ledColor.setRgbF(LEDcolor.color().red(),
                           LEDcolor.color().green(),
                           LEDcolor.color().blue());
@@ -246,7 +248,7 @@ void QCasuZMQ::messageReceived(const QList<QByteArray> &message)
                                                        << ";" << _state[LED];
     }
 
-    _logFile << endl;
+    _logFile << std::endl;
 }
 
 // ----------------------------------------------------------------

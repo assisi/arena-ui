@@ -1,6 +1,8 @@
 #include "qcasuscenegroup.h"
 #include "qcasusceneitem.h"
 
+using namespace zmqData;
+
 QVariant QCasuSceneGroup::itemChange(QGraphicsItem::GraphicsItemChange change, const QVariant &value)
 {
     QAbstractSceneItem::itemChange(change,value);

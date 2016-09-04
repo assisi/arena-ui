@@ -6,12 +6,7 @@
 #include "arenaui.h"
 #include "ui_arenaui.h"
 
-
-using namespace nzmqt;
-using namespace std;
-using namespace AssisiMsg;
-using namespace boost;
-
+using namespace zmqData;
 
 // -------------------------------------------------------------------------------
 
@@ -127,7 +122,7 @@ void ArenaUI::sortGraphicsScene()
             if(path1.intersects(path2)){
                 int z1 = item1->zValue();
                 int z2 = item2->zValue();
-                if(z1 > z2) swap(z1,z2);
+                if(z1 > z2) std::swap(z1,z2);
 
                 if(path1.intersects(item2->shape())){
                     item1->setZValue(z1);

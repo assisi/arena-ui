@@ -1,6 +1,8 @@
 #include "qcasutreegroup.h"
 #include "qabstractsceneitem.h"
 
+using namespace zmqData;
+
 QCasuTreeGroup::QCasuTreeGroup(QString name) :
     _name(name)
 {

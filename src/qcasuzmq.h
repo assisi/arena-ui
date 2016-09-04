@@ -1,7 +1,7 @@
 #ifndef QCASUZMQ_H
 #define QCASUZMQ_H
 
-#define dCast static_cast<dataType>
+#define dCast static_cast<zmqData::dataType>
 
 #include <QObject>
 #include <QTime>
@@ -44,20 +44,16 @@ namespace zmqData {
         };
 }
 
-using namespace nzmqt;
-using namespace std;
-using namespace zmqData;
-
 class QCasuZMQ : public QObject
 {
     Q_OBJECT
     friend class QCasuSceneItem;
 public:
     explicit QCasuZMQ(QObject *parent = 0, QString casuName = QString());
-    zmqBuffer* getBuffer(dataType key);
-    double getValue(dataType key);
+    zmqData::zmqBuffer* getBuffer(zmqData::dataType key);
+    double getValue(zmqData::dataType key);
     QColor getLedColor();
-    bool getState(dataType key);
+    bool getState(zmqData::dataType key);
     int getAvgSamplingTime();
     QString getName();
 
@@ -82,13 +78,13 @@ private:
 
     QTimer* _connectionTimer;
 
-    QMap<dataType, zmqBuffer*> _buffers;
-    QMap<dataType, QCPData> _values;
-    QMap<dataType, double> _lastDataTime;
-    QMap<dataType, bool> _state;
+    QMap<zmqData::dataType, zmqData::zmqBuffer*> _buffers;
+    QMap<zmqData::dataType, QCPData> _values;
+    QMap<zmqData::dataType, double> _lastDataTime;
+    QMap<zmqData::dataType, bool> _state;
     QColor _ledColor;
 
-    ofstream _logFile;
+    std::ofstream _logFile;
     QString _logName;
     bool _logOpen;
 
@@ -97,11 +93,11 @@ private:
     void openLogFile();
     void closeLogFile();
 
-    void addToBuffer(dataType key, QCPData data);
+    void addToBuffer(zmqData::dataType key, QCPData data);
     void connectZMQ();
 
 signals:
-    void updated(dataType key);
+    void updated(zmqData::dataType key);
     void connectMsg(QString message);
 
 private slots:

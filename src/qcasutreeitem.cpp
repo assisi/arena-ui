@@ -1,5 +1,7 @@
 #include "qcasutreeitem.h"
 
+using namespace zmqData;
+
 QCasuTreeItem::QCasuTreeItem(QCasuZMQ *zmqObject) :
     _zmqObject(zmqObject)
 {

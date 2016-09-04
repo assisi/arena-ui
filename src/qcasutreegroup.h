@@ -17,6 +17,6 @@ private:
     QGraphicsScene *_scene;
 public:
     QSelectionTreeItem(QGraphicsScene *scene);
-    QList<zmqBuffer *> getBuffers() Q_DECL_OVERRIDE;
+    QList<zmqData::zmqBuffer *> getBuffers() Q_DECL_OVERRIDE;
 };
 #endif // QCASUTREEGROUP_H

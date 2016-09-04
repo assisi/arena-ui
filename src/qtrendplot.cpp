@@ -1,5 +1,7 @@
 #include "qtrendplot.h"
 
+using namespace zmqData;
+
 QTrendPlot::QTrendPlot(QTreeWidget* tree1,QTreeWidget* tree2 , QWidget *parent) :
     QCustomPlot(parent),
     casuTree(tree1),

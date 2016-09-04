@@ -1,6 +1,8 @@
 #include "qabstractsceneitem.h"
 #include "qabstracttreeitem.h"
 
+using namespace zmqData;
+
 void QAbstractSceneItem::recursiveSetHidden(bool state)
 {
     if (isGroup())
