@@ -474,7 +474,7 @@ void ArenaUI::customContextMenu(QPoint pos)
         error_single = true; // Check if object is single casu
     }
 
-    bool error_multiple = m_arenaScene->selectedItems().size() > 1;
+    bool error_multiple = m_arenaScene->selectedItems().size() < 2;
 
     // FIXME: Qt 5.6 QMenu::addAction accepts Qt5 style connect (possible lambda expressions)
     tempAction = menu->addAction(g_settings->value("IR_on").toBool() ? "Hide proximity sensors" : "Show proximity sensors");
@@ -509,7 +509,7 @@ void ArenaUI::customContextMenu(QPoint pos)
     if(error_single) tempAction->setEnabled(false);
 
     auto sendMenu = new QMenu("Setpoint");
-    if(error_multiple && error_single) sendMenu->setEnabled(false);
+    if(!m_arenaScene->selectedItems().size()) sendMenu->setEnabled(false);
     menu->addMenu(sendMenu);
 
     auto signalMapper = new QSignalMapper(menu);
