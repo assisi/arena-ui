@@ -23,11 +23,12 @@ protected:
     QColor _groupColor;
     QTreeWidgetItem *_treeItem;
 
+    // only child classes can call constructor
+    explicit QAbstractSceneItem();
+
     //Protected virtual methods
     virtual QVariant itemChange(GraphicsItemChange change, const QVariant &value);
 public:
-    explicit QAbstractSceneItem();
-
     void setInGroup(bool state);
     void setTreeItem(QTreeWidgetItem *treeItem);
     void deleteTreeItem();

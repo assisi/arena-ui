@@ -15,8 +15,11 @@ class QAbstractTreeItem : public QTreeWidgetItem
 protected:
     QMap<zmqData::dataType, QTreeWidgetItem*> _widgetMap;
     QGraphicsItem *_sceneItem;
-public:
+
+    // only child classes can call constructor
     explicit QAbstractTreeItem() = default;
+
+public:
     void resetSelection() const;
     void setSceneItem(QGraphicsItem *sceneItem);
 
