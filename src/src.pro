@@ -23,7 +23,6 @@ INCLUDEPATH += msg \
 
 SOURCES += main.cpp\
         arenaui.cpp\
-        nzmqt/nzmqt.cpp\
         msg/base_msgs.pb.cc\
         msg/dev_msgs.pb.cc\
         msg/sim_msgs.pb.cc \
