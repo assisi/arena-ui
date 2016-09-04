@@ -80,9 +80,6 @@ void QTrendPlot::addGraph(zmqBuffer *buffer){
     m_connectionMap.insert(graph(), buffer);
 }
 
-bool sortZmqBuffer(zmqBuffer *buffer1,zmqBuffer *buffer2){
-    return QString::compare(buffer1->getLegendName(), buffer2->getLegendName()) < 0;
-}
 void QTrendPlot::addGraphList(QList<zmqBuffer *> &bufferList)
 {    
     bool new_trend = true;

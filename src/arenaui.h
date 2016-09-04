@@ -155,7 +155,7 @@ protected:
 
 private:
     QGraphicsScene* scene_;
-    bool drag_true;
+    bool dragTrue;
     QList<QGraphicsItem*> selectedList;
 };
 // ------------------------------------------------------------------------

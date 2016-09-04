@@ -149,7 +149,7 @@ void QCasuZMQ::connectZMQ()
         m_subSock->connectTo(m_subAddr);
         m_connectionTimer->start(1000);
     }
-    catch(zmq::error_t e){
+    catch(zmq::error_t &e){
         emit connectMsg("[ZMQ][" + m_name + "][ERR] Failed to connect: " + QString(e.what()));
         m_connected = false;
     }
@@ -163,8 +163,8 @@ void QCasuZMQ::messageReceived(const QList<QByteArray> &message)
         m_connected = true;
          emit connectMsg("[ZMQ][" + m_name + "] Connected");
     }
-    if(g_settings->value("log_on").toBool() & !m_logOpen) openLogFile();
-    if(!g_settings->value("log_on").toBool() & m_logOpen) closeLogFile();
+    if(g_settings->value("log_on").toBool() && !m_logOpen) openLogFile();
+    if(!g_settings->value("log_on").toBool() && m_logOpen) closeLogFile();
 
     m_connectionTimer->start(2000);
 

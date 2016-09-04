@@ -26,7 +26,8 @@ QVariant QAbstractSceneItem::itemChange(QGraphicsItem::GraphicsItemChange change
 
 QAbstractSceneItem::QAbstractSceneItem() :
     m_inGroup(false),
-    m_groupColor(Qt::black)
+    m_groupColor(Qt::black),
+    m_treeItem(nullptr)
 {
     this->setFlag(GraphicsItemFlag::ItemIsSelectable);
 }

@@ -145,7 +145,8 @@ void ArenaUI::sortGraphicsScene()
 
 MouseClickHandler::MouseClickHandler(QGraphicsScene* scene, QObject *parent) :
     QObject(parent),
-    scene_(scene){}
+    scene_(scene),
+    dragTrue(false){}
 
 bool MouseClickHandler::eventFilter(QObject* obj, QEvent* event)
 {
@@ -162,7 +163,7 @@ bool MouseClickHandler::eventFilter(QObject* obj, QEvent* event)
     else
     if (event->type() == QEvent::GraphicsSceneMouseMove){
         for(auto& item : selectedList) item->setSelected(true);
-        drag_true = true;
+        dragTrue = true;
         scene_->update();
 
         return QObject::eventFilter(obj, event);;
@@ -175,7 +176,7 @@ bool MouseClickHandler::eventFilter(QObject* obj, QEvent* event)
         auto mouse_click = static_cast<QGraphicsSceneMouseEvent *>(event);
         auto itemAtMouse= scene_->itemAt(mouse_click->scenePos().x(),mouse_click->scenePos().y(), QTransform());
 
-        if (itemAtMouse && !drag_true){
+        if (itemAtMouse && !dragTrue){
             if(QApplication::keyboardModifiers() == Qt::ControlModifier){
                 if(itemAtMouse->isSelected()){
                         itemAtMouse->setSelected(0);
@@ -186,11 +187,11 @@ bool MouseClickHandler::eventFilter(QObject* obj, QEvent* event)
                 scene_->clearSelection();
                 itemAtMouse->setSelected(1);
             }
-        } else if(QApplication::keyboardModifiers() != Qt::ControlModifier && !drag_true){
+        } else if(QApplication::keyboardModifiers() != Qt::ControlModifier && !dragTrue){
                 scene_->clearSelection();
             }
 
-        drag_true = false;
+        dragTrue = false;
         scene_->update();
 
         return QObject::eventFilter(obj, event);;
@@ -212,7 +213,7 @@ void ArenaUI::on_actionOpenArena_triggered()
     if(!loadFile.size()) return;
 
     while(m_trendTab->count()){
-        ((QCustomPlot*) m_trendTab->itemAt(0)->widget())->close();
+        dynamic_cast<QCustomPlot *> (m_trendTab->itemAt(0)->widget())->close();
         m_trendTab->removeWidget(m_trendTab->itemAt(0)->widget());
     }
 
@@ -644,7 +645,7 @@ void ArenaUI::on_actionSave_triggered()
     saveState.beginGroup("trendGraphs");
     saveState.beginWriteArray("plot");
     for(int k=0; k < m_trendTab->count() ; k++){
-        auto tempPlot = (QTrendPlot*) m_trendTab->itemAt(k)->widget();
+        auto tempPlot = dynamic_cast<QTrendPlot *>(m_trendTab->itemAt(k)->widget());
         saveState.setArrayIndex(k);
         saveState.beginWriteArray("graph");
         for(int i=0; i < tempPlot->graphCount(); i++){
