@@ -19,9 +19,9 @@ class QAbstractSceneItem : public QGraphicsItemGroup
 private:
     void recursiveSetHidden(bool state);
 protected:
-    bool _inGroup;
-    QColor _groupColor;
-    QTreeWidgetItem *_treeItem;
+    bool m_inGroup;
+    QColor m_groupColor;
+    QTreeWidgetItem *m_treeItem;
 
     // only child classes can call constructor
     explicit QAbstractSceneItem();

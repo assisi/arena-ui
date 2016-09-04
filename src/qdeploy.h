@@ -30,12 +30,12 @@ private:
     /*!
      * \brief Individual process for executing shell commands
      */
-    QProcess* _shell;
+    QProcess* m_shell;
 
-    qint64 _simulatorPID;
+    qint64 m_simulatorPID;
 
-    QMetaObject::Connection _shellOut1;
-    QMetaObject::Connection _shellOut2;
+    QMetaObject::Connection m_shellOut1;
+    QMetaObject::Connection m_shellOut2;
 
     bool isSimulatorStarted();
 

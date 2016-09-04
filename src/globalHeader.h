@@ -38,10 +38,10 @@ public :
     QString arenaLayer;
 };
 
-extern QSettings* settings;
-extern QString date_time_format;
-extern QString time_format;
-extern _assisi assisiFile;
+extern QSettings* g_settings;
+extern QString g_date_time_format;
+extern QString g_time_format;
+extern _assisi g_assisiFile;
 
 void loadConfig();
 

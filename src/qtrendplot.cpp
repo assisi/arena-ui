@@ -78,7 +78,7 @@ void QTrendPlot::addGraph(zmqBuffer *buffer){
     }
     // NOTE: QCustomPlot::replot() has default value
     connect(buffer, &zmqBuffer::updatePlot, [&](){ replot(); });
-    _connectionMap.insert(graph(), buffer);
+    m_connectionMap.insert(graph(), buffer);
 }
 
 bool sortZmqBuffer(zmqBuffer *buffer1,zmqBuffer *buffer2){
@@ -107,13 +107,13 @@ void QTrendPlot::addGraphList(QList<zmqBuffer *> &bufferList)
 
 void QTrendPlot::removeGraph(QCPGraph *graph){
     QCustomPlot::removeGraph(graph);
-    disconnect(_connectionMap[graph],0,this,0);
-    _connectionMap.remove(graph);
+    disconnect(m_connectionMap[graph],0,this,0);
+    m_connectionMap.remove(graph);
 }
 
 zmqBuffer *QTrendPlot::link(QCPGraph *graph)
 {
-    return _connectionMap[graph];
+    return m_connectionMap[graph];
 }
 
 void QTrendPlot::addSelectedGraphs(){

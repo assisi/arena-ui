@@ -7,14 +7,14 @@ QDialogSettings::QDialogSettings(QWidget *parent) :
 {
     ui->setupUi(this);
 
-    ui->trendTimeSpan->setTime(settings->value("trendTimeSpan").toTime());
-    ui->trendSampleTime->setValue(settings->value("trendSampleTime_ms").toInt());
-    ui->logFolder->setText(settings->value("logFolder").toString());
-    ui->camFolder->setText(settings->value("camFolder").toString());
-    ui->arenaFolder->setText(settings->value("arenaFolder").toString());
-    ui->simFile->setText(settings->value("simulator").toString());
-    ui->forceLog->setChecked(settings->value("forceLog").toBool());
-    ui->forceScene->setChecked(settings->value("forceScene").toBool());
+    ui->trendTimeSpan->setTime(g_settings->value("trendTimeSpan").toTime());
+    ui->trendSampleTime->setValue(g_settings->value("trendSampleTime_ms").toInt());
+    ui->logFolder->setText(g_settings->value("logFolder").toString());
+    ui->camFolder->setText(g_settings->value("camFolder").toString());
+    ui->arenaFolder->setText(g_settings->value("arenaFolder").toString());
+    ui->simFile->setText(g_settings->value("simulator").toString());
+    ui->forceLog->setChecked(g_settings->value("forceLog").toBool());
+    ui->forceScene->setChecked(g_settings->value("forceScene").toBool());
 
     link[ui->searchArena] = ui->arenaFolder;
     link[ui->searchLog] = ui->logFolder;
@@ -39,21 +39,21 @@ void QDialogSettings::findFolder()
 
 void QDialogSettings::saveConfig()
 {
-    settings->setValue("logFolder", ui->logFolder->text() + (ui->logFolder->text().endsWith("/")? "" : "/"));
-    settings->setValue("camFolder", ui->camFolder->text() + (ui->camFolder->text().endsWith("/")? "" : "/"));
-    settings->setValue("arenaFolder", ui->arenaFolder->text() + (ui->arenaFolder->text().endsWith("/")? "" : "/"));
-    settings->setValue("simulator", ui->simFile->text());
-    settings->setValue("trendTimeSpan", QTime::fromString(ui->trendTimeSpan->text(),"mm:ss"));
-    settings->setValue("trendSampleTime_ms", ui->trendSampleTime->text());
-    settings->setValue("forceLog", ui->forceLog->isChecked());
-    settings->setValue("forceScene", ui->forceScene->isChecked());
+    g_settings->setValue("logFolder", ui->logFolder->text() + (ui->logFolder->text().endsWith("/")? "" : "/"));
+    g_settings->setValue("camFolder", ui->camFolder->text() + (ui->camFolder->text().endsWith("/")? "" : "/"));
+    g_settings->setValue("arenaFolder", ui->arenaFolder->text() + (ui->arenaFolder->text().endsWith("/")? "" : "/"));
+    g_settings->setValue("simulator", ui->simFile->text());
+    g_settings->setValue("trendTimeSpan", QTime::fromString(ui->trendTimeSpan->text(),"mm:ss"));
+    g_settings->setValue("trendSampleTime_ms", ui->trendSampleTime->text());
+    g_settings->setValue("forceLog", ui->forceLog->isChecked());
+    g_settings->setValue("forceScene", ui->forceScene->isChecked());
 
 
-    settings->setValue("logSubFolder", settings->value("logFolder").toString() + QDate::currentDate().toString("yy-MM-dd") + "/");
-    settings->setValue("camSubFolder", settings->value("camFolder").toString() + QDate::currentDate().toString("yy-MM-dd") + "/");
+    g_settings->setValue("logSubFolder", g_settings->value("logFolder").toString() + QDate::currentDate().toString("yy-MM-dd") + "/");
+    g_settings->setValue("camSubFolder", g_settings->value("camFolder").toString() + QDate::currentDate().toString("yy-MM-dd") + "/");
 
-    if(!QDir(settings->value("logSubFolder").toString()).exists())QDir().mkdir(settings->value("logSubFolder").toString());
-    if(!QDir(settings->value("camSubFolder").toString()).exists())QDir().mkdir(settings->value("camSubFolder").toString());
+    if(!QDir(g_settings->value("logSubFolder").toString()).exists())QDir().mkdir(g_settings->value("logSubFolder").toString());
+    if(!QDir(g_settings->value("camSubFolder").toString()).exists())QDir().mkdir(g_settings->value("camSubFolder").toString());
 
     emit accept();
 }

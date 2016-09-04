@@ -12,9 +12,9 @@
 class QCasuSceneGroup : public QAbstractSceneItem
 {
 private:
-    QPainterPath _groupLine;
-    QPainterPath _groupShape;
-    QVector<QPointF> _childCoordinates;
+    QPainterPath m_groupLine;
+    QPainterPath m_groupShape;
+    QVector<QPointF> m_childCoordinates;
 
     QVector<QLineF> Prim(const QVector<QPointF> &list);
 

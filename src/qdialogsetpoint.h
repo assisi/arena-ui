@@ -41,8 +41,8 @@ public:
 private:
     Ui::QDialogSetpoint *ui;
 
-    QString _command;
-    QList<QByteArray> _message;
+    QString m_command;
+    QList<QByteArray> m_message;
 
 private slots:
     void prepareMessage();

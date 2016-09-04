@@ -10,25 +10,25 @@ QVariant QCasuSceneGroup::itemChange(QGraphicsItem::GraphicsItemChange change, c
     if(change==QGraphicsItem::ItemChildAddedChange || change==QGraphicsItem::ItemChildRemovedChange){
         QPainterPath newLine, newShape;
 
-        _childCoordinates.clear();
+        m_childCoordinates.clear();
 
         for(auto& item : childItems()) {
             for(auto& point : sCast(item)->getCoordinateVector())
-                _childCoordinates.append(point);
+                m_childCoordinates.append(point);
             newShape.addPath(item->shape());
         }
 
-        if(_childCoordinates.size()<2) return QGraphicsItem::itemChange(change, value);
+        if(m_childCoordinates.size()<2) return QGraphicsItem::itemChange(change, value);
 
-        auto mst = Prim(_childCoordinates);
+        auto mst = Prim(m_childCoordinates);
 
         for (QLineF& line : mst) {
             newLine.moveTo(line.p1());
             newLine.lineTo(line.p2());
         }
 
-        _groupLine = newLine;
-        _groupShape = newShape;
+        m_groupLine = newLine;
+        m_groupShape = newShape;
     }
 
     return QGraphicsItem::itemChange(change, value);
@@ -49,7 +49,7 @@ QList<zmqBuffer *> QCasuSceneGroup::getBuffers(dataType key) const
 
 QVector<QPointF> QCasuSceneGroup::getCoordinateVector() const
 {
-    return _childCoordinates;
+    return m_childCoordinates;
 }
 
 void QCasuSceneGroup::sendSetpoint(const QList<QByteArray> &message) const
@@ -60,8 +60,8 @@ void QCasuSceneGroup::sendSetpoint(const QList<QByteArray> &message) const
 
 void QCasuSceneGroup::setGroupColor(const QColor &color)
 {
-    _groupColor = color;
-    _treeItem->setTextColor(0, _groupColor);
+    m_groupColor = color;
+    m_treeItem->setTextColor(0, m_groupColor);
     for(auto& item : childItems())
         sCast(item)->setGroupColor(color);
 }
@@ -100,27 +100,27 @@ void QCasuSceneGroup::paint(QPainter *painter, const QStyleOptionGraphicsItem *o
     Q_UNUSED(option)
     Q_UNUSED(widget)
 
-    if(!isSelected() || _inGroup)return;
+    if(!isSelected() || m_inGroup)return;
 
     painter->setRenderHints(QPainter::Antialiasing | QPainter::SmoothPixmapTransform, true);
 
     QPen pen;
     pen.setStyle(Qt::DashLine);
-    pen.setColor(_groupColor);
+    pen.setColor(m_groupColor);
     pen.setWidth(2);
     painter->setPen(pen);
-    painter->drawPath(_groupLine);
+    painter->drawPath(m_groupLine);
 }
 
 QPainterPath QCasuSceneGroup::shape() const
 {
-    return _groupShape;
+    return m_groupShape;
 }
 
 QPainterPath QCasuSceneGroup::completeShape() const
 {
-    auto tempShape = _groupShape;
-    tempShape.addPath(_groupLine);
+    auto tempShape = m_groupShape;
+    tempShape.addPath(m_groupLine);
     return tempShape;
 }
 

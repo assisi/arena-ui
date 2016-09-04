@@ -6,7 +6,7 @@ using namespace zmqData;
 QDialogSetpoint::QDialogSetpoint(QWidget *parent, QString command, QList<QGraphicsItem *> group) :
     QDialog(parent),
     ui(new Ui::QDialogSetpoint),
-    _command(command)
+    m_command(command)
 {
     ui->setupUi(this);
 
@@ -123,21 +123,21 @@ QDialogSetpoint::~QDialogSetpoint()
 
 QList<QByteArray> QDialogSetpoint::getMessage() const
 {
-    return _message;
+    return m_message;
 }
 
 void QDialogSetpoint::prepareMessage()
 {
-    if (_command != "IR Proximity" && !ui->value1->hasAcceptableInput()){
+    if (m_command != "IR Proximity" && !ui->value1->hasAcceptableInput()){
         reject();
         return;
     }
-    if (_command == "Vibration" && !ui->value2->hasAcceptableInput()){
+    if (m_command == "Vibration" && !ui->value2->hasAcceptableInput()){
             reject();
             return;
         }
 
-    if(_command == "Temperature"){
+    if(m_command == "Temperature"){
         AssisiMsg::Temperature temp;
         temp.set_temp(ui->value1->text().toFloat());
 
@@ -145,11 +145,11 @@ void QDialogSetpoint::prepareMessage()
         void *buffer = malloc(size);
         temp.SerializePartialToArray(buffer, size);
 
-        _message.append(QString("Peltier").toLocal8Bit());
-        _message.push_back(QString(ui->radioON->isChecked() ? "On" : "Off").toLocal8Bit());
-        _message.push_back(QByteArray((char*)buffer, size));
+        m_message.append(QString("Peltier").toLocal8Bit());
+        m_message.push_back(QString(ui->radioON->isChecked() ? "On" : "Off").toLocal8Bit());
+        m_message.push_back(QByteArray((char*)buffer, size));
     }
-    if(_command == "Vibration"){
+    if(m_command == "Vibration"){
         AssisiMsg::VibrationSetpoint vibr;
         vibr.set_freq(ui->value1->text().toDouble());
         vibr.set_amplitude(ui->value2->text().toDouble());
@@ -158,11 +158,11 @@ void QDialogSetpoint::prepareMessage()
         void *buffer = malloc(size);
         vibr.SerializeToArray(buffer,size);
 
-        _message.push_back(QString("Speaker").toLocal8Bit());
-        _message.push_back(QString(ui->radioON->isChecked() ? "On" : "Off").toLocal8Bit());
-        _message.push_back(QByteArray((char*)buffer, size));
+        m_message.push_back(QString("Speaker").toLocal8Bit());
+        m_message.push_back(QString(ui->radioON->isChecked() ? "On" : "Off").toLocal8Bit());
+        m_message.push_back(QByteArray((char*)buffer, size));
     }
-    if(_command == "LED"){
+    if(m_command == "LED"){
         QColor userColor(ui->value1->text());
 
         AssisiMsg::ColorStamped color;
@@ -174,29 +174,29 @@ void QDialogSetpoint::prepareMessage()
         void *buffer = malloc(size);
         color.SerializeToArray(buffer, size);
 
-        _message.push_back(QString("DiagnosticLed").toLocal8Bit());
-        _message.push_back(QString(ui->radioON->isChecked() ? "On" : "Off").toLocal8Bit());
-        _message.push_back(QByteArray((char*)buffer, size));
+        m_message.push_back(QString("DiagnosticLed").toLocal8Bit());
+        m_message.push_back(QString(ui->radioON->isChecked() ? "On" : "Off").toLocal8Bit());
+        m_message.push_back(QByteArray((char*)buffer, size));
     }
-    if(_command == "Airflow"){
+    if(m_command == "Airflow"){
         AssisiMsg::Airflow air;
         air.set_intensity(ui->value1->text().toFloat());
         int size = air.ByteSize();
         void *buffer = malloc(size);
         air.SerializeToArray(buffer, size);
 
-        _message.push_back(QString("Airflow").toLocal8Bit());
-        _message.push_back(QString(ui->radioON->isChecked() ? "On" : "Off").toLocal8Bit());
-        _message.push_back(QByteArray((char*) buffer,size));
+        m_message.push_back(QString("Airflow").toLocal8Bit());
+        m_message.push_back(QString(ui->radioON->isChecked() ? "On" : "Off").toLocal8Bit());
+        m_message.push_back(QByteArray((char*) buffer,size));
     }
 
-    if(_command == "IR Proximity"){
+    if(m_command == "IR Proximity"){
         void *buffer = malloc(sizeof(int));
         //air.SerializeToArray(buffer, sizeof(int));
 
-        _message.push_back(QString("IR").toLocal8Bit());
-        _message.push_back(QString(ui->radioON->isChecked() ? "Activate" : "Standby").toLocal8Bit());
-        _message.push_back(QByteArray((char*) buffer,sizeof(int)));
+        m_message.push_back(QString("IR").toLocal8Bit());
+        m_message.push_back(QString(ui->radioON->isChecked() ? "Activate" : "Standby").toLocal8Bit());
+        m_message.push_back(QByteArray((char*) buffer,sizeof(int)));
     }
 
     accept();

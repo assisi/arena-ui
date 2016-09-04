@@ -6,7 +6,7 @@
 class QCasuTreeGroup : public QAbstractTreeItem
 {
 protected:
-    QString _name;
+    QString m_name;
 public:
     QCasuTreeGroup(QString name = QString("CASU group"));
 };
@@ -14,7 +14,7 @@ public:
 class QSelectionTreeItem : public QCasuTreeGroup
 {
 private:
-    QGraphicsScene *_scene;
+    QGraphicsScene *m_scene;
 public:
     explicit QSelectionTreeItem(QGraphicsScene *scene);
     QList<zmqData::zmqBuffer *> getBuffers() const Q_DECL_OVERRIDE;

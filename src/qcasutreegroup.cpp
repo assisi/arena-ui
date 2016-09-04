@@ -4,9 +4,9 @@
 using namespace zmqData;
 
 QCasuTreeGroup::QCasuTreeGroup(QString name) :
-    _name(name)
+    m_name(name)
 {
-    this->setData(0,Qt::DisplayRole,QStringList(_name));
+    this->setData(0,Qt::DisplayRole,QStringList(m_name));
     QTreeWidgetItem* tempWidget;
 
     /* IR branch children */{
@@ -17,8 +17,8 @@ QCasuTreeGroup::QCasuTreeGroup(QString name) :
         tempWidget->addChild(new QNoSortTreeItem(QStringList("IR - B")));
         tempWidget->addChild(new QNoSortTreeItem(QStringList("IR - BR")));
         tempWidget->addChild(new QNoSortTreeItem(QStringList("IR - FR")));
-        for(int k = 0; k < _IR_num; k++){
-            _widgetMap.insert(dCast(k), tempWidget->child(k));
+        for(int k = 0; k < m_IR_NUM; k++){
+            m_widgetMap.insert(dCast(k), tempWidget->child(k));
             tempWidget->child(k)->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled);
         }
         tempWidget->setFlags(Qt::ItemIsEnabled);
@@ -35,8 +35,8 @@ QCasuTreeGroup::QCasuTreeGroup(QString name) :
         tempWidget->addChild(new QNoSortTreeItem(QStringList("Temp - PCB")));
         tempWidget->addChild(new QNoSortTreeItem(QStringList("Temp - RING")));
         tempWidget->addChild(new QNoSortTreeItem(QStringList("Temp - WAX")));
-        for(int k = 0; k < _Temp_num; k++){
-            _widgetMap.insert(dCast(k + _IR_num), tempWidget->child(k));
+        for(int k = 0; k < m_temp_NUM; k++){
+            m_widgetMap.insert(dCast(k + m_IR_NUM), tempWidget->child(k));
             tempWidget->child(k)->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled);
         }
         tempWidget->setFlags(Qt::ItemIsEnabled);
@@ -47,16 +47,16 @@ QCasuTreeGroup::QCasuTreeGroup(QString name) :
 
 QSelectionTreeItem::QSelectionTreeItem(QGraphicsScene *scene) :
     QCasuTreeGroup(QString("Selected CASUS")),
-    _scene(scene)
+    m_scene(scene)
 {
 }
 
 QList<zmqBuffer *> QSelectionTreeItem::getBuffers() const
 {
     QList<zmqBuffer *> outList;
-    for(int k = 0; k < _IR_num + _Temp_num; k++)
-        if(_widgetMap[dCast(k)]->isSelected())
-            for(auto& item : _scene->selectedItems())
+    for(int k = 0; k < m_IR_NUM + m_temp_NUM; k++)
+        if(m_widgetMap[dCast(k)]->isSelected())
+            for(auto& item : m_scene->selectedItems())
                 outList.append((sCast(item))->getBuffers(dCast(k)));
     return outList;
 }

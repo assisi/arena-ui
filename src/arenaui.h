@@ -52,23 +52,23 @@ private:
     /*!
      * \brief Pointer to main graphics scene
      */
-    QArenaScene *_arenaScene;
+    QArenaScene *m_arenaScene;
     /*!
      * \brief YAML node to parse associated project files
      */
-    YAML::Node _assisiNode;
+    YAML::Node m_assisiNode;
 
     /*!
      * \brief Tab in which trend plots are docked
      */
-    QVBoxLayout* _trendTab;
+    QVBoxLayout* m_trendTab;
 
     //QGstreamerView* videoStream;
 
     /*!
      * \brief Timer responsible for 30FPS graphics scene refresh rate
      */
-    QTimer* _sceneUpdate;
+    QTimer* m_sceneUpdate;
 
     /*!
      * \brief Function which sorts arenaScene elements so overlaping items won't hide smaller items (rendering them unselectable)

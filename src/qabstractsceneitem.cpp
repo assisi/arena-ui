@@ -9,43 +9,43 @@ void QAbstractSceneItem::recursiveSetHidden(bool state)
         for(auto& item : childItems())
             sCast(item)->recursiveSetHidden(state);
     else {
-        _treeItem->setHidden(state);
-        if(state) tCast(_treeItem)->resetSelection();
+        m_treeItem->setHidden(state);
+        if(state) tCast(m_treeItem)->resetSelection();
     }
 }
 
 QVariant QAbstractSceneItem::itemChange(QGraphicsItem::GraphicsItemChange change, const QVariant &value){
     if(change == QGraphicsItem::ItemSelectedHasChanged){
         recursiveSetHidden(!value.toBool());
-        _treeItem->setHidden(!value.toBool());
-        if(!value.toBool()) tCast(_treeItem)->resetSelection();
+        m_treeItem->setHidden(!value.toBool());
+        if(!value.toBool()) tCast(m_treeItem)->resetSelection();
     }
     return QGraphicsItem::itemChange(change, value);
 }
 
 QAbstractSceneItem::QAbstractSceneItem() :
-    _inGroup(false),
-    _groupColor(Qt::black)
+    m_inGroup(false),
+    m_groupColor(Qt::black)
 {
     this->setFlag(GraphicsItemFlag::ItemIsSelectable);
 }
 
 void QAbstractSceneItem::setInGroup(bool state){
-    _inGroup = state;
+    m_inGroup = state;
 }
 
 void QAbstractSceneItem::setTreeItem(QTreeWidgetItem *treeItem)
 {
-    _treeItem = treeItem;
+    m_treeItem = treeItem;
 }
 
 void QAbstractSceneItem::deleteTreeItem()
 {
-    delete _treeItem;
+    delete m_treeItem;
 }
 
 void QAbstractSceneItem::setGroupColor(const QColor &color){
-    _groupColor = color;
+    m_groupColor = color;
 }
 
 QPainterPath QAbstractSceneItem::shape() const

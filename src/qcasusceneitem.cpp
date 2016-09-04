@@ -3,6 +3,8 @@
 
 using namespace zmqData;
 
+static const double PI = 3.14159265;
+
 bool QCasuSceneItem::isGroup() const
 {
     return false;
@@ -11,14 +13,14 @@ bool QCasuSceneItem::isGroup() const
 QList<zmqBuffer *> QCasuSceneItem::getBuffers(dataType key) const
 {
     QList<zmqBuffer *> out;
-    out.append(_zmqObject->getBuffer(key));
+    out.append(m_zmqObject->getBuffer(key));
     return out;
 }
 
 QVector<QPointF> QCasuSceneItem::getCoordinateVector() const
 {
     QVector<QPointF> out;
-    out.append(_coordinates);
+    out.append(m_coordinates);
     return out;
 }
 
@@ -26,27 +28,27 @@ void QCasuSceneItem::sendSetpoint(const QList<QByteArray> &message) const
 {
     // from context menu until here, message is passed as const and by reference
     // QCasuZMQ has to add CASU name in front so message is passed by value (making a copy)
-    _zmqObject->sendSetpoint(message);
+    m_zmqObject->sendSetpoint(message);
 }
 
 QCasuSceneItem::QCasuSceneItem(QPointF coordinates, double yaw, QCasuZMQ *zmqObject) :
-    _coordinates(coordinates),
-    _yaw((int)(yaw*180/PI)),
-    _airflowAngle(0),
-    _vibrAngle(0),
-    _zmqObject(zmqObject)
+    m_coordinates(coordinates),
+    m_yaw((int)(yaw*180/PI)),
+    m_airflowAngle(0),
+    m_vibrAngle(0),
+    m_zmqObject(zmqObject)
 {
     FPScheck = new QElapsedTimer();
 }
 
 QCasuZMQ *QCasuSceneItem::getZmqObject()
 {
-    return _zmqObject;
+    return m_zmqObject;
 }
 
 QRectF QCasuSceneItem::boundingRect() const
 {
-    return QRectF(_coordinates.x()-10,_coordinates.y()-10,20,20);
+    return QRectF(m_coordinates.x()-10, m_coordinates.y()-10,20,20);
 }
 
 void QCasuSceneItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
@@ -69,23 +71,23 @@ void QCasuSceneItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *op
     painter->setPen(pen);
 
     //paint IR sensor readings
-    if(settings->value("IR_on").toBool()){
-        for(int k = 0; k < _IR_num; k++){
+    if(g_settings->value("IR_on").toBool()){
+        for(int k = 0; k < m_IR_NUM; k++){
             brush.setColor(Qt::black);
             painter->setBrush(brush);
             double tempIR;
 
-            if (_zmqObject->isConnected()) tempIR = _zmqObject->getValue(dCast(k)) / 65536;
+            if (m_zmqObject->isConnected()) tempIR = m_zmqObject->getValue(dCast(k)) / 65536;
             else tempIR = 0;
-            painter->drawPie(QIRTriangle(_coordinates,_yaw + k*60, tempIR), (_yaw + k*60 - 25)*16, 50*16); // 0° is at 3 o'clock, ccw direction
+            painter->drawPie(QIRTriangle(m_coordinates, m_yaw + k*60, tempIR), (m_yaw + k*60 - 25)*16, 50*16); // 0° is at 3 o'clock, ccw direction
         }
     }
 
     //paint Temp sensor readings
-    if(settings->value("temp_on").toBool()){
+    if(g_settings->value("temp_on").toBool()){
         for(int k = 0; k < 4; k++){
-            if(_zmqObject->isConnected()){
-                double tempTemp = _zmqObject->getValue(dCast(6 + k));
+            if(m_zmqObject->isConnected()){
+                double tempTemp = m_zmqObject->getValue(dCast(6 + k));
                 if (tempTemp > 50) tempTemp = 50;
                 if (tempTemp < 20) tempTemp = 20;
 
@@ -99,7 +101,7 @@ void QCasuSceneItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *op
 
             painter->setPen(pen);
 
-            QTempArc arc(_coordinates, _yaw + k*90); // 0° is at 3 o'clock, ccw direction
+            QTempArc arc(m_coordinates, m_yaw + k*90); // 0° is at 3 o'clock, ccw direction
             painter->drawArc(arc.rect, arc.start ,arc.span);
         }
     }
@@ -114,27 +116,27 @@ void QCasuSceneItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *op
 
     // - Configurating pen and brush parameters
     pen.setWidth(2);
-    if(isSelected() && _inGroup)pen.setColor(_groupColor);
-    else if(_zmqObject->isConnected())pen.setColor(Qt::green);
+    if(isSelected() && m_inGroup)pen.setColor(m_groupColor);
+    else if(m_zmqObject->isConnected())pen.setColor(Qt::green);
     else pen.setColor(Qt::red);
 
     if(isSelected()) pen.setStyle(Qt::DotLine);
     else pen.setStyle(Qt::SolidLine);
 
-    brush.setColor(_zmqObject->getLedColor());
-    if(tCast(_treeItem)->isChildSelected()) brush.setStyle(Qt::Dense2Pattern);
+    brush.setColor(m_zmqObject->getLedColor());
+    if(tCast(m_treeItem)->isChildSelected()) brush.setStyle(Qt::Dense2Pattern);
 
     painter->setPen(pen);
     painter->setBrush(brush);
     painter->drawEllipse(boundingRect());
-    painter->drawLine(_coordinates.x() + 5*cos(-_yaw*PI/180),
-                      _coordinates.y() + 5*sin(-_yaw*PI/180),
-                      _coordinates.x() + 9*cos(-_yaw*PI/180),
-                      _coordinates.y() + 9*sin(-_yaw*PI/180));
+    painter->drawLine(m_coordinates.x() + 5*cos(-m_yaw*PI/180),
+                      m_coordinates.y() + 5*sin(-m_yaw*PI/180),
+                      m_coordinates.x() + 9*cos(-m_yaw*PI/180),
+                      m_coordinates.y() + 9*sin(-m_yaw*PI/180));
 
     //paint airflow marker
-    if(settings->value("air_on").toBool() && _zmqObject->isConnected() && _zmqObject->getState(Airflow)){
-        double value = _zmqObject->getValue(Airflow);
+    if(g_settings->value("air_on").toBool() && m_zmqObject->isConnected() && m_zmqObject->getState(Airflow)){
+        double value = m_zmqObject->getValue(Airflow);
 
         pen.setColor(Qt::transparent);
         brush.setColor(QColor(250, 218, 94, 96));
@@ -142,16 +144,16 @@ void QCasuSceneItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *op
         painter->setBrush(brush);
         // 30 FPS, max_speed = 6 deg/frame -> w = 0.5 rpm
         // CURRENTLY THERE IS ONLY ONE INTENSITY, WHEN INTESITY RANGE WILL BE ENABLED, MAX_SPEED SHOULD BE 12
-        _airflowAngle = fmod(_airflowAngle + value * 6 * FPSrepaint, 360);
-        painter->drawPath(QPetal(_coordinates,_airflowAngle));       // petal 1
-        painter->drawPath(QPetal(_coordinates,_airflowAngle + 120)); // petal 2
-        painter->drawPath(QPetal(_coordinates,_airflowAngle - 120)); // petal 3
+        m_airflowAngle = fmod(m_airflowAngle + value * 6 * FPSrepaint, 360);
+        painter->drawPath(QPetal(m_coordinates, m_airflowAngle));       // petal 1
+        painter->drawPath(QPetal(m_coordinates, m_airflowAngle + 120)); // petal 2
+        painter->drawPath(QPetal(m_coordinates, m_airflowAngle - 120)); // petal 3
     }
 
     //paint vibration marker
-    if(settings->value("vibr_on").toBool() && _zmqObject->isConnected() && _zmqObject->getState(Speaker)){
-        double freq = _zmqObject->getValue(Frequency);
-        double amplitude = _zmqObject->getValue(Amplitude);
+    if(g_settings->value("vibr_on").toBool() && m_zmqObject->isConnected() && m_zmqObject->getState(Speaker)){
+        double freq = m_zmqObject->getValue(Frequency);
+        double amplitude = m_zmqObject->getValue(Amplitude);
 
         pen.setColor(QColor(255,255,255,96));
         pen.setWidth(2);
@@ -160,10 +162,10 @@ void QCasuSceneItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *op
         painter->setPen(pen);
         painter->setBrush(brush);
         // 30 FPS, max_speed = 12 deg/frame -> w = 1 rpm
-        _vibrAngle = fmod(_vibrAngle - amplitude/50* 12*FPSrepaint, 360);
+        m_vibrAngle = fmod(m_vibrAngle - amplitude/50* 12*FPSrepaint, 360);
         // wawesNum = [6 .. 15]
         int wawesNum = 6+9*freq/1500;
-        auto tempItem = std::move(QVibratingCircle(_coordinates, wawesNum, _vibrAngle));
+        auto tempItem = std::move(QVibratingCircle(m_coordinates, wawesNum, m_vibrAngle));
         painter->drawPath(tempItem);
         pen.setColor(QColor(128,128,128,96));
         painter->setPen(pen);

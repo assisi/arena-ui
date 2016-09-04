@@ -29,7 +29,7 @@ private:
      * This is workaround for the context menu action because group functionality was added late
      */
 
-    QMap<QCPGraph *, zmqData::zmqBuffer *> _connectionMap;
+    QMap<QCPGraph *, zmqData::zmqBuffer *> m_connectionMap;
 
     bool autoPosition;
     bool showLegend;

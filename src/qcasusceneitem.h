@@ -7,8 +7,6 @@
 
 #include "qabstractsceneitem.h"
 
-#define PI 3.14159265
-
 /*!
  * \brief Graphics scene item for CASU
  *
@@ -18,14 +16,14 @@
 class QCasuSceneItem : public QAbstractSceneItem
 {
 private:
-    QPointF _coordinates;
-    int _yaw;
+    QPointF m_coordinates;
+    int m_yaw;
     QElapsedTimer *FPScheck;
 
-    double _airflowAngle;
-    double _vibrAngle;
+    double m_airflowAngle;
+    double m_vibrAngle;
 
-    QCasuZMQ *_zmqObject;
+    QCasuZMQ *m_zmqObject;
 
 public:
     explicit QCasuSceneItem(QPointF coordinates, double yaw, QCasuZMQ *zmqObject);

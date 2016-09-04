@@ -11,21 +11,21 @@ void QAbstractTreeItem::resetSelection() const{
 
 void QAbstractTreeItem::setSceneItem(QGraphicsItem *sceneItem)
 {
-    _sceneItem = sceneItem;
+    m_sceneItem = sceneItem;
 }
 
 bool QAbstractTreeItem::isChildSelected() const
 {
     bool childSelected = false;
-    for(int k = 0; k < _IR_num + _Temp_num; k++) childSelected |= _widgetMap[dCast(k)]->isSelected();
+    for(int k = 0; k < m_IR_NUM + m_temp_NUM; k++) childSelected |= m_widgetMap[dCast(k)]->isSelected();
     return childSelected;
 }
 
 QList<zmqBuffer *> QAbstractTreeItem::getBuffers() const
 {
     QList<zmqBuffer *> outList;
-    for(int k = 0; k < _IR_num + _Temp_num; k++)
-        if(_widgetMap[dCast(k)]->isSelected())
-            outList.append((sCast(_sceneItem))->getBuffers(dCast(k)));
+    for(int k = 0; k < m_IR_NUM + m_temp_NUM; k++)
+        if(m_widgetMap[dCast(k)]->isSelected())
+            outList.append((sCast(m_sceneItem))->getBuffers(dCast(k)));
     return outList;
 }

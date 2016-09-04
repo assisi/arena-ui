@@ -10,8 +10,8 @@ class QCasuTreeItem : public QObject, public QAbstractTreeItem
 {
     Q_OBJECT
 private:
-    QCasuZMQ *_zmqObject;
-    QMetaObject::Connection _zmqObjectConnection;
+    QCasuZMQ *m_zmqObject;
+    QMetaObject::Connection m_zmqObjectConnection;
 
 public:
     explicit QCasuTreeItem(QCasuZMQ *zmqObject);
