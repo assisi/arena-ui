@@ -24,9 +24,10 @@ Makefile
 \#*#
 .#*
 
-# Build, and test folders
+# Build, data and test folders
 test*
 doc/user/build
 doc/devel
+src/msg
 build*
 Doxygen
