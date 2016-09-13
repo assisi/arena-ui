@@ -11,9 +11,6 @@
 
 #include "globalHeader.h"
 
-//3rd party class implementations
-#include "flowlayout.h"
-
 #include "qarenascene.h"
 #include "qdialogconnect.h"
 #include "qdialogsettings.h"
@@ -25,6 +22,7 @@
 #include "qcasutreegroup.h"
 
 #include "qtrendplot.h"
+#include "flowlayout.h"
 #include "qdeploy.h"
 #include "qgraphicsviewzoom.h"
 //#include "qgstreamerview.h"
@@ -54,45 +52,23 @@ private:
     /*!
      * \brief Pointer to main graphics scene
      */
-    QArenaScene *_arenaScene;
+    QArenaScene *m_arenaScene;
     /*!
      * \brief YAML node to parse associated project files
      */
-    YAML::Node _assisiNode;
+    YAML::Node m_assisiNode;
 
     /*!
      * \brief Tab in which trend plots are docked
      */
-    QVBoxLayout* _trendTab;
-    /*!
-     * \brief Custom widget for deployment
-     */
-    QDeploy* _deployWidget;
-    /*!
-     * \brief Pointer to shell output scroll area
-     */
-    QScrollArea* _deployScroll;
-    /*!
-     * \brief Pointer to QLabel for showing loaded associated file
-     */
-    QLabel* _deployArena;
-    /*!
-     * \brief Pointer to QLabel for showing loaded associated file
-     */
-    QLabel* _deployFile;
-    /*!
-     * \brief Pointer to QLabel for showing loaded associated file
-     */
-    QLabel* _deployNeighborhood;
-    /*!
-     * \brief Custom widget for video streaming
-     */
+    QVBoxLayout* m_trendTab;
+
     //QGstreamerView* videoStream;
 
     /*!
      * \brief Timer responsible for 30FPS graphics scene refresh rate
      */
-    QTimer* _sceneUpdate;
+    QTimer* m_sceneUpdate;
 
     /*!
      * \brief Function which sorts arenaScene elements so overlaping items won't hide smaller items (rendering them unselectable)
@@ -100,17 +76,13 @@ private:
     void sortGraphicsScene();
 
     /*!
-     * \brief Recursive function to send setpoint to multiple and/or grouped CASUs
-     */
-    void groupSendSetpoint(QList<QGraphicsItem *> group, QList<QByteArray> message);
-    /*!
      * \brief Recursive function which saves grouping hieararchy of arenaScene items when saving a session
      */
-    void groupSave(QSettings *saveState, QList<QGraphicsItem*> items, QString groupName);
+    void groupSave(QSettings *saveState, const QList<QGraphicsItem *> &items, const QString &groupName);
     /*!
      * \brief Recursive function which loads grouping hieararchy of arenaScene items when loading a session
      */
-    QList<QGraphicsItem *> *groupLoad(YAML::Node *arenaNode, QSettings *loadState, int groupSize, QMap<QString, QCasuZMQ*>* linkMap, QProgressBar *progress);
+    QList<QGraphicsItem *> groupLoad(YAML::Node *arenaNode, QSettings *loadState, const int &groupSize, QMap<QString, QCasuZMQ*>* linkMap, QProgressBar *progress);
 
 private slots:
     /*!
@@ -159,39 +131,9 @@ private slots:
     void on_actionCamera_toggled(bool arg1);
 
     /*!
-     * \brief Action for toggling QCasuSceneItem graphics elements
-     */
-    void toggleIR();
-    /*!
-     * \brief Action for toggling QCasuSceneItem graphics elements
-     */
-    void toggleTemp();
-    /*!
-     * \brief Action for toggling QCasuSceneItem graphics elements
-     */
-    void toggleAir();
-    /*!
-     * \brief Action for toggling QCasuSceneItem graphics elements
-     */
-    void toggleVibr();
-    void toggleAvgTime();
-    /*!
-     * \brief Updates selected QCasuTreeItem elements in tabCasus
-     */
-    void updateTreeSelection();
-    /*!
      * \brief Custom context menu dialog for arenaScene
      */
-    void customContextMenu(QPoint pos);
-    /*!
-     * \brief Scrolls shell output window on tabDeploy according to updates
-     */
-    void moveDeployScroll(int min, int max);
-
-    /*!
-     * \brief Opens a dialog for configuring setpoint parameters of selected actuator and sends them to selected CASUs
-     */
-    void sendSetpoint(QString actuator);
+    void customContextMenu(const QPoint &pos);
 };
 
 
@@ -213,7 +155,7 @@ protected:
 
 private:
     QGraphicsScene* scene_;
-    bool drag_true;
+    bool dragTrue;
     QList<QGraphicsItem*> selectedList;
 };
 // ------------------------------------------------------------------------

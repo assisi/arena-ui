@@ -10,13 +10,12 @@ class QCasuTreeItem : public QObject, public QAbstractTreeItem
 {
     Q_OBJECT
 private:
-    QCasuZMQ *_zmqObject;
+    QCasuZMQ *m_zmqObject;
+    QMetaObject::Connection m_zmqObjectConnection;
 
 public:
-    QCasuTreeItem(QCasuZMQ *zmqObject);
-
-private slots:
-    void updateData(dataType key);
+    explicit QCasuTreeItem(QCasuZMQ *zmqObject);
+    ~QCasuTreeItem();
 };
 
 #endif // CASUTREEITEM_H

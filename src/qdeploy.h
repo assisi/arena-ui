@@ -2,7 +2,7 @@
 #define QDEPLOY_H
 
 #include <QDebug>
-#include <QLabel>
+#include <QTextEdit>
 #include <QProcess>
 #include <QWindow>
 
@@ -17,28 +17,26 @@
  *
  * Simulator is started as individual process with spawning capabilities
  */
-class QDeploy : public QLabel
+class QDeploy : public QTextEdit
 {
     Q_OBJECT
 
 public:
-    QDeploy(QWidget *parent = 0);
+    explicit QDeploy(QWidget *parent = 0);
     ~QDeploy();
 
-    void setWorkingDirectory(QString dir);
+    void setWorkingDirectory(const QString &dir);
 private:
     /*!
      * \brief Individual process for executing shell commands
      */
-    QProcess* _shell;
+    QProcess* m_shell;
 
-    qint64 _simulatorPID;
+    qint64 m_simulatorPID;
 
-    /*!
-     * \brief Appends shell output in UI
-     * \param text - colected shell output
-     */
-    void appendText(QString text);
+    QMetaObject::Connection m_shellOut1;
+    QMetaObject::Connection m_shellOut2;
+
     bool isSimulatorStarted();
 
 signals:
@@ -68,7 +66,7 @@ public slots:
      * \brief Toggle QProcess output collecting
      * \param state
      */
-    void toggleOutput(int state);
+    void toggleOutput(bool state);
 
     /*!
      * \brief Start simulator and spawn CASUs from loaded arena file (*.arena)
@@ -78,16 +76,6 @@ public slots:
      * \brief Close running simulator
      */
     void simulatorStop();
-
-private slots:
-    /*!
-     * \brief Collects shell ouput from QProcess
-     */
-    void appendOut();
-    /*!
-     * \brief Collects QProcess errors
-     */
-    void appendErr();
 };
 
 #endif // QDEPLOY_H

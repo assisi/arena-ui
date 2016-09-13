@@ -3,8 +3,7 @@
 
 #include<QGraphicsScene>
 
-#include"qcasusceneitem.h"
-#include"qcasutreegroup.h"
+class QTreeWidgetItem;
 
 /*!
  * \brief Subclassed QGraphicsScene with overloaded \b mousePressEvent function as a bug workaround.
@@ -15,15 +14,13 @@ class QArenaScene : public QGraphicsScene
 {
     Q_OBJECT
 protected:
-    void drawBackground(QPainter *painter, const QRectF &rect);
-    void drawForeground(QPainter *painter, const QRectF &rect);
-    QSelectionTreeItem *_treeItem;
+    void drawBackground(QPainter *painter, const QRectF &rect) Q_DECL_OVERRIDE;
+    void drawForeground(QPainter *painter, const QRectF &rect) Q_DECL_OVERRIDE;
+    QTreeWidgetItem *m_treeItem;
 public:
-    QArenaScene(QWidget *parent);
-    void mousePressEvent(QGraphicsSceneMouseEvent *event);
-    void setTreeItem(QSelectionTreeItem *treeItem);
-private slots:
-    void checkSelection();
+    explicit QArenaScene(QWidget *parent);
+    void mousePressEvent(QGraphicsSceneMouseEvent *event) Q_DECL_OVERRIDE;
+    void setTreeItem(QTreeWidgetItem *treeItem);
 };
 
 #endif // QARENASCENE_H

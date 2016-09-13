@@ -1,73 +1,101 @@
 #include "qcasuzmq.h"
 
+using namespace zmqData;
+
 QCasuZMQ::QCasuZMQ(QObject *parent, QString casuName) :
     QObject(parent),
-    _name(casuName)
+    m_name(casuName)
 {
-    for(int k = 0; k < _IR_num + _Temp_num; k++) _buffers.insert(static_cast<dataType>(k), new zmqBuffer(_name, static_cast<dataType>(k)));
-    for(int k = _IR_num + _Temp_num; k < _dataType_num; k++)_state.insert(static_cast<dataType>(k), false);
+    for(int k = 0; k < m_IR_NUM + m_temp_NUM; k++){
+        m_buffers.insert(dCast(k), new zmqBuffer(m_name, dCast(k)));
+    }
+    for(int k = m_IR_NUM + m_temp_NUM; k < m_dataType_NUM; k++){
+        m_state.insert(dCast(k), false);
+    }
 
-    _connectionTimer = new QTimer(this);
+    m_connectionTimer = new QTimer(this);
 
-    _context = createDefaultContext(this);
-    _context->start();
-    _subSock = _context->createSocket(ZMQSocket::TYP_SUB, this);
-    _pubSock = _context->createSocket(ZMQSocket::TYP_PUB, this);
+    m_context = nzmqt::createDefaultContext(this);
+    m_context->start();
+    m_subSock = m_context->createSocket(nzmqt::ZMQSocket::TYP_SUB, this);
+    m_pubSock = m_context->createSocket(nzmqt::ZMQSocket::TYP_PUB, this);
 
-    connect(_subSock, SIGNAL(messageReceived(const QList<QByteArray>&)), SLOT(messageReceived(const QList<QByteArray>&)));
-    connect(_connectionTimer, SIGNAL(timeout()),SLOT(connectionTimeout()));
+    connect(m_subSock, &nzmqt::ZMQSocket::messageReceived, this, &QCasuZMQ::messageReceived);
+    connect(m_connectionTimer, &QTimer::timeout,[&](){
+        m_connected = false;
+        m_connectionTimer->stop();
+         emit connectMsg("[ZMQ][" + m_name + "][ERR] Connection timeout!");
+    });
 }
 
-zmqBuffer *QCasuZMQ::getBuffer(dataType key)
+zmqBuffer *QCasuZMQ::getBuffer(dataType key) const
 {
-    if (key < _IR_num + _Temp_num) return _buffers[key];
+    if (key < m_IR_NUM + m_temp_NUM) return m_buffers[key];
     return 0;
 }
 
-double QCasuZMQ::getValue(dataType key)
+double QCasuZMQ::getValue(dataType key) const
 {
-    if (key < _IR_num + _Temp_num){
-        if (_buffers[key]->isEmpty()) return 0;
-        else return _buffers[key]->last().value;
+    if (key < m_IR_NUM + m_temp_NUM){
+        if (m_buffers[key]->isEmpty()) return 0;
+        else return m_buffers[key]->last().value;
     }
-    return _values[key].value;
+    return m_values[key].value;
 }
 
-QColor QCasuZMQ::getLedColor()
+QColor QCasuZMQ::getLedColor() const
 {
-    return _state[LED] ? _ledColor : Qt::gray;
+    return m_state[LED] ? m_ledColor : Qt::gray;
 }
 
-bool QCasuZMQ::getState(dataType key)
+bool QCasuZMQ::getState(dataType key) const
 {
-    return _state[key];
+    return m_state[key];
 }
 
-int QCasuZMQ::getAvgSamplingTime()
+int QCasuZMQ::getAvgSamplingTime() const
 {
     double result = 0;
     double itemNum = 0;
 
-    foreach(double oldTime, _lastDataTime){
-        dataType key = _lastDataTime.key(oldTime, LED);
+    for(auto& oldTime : m_lastDataTime){
+        dataType key = m_lastDataTime.key(oldTime, LED);
         if(key == LED) continue;
-        if(key >= _IR_num + _Temp_num) result += _values[key].key - oldTime;
-        else result += _buffers[key]->getLastTime() - oldTime;
+        if(key >= m_IR_NUM + m_temp_NUM){
+            result += m_values[key].key - oldTime;
+        } else {
+            result += m_buffers[key]->getLastTime() - oldTime;
+        }
         itemNum++;
     }
-    return itemNum && _connected ? result*1000/itemNum : 0;
+    return itemNum && m_connected ? result*1000/itemNum : 0;
 }
 
-QString QCasuZMQ::getName()
+QString QCasuZMQ::getName() const
 {
-    return _name;
+    return m_name;
+}
+
+QStringList QCasuZMQ::getAddresses() const
+{
+    QStringList out;
+    out.append(m_subAddr);
+    out.append(m_pubAddr);
+    out.append(m_msgAddr);
+    return out;
 }
 
 void QCasuZMQ::setAddresses(QString sub, QString pub, QString msg)
 {
-    _subAddr = sub;
-    _pubAddr = pub;
-    _msgAddr = msg;
+    if(m_connected){
+        m_subSock->unsubscribeFrom("casu");
+        m_subSock->disconnectFrom(m_subAddr);
+        m_pubSock->disconnectFrom(m_pubAddr);
+        emit connectMsg("[ZMQ][" + m_name + "] Disconnected");
+    }
+    m_subAddr = sub;
+    m_pubAddr = pub;
+    m_msgAddr = msg;
 
     this->connectZMQ();
 }
@@ -77,44 +105,37 @@ void QCasuZMQ::setAddresses(QStringList addresses)
     setAddresses(addresses.at(0), addresses.at(1), addresses.at(2));
 }
 
-QStringList QCasuZMQ::getAddresses()
-{
-    QStringList out;
-    out.append(_subAddr);
-    out.append(_pubAddr);
-    out.append(_msgAddr);
-    return out;
-}
-
 bool QCasuZMQ::sendSetpoint(QList<QByteArray> message)
 {
-    if(!_connected) return false;
-    message.push_front(QString(_name).toLocal8Bit());
-    return _pubSock->sendMessage(message);
+    if(!m_connected) return false;
+    message.push_front(QString(m_name).toLocal8Bit());
+    return m_pubSock->sendMessage(message);
 }
 
-bool QCasuZMQ::isConnected()
+bool QCasuZMQ::isConnected() const
 {
-    return _connected;
+    return m_connected;
 }
 
 void QCasuZMQ::openLogFile()
 {
-    _logName = settings->value("logSubFolder").toString() + QDateTime::currentDateTime().toString(date_time_format) + _name + ".log";
-    _logFile.open(_logName.toStdString().c_str(), ofstream::out | ofstream::app);
-    _logOpen = true;
+    m_logName = g_settings->value("logSubFolder").toString() + QDateTime::currentDateTime().toString(g_date_time_format) + m_name + ".log";
+    m_logFile.open(m_logName.toStdString().c_str(), std::ofstream::out | std::ofstream::app);
+    m_logOpen = true;
 }
 
 void QCasuZMQ::closeLogFile()
 {
-    _logFile.close();
-    _logOpen = false;
+    m_logFile.close();
+    m_logOpen = false;
 }
 
 void QCasuZMQ::addToBuffer(dataType key, QCPData data)
 {
-    _buffers[key]->insert(data.key, data);
-    while(data.key - _buffers[key]->firstKey() > QTime(0,0,0).secsTo(settings->value("trendTimeSpan").toTime())) _buffers[key]->erase(_buffers[key]->begin()); //Delete data older than $timeSpan
+    m_buffers[key]->insert(data.key, data);
+    while(data.key - m_buffers[key]->firstKey() > QTime(0,0,0).secsTo(g_settings->value("trendTimeSpan").toTime())){
+        m_buffers[key]->erase(m_buffers[key]->begin()); //Delete data older than $timeSpan
+    }
 
     emit updated(key);
 }
@@ -122,59 +143,66 @@ void QCasuZMQ::addToBuffer(dataType key, QCPData data)
 void QCasuZMQ::connectZMQ()
 {
     try{
-        _pubSock->connectTo(_pubAddr);
+        m_pubSock->connectTo(m_pubAddr);
         // Subscribe to everything!
-        _subSock->subscribeTo("casu");
-        _subSock->connectTo(_subAddr);
-        _connected = true;
-        _connectionTimer->start(1000);
+        m_subSock->subscribeTo("casu");
+        m_subSock->connectTo(m_subAddr);
+        m_connectionTimer->start(1000);
     }
-    catch(zmq::error_t e){
-        _connected = false;
+    catch(zmq::error_t &e){
+        emit connectMsg("[ZMQ][" + m_name + "][ERR] Failed to connect: " + QString(e.what()));
+        m_connected = false;
     }
 }
 
 void QCasuZMQ::messageReceived(const QList<QByteArray> &message)
 {
-    string name(message.at(0).constData(), message.at(0).length());
-    if(name != _name.toStdString()) return;
-    if(!_connected) _connected = true;
-    if(settings->value("log_on").toBool() & !_logOpen) openLogFile();
-    if(!settings->value("log_on").toBool() & _logOpen) closeLogFile();
+    QString name(message.at(0));
+    if(name != m_name) return;
+    if(!m_connected) {
+        m_connected = true;
+         emit connectMsg("[ZMQ][" + m_name + "] Connected");
+    }
+    if(g_settings->value("log_on").toBool() && !m_logOpen) openLogFile();
+    if(!g_settings->value("log_on").toBool() && m_logOpen) closeLogFile();
 
-    _connectionTimer->start(2000);
+    m_connectionTimer->start(2000);
 
-    string device(message.at(1).constData(), message.at(1).length());
-    string command(message.at(2).constData(), message.at(2).length());
-    string data(message.at(3).constData(), message.at(3).length());
+    QString device(message.at(1));
+    QString command(message.at(2));
+    std::string data(message.at(3).constData(), message.at(3).size());
 
     QCPData newData;
     newData.key = (double) QTime(0,0,0).msecsTo(QTime::currentTime())/1000;
 
-    _logFile << device << ";" << (float) QDateTime::currentDateTime().toMSecsSinceEpoch() / 1000 ;
+    m_logFile << device.toStdString() << ";" << (float) QDateTime::currentDateTime().toMSecsSinceEpoch() / 1000 ;
 
     if (device == "IR"){
         AssisiMsg::RangeArray ranges;
         ranges.ParseFromString(data);
-        _lastDataTime[static_cast<dataType>(0)] = _buffers[static_cast<dataType>(0)]->getLastTime();
+        m_lastDataTime[dCast(0)] = m_buffers[dCast(0)]->getLastTime();
         for (int k = 0; k < ranges.raw_value_size(); k++){
-            if( k == _IR_num) break;
+            if( k == m_IR_NUM) break;
             newData.value = ranges.raw_value(k);
-            this->addToBuffer(static_cast<dataType>(k), newData);
-            emit updated(static_cast<dataType>(k));
-            if(settings->value("log_on").toBool()) _logFile << ";" << newData.value;
+            this->addToBuffer(dCast(k), newData);
+            emit updated(dCast(k));
+            if(g_settings->value("log_on").toBool()){
+                m_logFile << ";" << newData.value;
+            }
         }
     }
     if (device == "Temp"){
         AssisiMsg::TemperatureArray temperatures;
         temperatures.ParseFromString(data);
-        _lastDataTime[static_cast<dataType>(_IR_num)] = _buffers[static_cast<dataType>(_IR_num)]->getLastTime();
+        m_lastDataTime[dCast(m_IR_NUM)] = m_buffers[dCast(m_IR_NUM)]->getLastTime();
         for (int k = 0; k < temperatures.temp_size(); k++){
-            if( k == _Temp_num) break;
+            if( k == m_temp_NUM) break;
             newData.value = temperatures.temp(k);
-            this->addToBuffer(static_cast<dataType>(k+_IR_num), newData);
-            emit updated(static_cast<dataType>(k+_IR_num));
-            if(settings->value("log_on").toBool()) _logFile << ";" << newData.value;
+            this->addToBuffer(dCast(k+m_IR_NUM), newData);
+            emit updated(dCast(k+m_IR_NUM));
+            if(g_settings->value("log_on").toBool()){
+                m_logFile << ";" << newData.value;
+            }
         }
     }
 
@@ -184,88 +212,90 @@ void QCasuZMQ::messageReceived(const QList<QByteArray> &message)
         AssisiMsg::Temperature pelt;
         pelt.ParseFromString(data);
         newData.value = pelt.temp();
-        _lastDataTime[Peltier] = _values[Peltier].key;
-        _values[Peltier] = newData;
-        _state[Peltier] = command == "On";
+        m_lastDataTime[Peltier] = m_values[Peltier].key;
+        m_values[Peltier] = newData;
+        m_state[Peltier] = command == "On";
         emit updated(Peltier);
-        if(settings->value("log_on").toBool()) _logFile << ";" << _values[Peltier].value
-                                                       << ";" << _state[Peltier];
+        if(g_settings->value("log_on").toBool()){
+            m_logFile << ";" << m_values[Peltier].value
+                      << ";" << m_state[Peltier];
+        }
      }
     if (device == "Airflow"){
         AssisiMsg::Airflow air;
         air.ParseFromString(data);
-        _lastDataTime[Airflow] = _values[Airflow].key;
+        m_lastDataTime[Airflow] = m_values[Airflow].key;
         newData.value = air.intensity();
-        _values[Airflow] = newData;
-        _state[Airflow] = command == "On";
+        m_values[Airflow] = newData;
+        m_state[Airflow] = command == "On";
         emit updated(Airflow);
-        if(settings->value("log_on").toBool()) _logFile << ";" << _values[Airflow].value
-                                                       << ";" << _state[Airflow];
+        if(g_settings->value("log_on").toBool()){
+            m_logFile << ";" << m_values[Airflow].value
+                      << ";" << m_state[Airflow];
+        }
 
      }
     if (device == "Speaker"){
         AssisiMsg::VibrationSetpoint vibr;
         vibr.ParseFromString(data);
-         _lastDataTime[Frequency] = _values[Frequency].key;
+         m_lastDataTime[Frequency] = m_values[Frequency].key;
         newData.value = vibr.freq();
-        _values[Frequency] = newData;
+        m_values[Frequency] = newData;
         newData.value = vibr.amplitude();
-        _values[Amplitude] = newData;
-        _state[Speaker] = command == "On";
-        _state[Frequency] = command == "On";
-        _state[Amplitude] = command == "On";
+        m_values[Amplitude] = newData;
+        m_state[Speaker] = command == "On";
+        m_state[Frequency] = command == "On";
+        m_state[Amplitude] = command == "On";
         emit updated(Frequency);
         emit updated(Amplitude);
-        if(settings->value("log_on").toBool()) _logFile << ";" << _values[Frequency].value
-                                                       << ";" << _values[Amplitude].value
-                                                       << ";" << _state[Speaker];
+        if(g_settings->value("log_on").toBool()){
+            m_logFile << ";" << m_values[Frequency].value
+                      << ";" << m_values[Amplitude].value
+                      << ";" << m_state[Speaker];
+        }
     }
     if (device == "DiagnosticLed")
     {
         AssisiMsg::ColorStamped LEDcolor;
         LEDcolor.ParseFromString(data);
-        _ledColor.setRgbF(LEDcolor.color().red(),
+        m_ledColor.setRgbF(LEDcolor.color().red(),
                           LEDcolor.color().green(),
                           LEDcolor.color().blue());
-        _state[LED] = command == "On";
+        m_state[LED] = command == "On";
         emit updated(LED);
-        if(settings->value("log_on").toBool()) _logFile << ";" << _ledColor.name().toStdString()
-                                                       << ";" << _state[LED];
+        if(g_settings->value("log_on").toBool()){
+            m_logFile << ";" << m_ledColor.name().toStdString()
+                      << ";" << m_state[LED];
+        }
     }
 
-    _logFile << endl;
-}
-
-void QCasuZMQ::connectionTimeout()
-{
-    _connected = false;
-    _connectionTimer->stop();
+    m_logFile << std::endl;
 }
 
 // ----------------------------------------------------------------
 
 zmqBuffer::zmqBuffer(QString casuName, dataType key) :
-    _legendName(casuName),
-    _casuName(casuName),
-    _key(key)
+    m_legendName(casuName),
+    m_casuName(casuName),
+    m_key(key)
 {
     switch(key){
-    case IR_F  : _legendName += ": IR - F";  break;
-    case IR_FL : _legendName += ": IR - FL"; break;
-    case IR_FR : _legendName += ": IR - FR"; break;
-    case IR_B  : _legendName += ": IR - B";  break;
-    case IR_BR : _legendName += ": IR - BR"; break;
-    case IR_BL : _legendName += ": IR - BL"; break;
+        case IR_F  : m_legendName += ": IR - F";  break;
+        case IR_FL : m_legendName += ": IR - FL"; break;
+        case IR_FR : m_legendName += ": IR - FR"; break;
+        case IR_B  : m_legendName += ": IR - B";  break;
+        case IR_BR : m_legendName += ": IR - BR"; break;
+        case IR_BL : m_legendName += ": IR - BL"; break;
 
-    case Temp_F : _legendName += ": Temp - F"; break;
-    case Temp_R : _legendName += ": Temp - R"; break;
-    case Temp_B : _legendName += ": Temp - B"; break;
-    case Temp_L : _legendName += ": Temp - L"; break;
-    case Temp_Top : _legendName += ": Temp - F"; break;
-    case Temp_Pcb : _legendName += ": Temp - R"; break;
-    case Temp_Ring : _legendName += ": Temp - B"; break;
-    case Temp_Wax : _legendName += ": Temp - L"; break;
-    default: break;
+        case Temp_F : m_legendName += ": Temp - F"; break;
+        case Temp_R : m_legendName += ": Temp - R"; break;
+        case Temp_B : m_legendName += ": Temp - B"; break;
+        case Temp_L : m_legendName += ": Temp - L"; break;
+        case Temp_Top : m_legendName += ": Temp - F"; break;
+        case Temp_Pcb : m_legendName += ": Temp - R"; break;
+        case Temp_Ring : m_legendName += ": Temp - B"; break;
+        case Temp_Wax : m_legendName += ": Temp - L"; break;
+        default: break;
     }
 }
 
@@ -281,22 +311,22 @@ void zmqBuffer::erase(QMap::iterator it)
     emit updatePlot();
 }
 
-QString zmqBuffer::getLegendName()
+QString zmqBuffer::getLegendName() const
 {
-    return _legendName;
+    return m_legendName;
 }
 
-QString zmqBuffer::getCasuName()
+QString zmqBuffer::getCasuName() const
 {
-    return _casuName;
+    return m_casuName;
 }
 
-dataType zmqBuffer::getDataType()
+dataType zmqBuffer::getDataType() const
 {
-    return _key;
+    return m_key;
 }
 
-double zmqBuffer::getLastTime()
+double zmqBuffer::getLastTime() const
 {
     if (this->isEmpty()) return 0;
     return last().key;

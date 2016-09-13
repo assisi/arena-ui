@@ -1,4 +1,6 @@
 #include "qarenascene.h"
+#include "qcasusceneitem.h"
+#include "qcasutreegroup.h"
 
 void QArenaScene::drawBackground(QPainter *painter, const QRectF &rect)
 {
@@ -19,16 +21,16 @@ void QArenaScene::drawBackground(QPainter *painter, const QRectF &rect)
 void QArenaScene::drawForeground(QPainter *painter, const QRectF &rect)
 {
     Q_UNUSED(rect)
-    if(!settings->value("temp_on").toBool()) return; //don't draw when not showing temp sensors
+    if(!g_settings->value("temp_on").toBool()) return; //don't draw when not showing temp sensors
 
     painter->setRenderHints(QPainter::Antialiasing | QPainter::SmoothPixmapTransform, true);
 
-    QGraphicsView* _view = this->views().first();
-    double scale = _view->transform().m11();
+    auto m_view = this->views().first();
+    double scale = m_view->transform().m11();
 
-    QRectF model(_view->mapToScene(QPoint(10,10)),QSizeF(180,15)/scale);
+    QRectF model(m_view->mapToScene(QPoint(10,10)),QSizeF(180,15)/scale);
 
-    QLinearGradient heatmap(_view->mapToScene(QPoint(10,10)),_view->mapToScene(QPoint(190,10)));
+    QLinearGradient heatmap(m_view->mapToScene(QPoint(10,10)), m_view->mapToScene(QPoint(190,10)));
     heatmap.setColorAt(0, Qt::blue);
     heatmap.setColorAt(0.33, Qt::magenta);
     heatmap.setColorAt(0.66, Qt::red);
@@ -46,36 +48,51 @@ void QArenaScene::drawForeground(QPainter *painter, const QRectF &rect)
     pen.setWidth(0);
     painter->setPen(pen);
 
-    painter->drawLine(_view->mapToScene(QPoint(10,25)),_view->mapToScene(QPoint(10,30)));
-    painter->drawLine(_view->mapToScene(QPoint(100,25)),_view->mapToScene(QPoint(100,30)));
-    painter->drawLine(_view->mapToScene(QPoint(190,25)),_view->mapToScene(QPoint(190,30)));
+    painter->drawLine(m_view->mapToScene(QPoint(10,25)), m_view->mapToScene(QPoint(10,30)));
+    painter->drawLine(m_view->mapToScene(QPoint(100,25)), m_view->mapToScene(QPoint(100,30)));
+    painter->drawLine(m_view->mapToScene(QPoint(190,25)), m_view->mapToScene(QPoint(190,30)));
 
-    QFont font = painter->font();
+    auto font = painter->font();
     font.setPointSizeF(11 / scale);
     painter->setFont(font);
-    painter->drawText(_view->mapToScene(QPoint(11,36)), "20 °C");
-    painter->drawText(_view->mapToScene(QPoint(101,36)), "35 °C");
-    painter->drawText(_view->mapToScene(QPoint(191,36)), "50 °C");
+    painter->drawText(m_view->mapToScene(QPoint(11,36)), "20 °C");
+    painter->drawText(m_view->mapToScene(QPoint(101,36)), "35 °C");
+    painter->drawText(m_view->mapToScene(QPoint(191,36)), "50 °C");
 
     int time = 0;
     int connectedItems = 0;
-    foreach(QGraphicsItem *item, items())
-        if(!dynamic_cast<QAbstractSceneItem *>(item)->isGroup())
-            if(dynamic_cast<QCasuSceneItem *>(item)->getZmqObject()->isConnected()){
-                time += dynamic_cast<QCasuSceneItem *>(item)->getZmqObject()->getAvgSamplingTime();
+    for(auto& item : items()){
+        if(!sCast(item)->isGroup()){
+            if(siCast(item)->getZmqObject()->isConnected()){
+                time += siCast(item)->getZmqObject()->getAvgSamplingTime();
                 connectedItems++;
             }
-    if(connectedItems && settings->value("avgTime_on").toBool()){
-        QPoint samplingTimePosition = _view->rect().topRight() - QPoint(180,-20);
-        if(_view->verticalScrollBar()->isVisible()) samplingTimePosition -= QPoint(20,0);
-        QString tempText = QString("Avg. sample time: ") + QString::number(time/connectedItems) + QString("ms");
-        painter->drawText(_view->mapToScene(samplingTimePosition), tempText);
+        }
+    }
+    if(connectedItems && g_settings->value("avgTime_on").toBool()){
+        auto samplingTimePosition = m_view->rect().topRight() - QPoint(180,-20) - QPoint(20,0) * (m_view->verticalScrollBar()->isVisible()) ;
+        auto tempText = QString("Avg. sample time: ") + QString::number(time/connectedItems) + QString("ms");
+        painter->drawText(m_view->mapToScene(samplingTimePosition), tempText);
     }
 }
 
-QArenaScene::QArenaScene(QWidget *parent) : QGraphicsScene(parent){
+QArenaScene::QArenaScene(QWidget *parent) : QGraphicsScene(parent)
+{
     this->setItemIndexMethod(QGraphicsScene::NoIndex);
-    connect(this,SIGNAL(selectionChanged()),SLOT(checkSelection()));
+
+    connect(this, &QGraphicsScene::selectionChanged, [&](){
+        auto tempList = this->selectedItems();
+        if(tempList.size()>1) m_treeItem->setHidden(false);
+        else m_treeItem->setHidden(true);
+
+        int color = 14;
+
+        for(auto& item : tempList){
+            if(sCast(item)->isGroup()){
+                sCast(item)->setGroupColor(static_cast<Qt::GlobalColor>(color++));
+            }
+        }
+    });
 }
 
 void QArenaScene::mousePressEvent(QGraphicsSceneMouseEvent *event)
@@ -84,21 +101,8 @@ void QArenaScene::mousePressEvent(QGraphicsSceneMouseEvent *event)
     else QGraphicsScene::mousePressEvent(event);
 }
 
-void QArenaScene::setTreeItem(QSelectionTreeItem *treeItem)
+void QArenaScene::setTreeItem(QTreeWidgetItem *treeItem)
 {
-    _treeItem = treeItem;
-    _treeItem->setHidden(true);
-}
-
-void QArenaScene::checkSelection()
-{
-    QList<QGraphicsItem *> tempList = this->selectedItems();
-    if(tempList.size()>1) _treeItem->setHidden(false);
-    else _treeItem->setHidden(true);
-
-    int color = 14;
-
-    foreach(QGraphicsItem *item, tempList)
-        if(dynamic_cast<QAbstractSceneItem *>(item)->isGroup())
-            dynamic_cast<QAbstractSceneItem *>(item)->setGroupColor(static_cast<Qt::GlobalColor>(color++));
+    m_treeItem = treeItem;
+    m_treeItem->setHidden(true);
 }

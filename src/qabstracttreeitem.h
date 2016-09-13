@@ -1,7 +1,10 @@
 #ifndef QABSTRACTTREEITEM_H
 #define QABSTRACTTREEITEM_H
 
-#include <utility>
+#define tCast(x) dynamic_cast<QAbstractTreeItem* >(x)
+#define tiCast(x) dynamic_cast<QCasuTreeItem *>(x)
+#define tgCast(x) dynamic_cast<QCasuTreeGroup *>(x)
+
 #include <QTreeWidgetItem>
 
 #include "qcasuzmq.h"
@@ -10,16 +13,19 @@ class QAbstractSceneItem;
 class QAbstractTreeItem : public QTreeWidgetItem
 {
 protected:
-    QMap<dataType, QTreeWidgetItem*> _widgetMap;
-    QGraphicsItem *_sceneItem;
+    QMap<zmqData::dataType, QTreeWidgetItem*> m_widgetMap;
+    QGraphicsItem *m_sceneItem;
+
+    // only child classes can call constructor
+    explicit QAbstractTreeItem() = default;
+
 public:
-    QAbstractTreeItem();
-    void resetSelection();
+    void resetSelection() const;
     void setSceneItem(QGraphicsItem *sceneItem);
 
     //Public virtual methods
-    virtual bool isChildSelected();
-    virtual QList<zmqBuffer *> getBuffers();
+    virtual bool isChildSelected() const;
+    virtual QList<zmqData::zmqBuffer *> getBuffers() const;
 };
 
 /*!
@@ -33,7 +39,7 @@ public:
      * \brief Calls QTreeWigdetItem constructor with same parameters
      * \param params
      */
-    QNoSortTreeItem(Params&&... params) : QTreeWidgetItem(forward<Params>(params)...) {}
+    QNoSortTreeItem(Params&&... params) : QTreeWidgetItem(std::forward<Params>(params)...) {}
     /*!
      * \brief reimplemented operator <
      * \param other [unused]

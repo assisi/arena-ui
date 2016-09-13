@@ -23,7 +23,6 @@ INCLUDEPATH += msg \
 
 SOURCES += main.cpp\
         arenaui.cpp\
-        nzmqt/nzmqt.cpp\
         msg/base_msgs.pb.cc\
         msg/dev_msgs.pb.cc\
         msg/sim_msgs.pb.cc \
@@ -32,7 +31,6 @@ SOURCES += main.cpp\
         qcasutreeitem.cpp \
         qtrendplot.cpp \
         qdialogsettings.cpp \
-        qdialogconnect.cpp \
         globalHeader.cpp \
         qdialogsetpoint.cpp \
         flowlayout.cpp \
@@ -44,7 +42,8 @@ SOURCES += main.cpp\
     qcasuzmq.cpp \
     qcasutreegroup.cpp \
     qabstractsceneitem.cpp \
-    qabstracttreeitem.cpp
+    qabstracttreeitem.cpp \
+    qdialogconnect.cpp
 
 
 HEADERS  += arenaui.h\
@@ -54,7 +53,6 @@ HEADERS  += arenaui.h\
         qcasutreeitem.h \
         qtrendplot.h \
         qdialogsettings.h \
-        qdialogconnect.h \
         globalHeader.h \
         qdialogsetpoint.h \
         flowlayout.h \
@@ -66,10 +64,14 @@ HEADERS  += arenaui.h\
     qcasuzmq.h \
     qabstractsceneitem.h \
     qabstracttreeitem.h \
-    qcasutreegroup.h
+    qcasutreegroup.h \
+    qdialogconnect.h
 
 
-FORMS    += arenaui.ui
+FORMS    += arenaui.ui \
+    qdialogconnect.ui \
+    qdialogsettings.ui \
+    qdialogsetpoint.ui
 
 LIBS += -lzmq\
         -lprotobuf\

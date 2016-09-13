@@ -1,81 +1,80 @@
 #include "qdeploy.h"
 
 QDeploy::QDeploy(QWidget *parent) :
-    QLabel(parent),
-    _simulatorPID(0)
+    QTextEdit(parent),
+    m_simulatorPID(0)
 {
+    setReadOnly(true);
     setAlignment(Qt::AlignLeft | Qt::AlignTop);
-    setTextFormat(Qt::PlainText);
-    setWordWrap(true);
 
-    _shell = new QProcess;
+    m_shell = new QProcess;
 }
 
 QDeploy::~QDeploy()
 {
-    _shell->close();
-    delete _shell;
+    m_shell->close();
+    delete m_shell;
 }
 
 
-void QDeploy::setWorkingDirectory(QString dir)
+void QDeploy::setWorkingDirectory(const QString &dir)
 {
-    _shell->setWorkingDirectory(dir);
-}
-
-void QDeploy::appendText(QString text)
-{
-    setText(this->text() + text);
+    m_shell->setWorkingDirectory(dir);
 }
 
 bool QDeploy::isSimulatorStarted()
 {
-    QString tempString = settings->value("simulator").toString();
+    auto tempString = g_settings->value("simulator").toString();
     tempString = tempString.right(tempString.size() - tempString.lastIndexOf("/") - 1);
     tempString = tempString.left(15);
 
-    _shell->start("sh");
-    _shell->write("pgrep ");
-    _shell->write(tempString.toStdString().c_str());
-    _shell->closeWriteChannel();
-    _shell->waitForFinished();
+    m_shell->start("sh");
+    m_shell->write("pgrep ");
+    m_shell->write(tempString.toStdString().c_str());
+    m_shell->closeWriteChannel();
+    m_shell->waitForFinished();
 
-    QString out(_shell->readAll());
-    if(out.size()) _simulatorPID = out.toLongLong();
+    QString out(m_shell->readAll());
+    if(out.size()) m_simulatorPID = out.toLongLong();
     return out.size();
 }
 
 void QDeploy::deploy()
 {
-    if(_shell->state() == QProcess::NotRunning){
-        _shell->start("deploy.py", QStringList(assisiFile.name));
-        appendText("[arenaUI] Starting 'deploy.py'\n");
+    if(m_shell->state() == QProcess::NotRunning){
+        m_shell->start("deploy.py", QStringList(g_assisiFile.name));
+        append("[arenaUI] Starting 'deploy.py'");
     }
-    else appendText("[arenaUI] Already running a process\n");
+    else append("[arenaUI] Already running a process");
 }
 
 void QDeploy::run()
 {
-    if(_shell->state() == QProcess::NotRunning){
-        _shell->start("assisirun.py", QStringList(assisiFile.name));
-        appendText("[arenaUI] Starting 'assisirun.py'\n");
+    if(m_shell->state() == QProcess::NotRunning){
+        m_shell->start("assisirun.py", QStringList(g_assisiFile.name));
+        append("[arenaUI] Starting 'assisirun.py'");
+    } else {
+        append("[arenaUI] Already running a process");
     }
-    else appendText("[arenaUI] Already running a process\n");
 }
 
 void QDeploy::stop()
 {
-    if(_shell->state() != QProcess::NotRunning) _shell->close();
-    else appendText("[arenaUI] Process is not running\n");
+    if(m_shell->state() != QProcess::NotRunning){
+        m_shell->close();
+    } else {
+        append("[arenaUI] Process is not running");
+    }
 }
 
 void QDeploy::collect()
 {
-    if(_shell->state() == QProcess::NotRunning){
-        _shell->start("collect_data.py", QStringList(assisiFile.name));
-        appendText("[arenaUI] Starting 'collect_data.py'\n");
+    if(m_shell->state() == QProcess::NotRunning){
+        m_shell->start("collect_data.py", QStringList(g_assisiFile.name));
+        append("[arenaUI] Starting 'collect_data.py'");
+    } else {
+        append("[arenaUI] Already running a process");
     }
-    else appendText("[arenaUI] Already running a process\n");
 }
 
 void QDeploy::cleanLog()
@@ -85,50 +84,45 @@ void QDeploy::cleanLog()
 
 void QDeploy::simulatorStart()
 {
-    if(_shell->state() == QProcess::NotRunning){
+    if(m_shell->state() == QProcess::NotRunning){
         if(isSimulatorStarted()){
-            appendText("[Simulator] Simulator is already running (PID: " + QString::number(_simulatorPID) +")\n");
+            append("[Simulator] Simulator is already running (PID: " + QString::number(m_simulatorPID) +")");
             return;
         }
-        _shell->startDetached(settings->value("simulator").toString(), QStringList(), QString(), &_simulatorPID);
-        if(!_simulatorPID) appendText("[Simulator] Cannot start: " + settings->value("simulator").toString() + "\n");
-        else appendText("[Simulator] New simulator started (PID: " + QString::number(_simulatorPID) +")\n");
+        m_shell->startDetached(g_settings->value("simulator").toString(), QStringList(), QString(), &m_simulatorPID);
+        if(!m_simulatorPID){
+            append("[Simulator] Cannot start: " + g_settings->value("simulator").toString());
+        } else {
+            append("[Simulator] New simulator started (PID: " + QString::number(m_simulatorPID) +")");
+        }
     }
-    else appendText("[arenaUI] Already running a process\n");
+    else append("[arenaUI] Already running a process");
 
-    _shell->start("sim.py", QStringList(assisiFile.arenaFile));
+    m_shell->start("sim.py", QStringList(g_assisiFile.arenaFile));
 }
 
 void QDeploy::simulatorStop()
 {
     if(isSimulatorStarted()){
-        _shell->execute(QString("kill ") + QString::number(_simulatorPID));
-        appendText("[Simulator] Simulator process is stopped.\n");
+        m_shell->execute(QString("kill ") + QString::number(m_simulatorPID));
+        append("[Simulator] Simulator process is stopped.");
     }
 }
 
-void QDeploy::appendOut()
-{
-    appendText("[SHELL][OUT] ");
-    appendText(_shell->readAllStandardOutput());
-}
-
-void QDeploy::appendErr()
-{
-    appendText("[SHELL][ERR] ");
-    appendText(_shell->readAllStandardError());
-}
-
-void QDeploy::toggleOutput(int state){
+void QDeploy::toggleOutput(bool state){
     if(state){
-        _shell->readAllStandardError();
-        _shell->readAllStandardOutput();
-        connect(_shell, SIGNAL(readyReadStandardOutput()), this, SLOT(appendOut()));
-        connect(_shell, SIGNAL(readyReadStandardError()), this, SLOT(appendErr()));
+        m_shellOut1 = connect(m_shell, &QProcess::readyReadStandardOutput, [&](){
+            append("\n[SHELL][OUT]");
+            append(m_shell->readAllStandardOutput());
+        });
+        m_shellOut2 = connect(m_shell, &QProcess::readyReadStandardError, [&](){
+            append("\n[SHELL][ERR]");
+            append(m_shell->readAllStandardError());
+        });
     }
     else{
-        disconnect(_shell, SIGNAL(readyReadStandardOutput()), this, SLOT(appendOut()));
-        disconnect(_shell, SIGNAL(readyReadStandardError()), this, SLOT(appendErr()));
+        disconnect(m_shellOut1);
+        disconnect(m_shellOut2);
     }
 
 }

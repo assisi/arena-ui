@@ -7,8 +7,6 @@
 
 #include "qabstractsceneitem.h"
 
-#define PI 3.14159265
-
 /*!
  * \brief Graphics scene item for CASU
  *
@@ -18,33 +16,26 @@
 class QCasuSceneItem : public QAbstractSceneItem
 {
 private:
-    QPointF _coordinates;
-    int _yaw;
+    QPointF m_coordinates;
+    int m_yaw;
     QElapsedTimer *FPScheck;
 
-    double _airflowAngle;
-    double _vibrAngle;
+    double m_airflowAngle;
+    double m_vibrAngle;
 
-    QCasuZMQ *_zmqObject;
+    QCasuZMQ *m_zmqObject;
 
 public:
-    bool isGroup() const;
-    QList<zmqBuffer *> getBuffers(dataType key);
-    QVector<QPointF> getCoordinateVector();
-    void sendSetpoint(QList<QByteArray> message);
+    explicit QCasuSceneItem(QPointF coordinates, double yaw, QCasuZMQ *zmqObject);
 
-    QCasuSceneItem(QPointF coordinates, double yaw, QCasuZMQ *zmqObject);
+    bool isGroup() const Q_DECL_OVERRIDE;
+    QList<zmqData::zmqBuffer *> getBuffers(zmqData::dataType key) const Q_DECL_OVERRIDE;
+    QVector<QPointF> getCoordinateVector() const Q_DECL_OVERRIDE;
+    void sendSetpoint(const QList<QByteArray> &message) const Q_DECL_OVERRIDE;
+    QRectF boundingRect() const Q_DECL_OVERRIDE;
+    void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) Q_DECL_OVERRIDE;
 
-    QCasuZMQ *getZmqObject();
-
-    QRectF boundingRect() const;
-
-    /*!
-     * \brief Overloaded inherited function responsible for drawing this item
-     *
-     * All graphical elements are implemented in this
-     */
-    void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
+    QCasuZMQ *getZmqObject();    
 };
 
 /*!
