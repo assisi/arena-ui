@@ -30,6 +30,7 @@ QCasuZMQ::QCasuZMQ(QObject *parent, QString casuName) :
 
 zmqBuffer *QCasuZMQ::getBuffer(dataType key) const
 {
+    qDebug() << key;
     if (key < m_IR_NUM + m_temp_NUM) return m_buffers[key];
     return 0;
 }
@@ -291,10 +292,10 @@ zmqBuffer::zmqBuffer(QString casuName, dataType key) :
         case Temp_R : m_legendName += ": Temp - R"; break;
         case Temp_B : m_legendName += ": Temp - B"; break;
         case Temp_L : m_legendName += ": Temp - L"; break;
-        case Temp_Top : m_legendName += ": Temp - F"; break;
-        case Temp_Pcb : m_legendName += ": Temp - R"; break;
-        case Temp_Ring : m_legendName += ": Temp - B"; break;
-        case Temp_Wax : m_legendName += ": Temp - L"; break;
+        case Temp_Top : m_legendName += ": Temp - Top"; break;
+        case Temp_Pcb : m_legendName += ": Temp - Pcb"; break;
+        case Temp_Ring : m_legendName += ": Temp - Ring"; break;
+        case Temp_Wax : m_legendName += ": Temp - Wax"; break;
         default: break;
     }
 }
