@@ -1,3 +1,12 @@
+assisi-arena-ui (0.16.0-1ubuntu1) trusty; urgency=high
+
+  * New and improved grouping functionalities (Treview operations can be applied to the whole group)
+  * New dialogs (replaced hand-coded dialogs with Qt Creator)
+  * Using C++11
+  * Major code refactoring behind the scenes
+
+ -- Damjan Miklic (LARICS Lab) <damjan.miklic@fer.hr>  Tue, 13 Sep 2016 13:00:00 +0200
+
 assisi-arena-ui (0.15.0-1ubuntu1) trusty; urgency=high
 
   * Calibrated raw IR reading visualization for real hardware
