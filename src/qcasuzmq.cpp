@@ -30,7 +30,6 @@ QCasuZMQ::QCasuZMQ(QObject *parent, QString casuName) :
 
 zmqBuffer *QCasuZMQ::getBuffer(dataType key) const
 {
-    qDebug() << key;
     if (key < m_IR_NUM + m_temp_NUM) return m_buffers[key];
     return 0;
 }
