@@ -39,6 +39,14 @@ ArenaUI::ArenaUI(QWidget *parent) :
     };
     connect(ui->casuTree, &QTreeWidget::itemSelectionChanged, tempLambda);
     connect(ui->groupTree, &QTreeWidget::itemSelectionChanged, tempLambda);
+    connect(ui->casuTree, &QTreeWidget::itemSelectionChanged, [&](){
+        if (!ui->casuTree->selectedItems().size()) return;
+        if (!(QApplication::keyboardModifiers() & Qt::ControlModifier)) ui->groupTree->clearSelection();
+    });
+    connect(ui->groupTree, &QTreeWidget::itemSelectionChanged, [&](){
+        if (!ui->groupTree->selectedItems().size()) return;
+        if (!(QApplication::keyboardModifiers() & Qt::ControlModifier)) ui->casuTree->clearSelection();
+    });
 
 
     // TREND TAB SCROLLABLE LAYOUT
