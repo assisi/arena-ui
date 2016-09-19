@@ -1,19 +1,12 @@
 sudo: required
 dist: trusty
-git:
-    submodules: false
-
-before_install:
-    - sed -i 's/git@github.com:/https:\/\/github.com\//' .gitmodules
-    - git submodule update --init --recursive
 
 install:
   - sudo apt-get update
   - sudo apt-get install qt5-default qt5-qmake libzmq3-dev libprotobuf-dev libyaml-cpp-dev libboost-dev
 
 script:
-  - qmake -qt=qt5 -v
-  - qmake -qt=qt5
+  - qmake
   - make
 
 language: cpp
