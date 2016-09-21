@@ -1,4 +1,4 @@
-assisi-arena-ui (0.16.0-1ubuntu1) trusty; urgency=high
+assisi-arena-ui (0.16.1-1ubuntu1) trusty; urgency=high
 
   * Bugfixes for treeview selection issues and graph labels
 
