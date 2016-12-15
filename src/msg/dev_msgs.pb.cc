@@ -427,6 +427,7 @@ const int RangeArray::kRawValueFieldNumber;
 RangeArray::RangeArray()
   : ::google::protobuf::Message() {
   SharedCtor();
+  // @@protoc_insertion_point(constructor:AssisiMsg.RangeArray)
 }
 
 void RangeArray::InitAsDefaultInstance() {
@@ -437,6 +438,7 @@ RangeArray::RangeArray(const RangeArray& from)
   : ::google::protobuf::Message() {
   SharedCtor();
   MergeFrom(from);
+  // @@protoc_insertion_point(copy_constructor:AssisiMsg.RangeArray)
 }
 
 void RangeArray::SharedCtor() {
@@ -450,6 +452,7 @@ void RangeArray::SharedCtor() {
 }
 
 RangeArray::~RangeArray() {
+  // @@protoc_insertion_point(destructor:AssisiMsg.RangeArray)
   SharedDtor();
 }
 
@@ -481,7 +484,7 @@ RangeArray* RangeArray::New() const {
 }
 
 void RangeArray::Clear() {
-  if (_has_bits_[0 / 32] & (0xffu << (0 % 32))) {
+  if (_has_bits_[0 / 32] & 31) {
     if (has_header()) {
       if (header_ != NULL) header_->::AssisiMsg::Header::Clear();
     }
@@ -498,18 +501,21 @@ void RangeArray::Clear() {
 
 bool RangeArray::MergePartialFromCodedStream(
     ::google::protobuf::io::CodedInputStream* input) {
-#define DO_(EXPRESSION) if (!(EXPRESSION)) return false
+#define DO_(EXPRESSION) if (!(EXPRESSION)) goto failure
   ::google::protobuf::uint32 tag;
-  while ((tag = input->ReadTag()) != 0) {
+  // @@protoc_insertion_point(parse_start:AssisiMsg.RangeArray)
+  for (;;) {
+    ::std::pair< ::google::protobuf::uint32, bool> p = input->ReadTagWithCutoff(127);
+    tag = p.first;
+    if (!p.second) goto handle_unusual;
     switch (::google::protobuf::internal::WireFormatLite::GetTagFieldNumber(tag)) {
       // optional .AssisiMsg.Header header = 1;
       case 1: {
-        if (::google::protobuf::internal::WireFormatLite::GetTagWireType(tag) ==
-            ::google::protobuf::internal::WireFormatLite::WIRETYPE_LENGTH_DELIMITED) {
+        if (tag == 10) {
           DO_(::google::protobuf::internal::WireFormatLite::ReadMessageNoVirtual(
                input, mutable_header()));
         } else {
-          goto handle_uninterpreted;
+          goto handle_unusual;
         }
         if (input->ExpectTag(16)) goto parse_type;
         break;
@@ -517,8 +523,7 @@ bool RangeArray::MergePartialFromCodedStream(
 
       // optional .AssisiMsg.RangeArray.SensorType type = 2 [default = IR];
       case 2: {
-        if (::google::protobuf::internal::WireFormatLite::GetTagWireType(tag) ==
-            ::google::protobuf::internal::WireFormatLite::WIRETYPE_VARINT) {
+        if (tag == 16) {
          parse_type:
           int value;
           DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
@@ -530,7 +535,7 @@ bool RangeArray::MergePartialFromCodedStream(
             mutable_unknown_fields()->AddVarint(2, value);
           }
         } else {
-          goto handle_uninterpreted;
+          goto handle_unusual;
         }
         if (input->ExpectTag(29)) goto parse_field_of_view;
         break;
@@ -538,15 +543,14 @@ bool RangeArray::MergePartialFromCodedStream(
 
       // optional float field_of_view = 3 [default = 0.5236];
       case 3: {
-        if (::google::protobuf::internal::WireFormatLite::GetTagWireType(tag) ==
-            ::google::protobuf::internal::WireFormatLite::WIRETYPE_FIXED32) {
+        if (tag == 29) {
          parse_field_of_view:
           DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
                    float, ::google::protobuf::internal::WireFormatLite::TYPE_FLOAT>(
                  input, &field_of_view_)));
           set_has_field_of_view();
         } else {
-          goto handle_uninterpreted;
+          goto handle_unusual;
         }
         if (input->ExpectTag(37)) goto parse_min_range;
         break;
@@ -554,15 +558,14 @@ bool RangeArray::MergePartialFromCodedStream(
 
       // optional float min_range = 4 [default = 0];
       case 4: {
-        if (::google::protobuf::internal::WireFormatLite::GetTagWireType(tag) ==
-            ::google::protobuf::internal::WireFormatLite::WIRETYPE_FIXED32) {
+        if (tag == 37) {
          parse_min_range:
           DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
                    float, ::google::protobuf::internal::WireFormatLite::TYPE_FLOAT>(
                  input, &min_range_)));
           set_has_min_range();
         } else {
-          goto handle_uninterpreted;
+          goto handle_unusual;
         }
         if (input->ExpectTag(45)) goto parse_max_range;
         break;
@@ -570,15 +573,14 @@ bool RangeArray::MergePartialFromCodedStream(
 
       // optional float max_range = 5 [default = inf];
       case 5: {
-        if (::google::protobuf::internal::WireFormatLite::GetTagWireType(tag) ==
-            ::google::protobuf::internal::WireFormatLite::WIRETYPE_FIXED32) {
+        if (tag == 45) {
          parse_max_range:
           DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
                    float, ::google::protobuf::internal::WireFormatLite::TYPE_FLOAT>(
                  input, &max_range_)));
           set_has_max_range();
         } else {
-          goto handle_uninterpreted;
+          goto handle_unusual;
         }
         if (input->ExpectTag(53)) goto parse_range;
         break;
@@ -586,20 +588,17 @@ bool RangeArray::MergePartialFromCodedStream(
 
       // repeated float range = 6;
       case 6: {
-        if (::google::protobuf::internal::WireFormatLite::GetTagWireType(tag) ==
-            ::google::protobuf::internal::WireFormatLite::WIRETYPE_FIXED32) {
+        if (tag == 53) {
          parse_range:
           DO_((::google::protobuf::internal::WireFormatLite::ReadRepeatedPrimitive<
                    float, ::google::protobuf::internal::WireFormatLite::TYPE_FLOAT>(
                  1, 53, input, this->mutable_range())));
-        } else if (::google::protobuf::internal::WireFormatLite::GetTagWireType(tag)
-                   == ::google::protobuf::internal::WireFormatLite::
-                      WIRETYPE_LENGTH_DELIMITED) {
+        } else if (tag == 50) {
           DO_((::google::protobuf::internal::WireFormatLite::ReadPackedPrimitiveNoInline<
                    float, ::google::protobuf::internal::WireFormatLite::TYPE_FLOAT>(
                  input, this->mutable_range())));
         } else {
-          goto handle_uninterpreted;
+          goto handle_unusual;
         }
         if (input->ExpectTag(53)) goto parse_range;
         if (input->ExpectTag(61)) goto parse_raw_value;
@@ -608,31 +607,29 @@ bool RangeArray::MergePartialFromCodedStream(
 
       // repeated float raw_value = 7;
       case 7: {
-        if (::google::protobuf::internal::WireFormatLite::GetTagWireType(tag) ==
-            ::google::protobuf::internal::WireFormatLite::WIRETYPE_FIXED32) {
+        if (tag == 61) {
          parse_raw_value:
           DO_((::google::protobuf::internal::WireFormatLite::ReadRepeatedPrimitive<
                    float, ::google::protobuf::internal::WireFormatLite::TYPE_FLOAT>(
                  1, 61, input, this->mutable_raw_value())));
-        } else if (::google::protobuf::internal::WireFormatLite::GetTagWireType(tag)
-                   == ::google::protobuf::internal::WireFormatLite::
-                      WIRETYPE_LENGTH_DELIMITED) {
+        } else if (tag == 58) {
           DO_((::google::protobuf::internal::WireFormatLite::ReadPackedPrimitiveNoInline<
                    float, ::google::protobuf::internal::WireFormatLite::TYPE_FLOAT>(
                  input, this->mutable_raw_value())));
         } else {
-          goto handle_uninterpreted;
+          goto handle_unusual;
         }
         if (input->ExpectTag(61)) goto parse_raw_value;
-        if (input->ExpectAtEnd()) return true;
+        if (input->ExpectAtEnd()) goto success;
         break;
       }
 
       default: {
-      handle_uninterpreted:
-        if (::google::protobuf::internal::WireFormatLite::GetTagWireType(tag) ==
+      handle_unusual:
+        if (tag == 0 ||
+            ::google::protobuf::internal::WireFormatLite::GetTagWireType(tag) ==
             ::google::protobuf::internal::WireFormatLite::WIRETYPE_END_GROUP) {
-          return true;
+          goto success;
         }
         DO_(::google::protobuf::internal::WireFormat::SkipField(
               input, tag, mutable_unknown_fields()));
@@ -640,12 +637,18 @@ bool RangeArray::MergePartialFromCodedStream(
       }
     }
   }
+success:
+  // @@protoc_insertion_point(parse_success:AssisiMsg.RangeArray)
   return true;
+failure:
+  // @@protoc_insertion_point(parse_failure:AssisiMsg.RangeArray)
+  return false;
 #undef DO_
 }
 
 void RangeArray::SerializeWithCachedSizes(
     ::google::protobuf::io::CodedOutputStream* output) const {
+  // @@protoc_insertion_point(serialize_start:AssisiMsg.RangeArray)
   // optional .AssisiMsg.Header header = 1;
   if (has_header()) {
     ::google::protobuf::internal::WireFormatLite::WriteMessageMaybeToArray(
@@ -689,10 +692,12 @@ void RangeArray::SerializeWithCachedSizes(
     ::google::protobuf::internal::WireFormat::SerializeUnknownFields(
         unknown_fields(), output);
   }
+  // @@protoc_insertion_point(serialize_end:AssisiMsg.RangeArray)
 }
 
 ::google::protobuf::uint8* RangeArray::SerializeWithCachedSizesToArray(
     ::google::protobuf::uint8* target) const {
+  // @@protoc_insertion_point(serialize_to_array_start:AssisiMsg.RangeArray)
   // optional .AssisiMsg.Header header = 1;
   if (has_header()) {
     target = ::google::protobuf::internal::WireFormatLite::
@@ -737,6 +742,7 @@ void RangeArray::SerializeWithCachedSizes(
     target = ::google::protobuf::internal::WireFormat::SerializeUnknownFieldsToArray(
         unknown_fields(), target);
   }
+  // @@protoc_insertion_point(serialize_to_array_end:AssisiMsg.RangeArray)
   return target;
 }
 
@@ -888,6 +894,7 @@ const int Temperature::kTempFieldNumber;
 Temperature::Temperature()
   : ::google::protobuf::Message() {
   SharedCtor();
+  // @@protoc_insertion_point(constructor:AssisiMsg.Temperature)
 }
 
 void Temperature::InitAsDefaultInstance() {
@@ -898,6 +905,7 @@ Temperature::Temperature(const Temperature& from)
   : ::google::protobuf::Message() {
   SharedCtor();
   MergeFrom(from);
+  // @@protoc_insertion_point(copy_constructor:AssisiMsg.Temperature)
 }
 
 void Temperature::SharedCtor() {
@@ -908,6 +916,7 @@ void Temperature::SharedCtor() {
 }
 
 Temperature::~Temperature() {
+  // @@protoc_insertion_point(destructor:AssisiMsg.Temperature)
   SharedDtor();
 }
 
@@ -939,7 +948,7 @@ Temperature* Temperature::New() const {
 }
 
 void Temperature::Clear() {
-  if (_has_bits_[0 / 32] & (0xffu << (0 % 32))) {
+  if (_has_bits_[0 / 32] & 3) {
     if (has_header()) {
       if (header_ != NULL) header_->::AssisiMsg::Header::Clear();
     }
@@ -951,18 +960,21 @@ void Temperature::Clear() {
 
 bool Temperature::MergePartialFromCodedStream(
     ::google::protobuf::io::CodedInputStream* input) {
-#define DO_(EXPRESSION) if (!(EXPRESSION)) return false
+#define DO_(EXPRESSION) if (!(EXPRESSION)) goto failure
   ::google::protobuf::uint32 tag;
-  while ((tag = input->ReadTag()) != 0) {
+  // @@protoc_insertion_point(parse_start:AssisiMsg.Temperature)
+  for (;;) {
+    ::std::pair< ::google::protobuf::uint32, bool> p = input->ReadTagWithCutoff(127);
+    tag = p.first;
+    if (!p.second) goto handle_unusual;
     switch (::google::protobuf::internal::WireFormatLite::GetTagFieldNumber(tag)) {
       // optional .AssisiMsg.Header header = 1;
       case 1: {
-        if (::google::protobuf::internal::WireFormatLite::GetTagWireType(tag) ==
-            ::google::protobuf::internal::WireFormatLite::WIRETYPE_LENGTH_DELIMITED) {
+        if (tag == 10) {
           DO_(::google::protobuf::internal::WireFormatLite::ReadMessageNoVirtual(
                input, mutable_header()));
         } else {
-          goto handle_uninterpreted;
+          goto handle_unusual;
         }
         if (input->ExpectTag(21)) goto parse_temp;
         break;
@@ -970,25 +982,25 @@ bool Temperature::MergePartialFromCodedStream(
 
       // required float temp = 2;
       case 2: {
-        if (::google::protobuf::internal::WireFormatLite::GetTagWireType(tag) ==
-            ::google::protobuf::internal::WireFormatLite::WIRETYPE_FIXED32) {
+        if (tag == 21) {
          parse_temp:
           DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
                    float, ::google::protobuf::internal::WireFormatLite::TYPE_FLOAT>(
                  input, &temp_)));
           set_has_temp();
         } else {
-          goto handle_uninterpreted;
+          goto handle_unusual;
         }
-        if (input->ExpectAtEnd()) return true;
+        if (input->ExpectAtEnd()) goto success;
         break;
       }
 
       default: {
-      handle_uninterpreted:
-        if (::google::protobuf::internal::WireFormatLite::GetTagWireType(tag) ==
+      handle_unusual:
+        if (tag == 0 ||
+            ::google::protobuf::internal::WireFormatLite::GetTagWireType(tag) ==
             ::google::protobuf::internal::WireFormatLite::WIRETYPE_END_GROUP) {
-          return true;
+          goto success;
         }
         DO_(::google::protobuf::internal::WireFormat::SkipField(
               input, tag, mutable_unknown_fields()));
@@ -996,12 +1008,18 @@ bool Temperature::MergePartialFromCodedStream(
       }
     }
   }
+success:
+  // @@protoc_insertion_point(parse_success:AssisiMsg.Temperature)
   return true;
+failure:
+  // @@protoc_insertion_point(parse_failure:AssisiMsg.Temperature)
+  return false;
 #undef DO_
 }
 
 void Temperature::SerializeWithCachedSizes(
     ::google::protobuf::io::CodedOutputStream* output) const {
+  // @@protoc_insertion_point(serialize_start:AssisiMsg.Temperature)
   // optional .AssisiMsg.Header header = 1;
   if (has_header()) {
     ::google::protobuf::internal::WireFormatLite::WriteMessageMaybeToArray(
@@ -1017,10 +1035,12 @@ void Temperature::SerializeWithCachedSizes(
     ::google::protobuf::internal::WireFormat::SerializeUnknownFields(
         unknown_fields(), output);
   }
+  // @@protoc_insertion_point(serialize_end:AssisiMsg.Temperature)
 }
 
 ::google::protobuf::uint8* Temperature::SerializeWithCachedSizesToArray(
     ::google::protobuf::uint8* target) const {
+  // @@protoc_insertion_point(serialize_to_array_start:AssisiMsg.Temperature)
   // optional .AssisiMsg.Header header = 1;
   if (has_header()) {
     target = ::google::protobuf::internal::WireFormatLite::
@@ -1037,6 +1057,7 @@ void Temperature::SerializeWithCachedSizes(
     target = ::google::protobuf::internal::WireFormat::SerializeUnknownFieldsToArray(
         unknown_fields(), target);
   }
+  // @@protoc_insertion_point(serialize_to_array_end:AssisiMsg.Temperature)
   return target;
 }
 
@@ -1143,6 +1164,7 @@ const int TemperatureArray::kTempFieldNumber;
 TemperatureArray::TemperatureArray()
   : ::google::protobuf::Message() {
   SharedCtor();
+  // @@protoc_insertion_point(constructor:AssisiMsg.TemperatureArray)
 }
 
 void TemperatureArray::InitAsDefaultInstance() {
@@ -1153,6 +1175,7 @@ TemperatureArray::TemperatureArray(const TemperatureArray& from)
   : ::google::protobuf::Message() {
   SharedCtor();
   MergeFrom(from);
+  // @@protoc_insertion_point(copy_constructor:AssisiMsg.TemperatureArray)
 }
 
 void TemperatureArray::SharedCtor() {
@@ -1162,6 +1185,7 @@ void TemperatureArray::SharedCtor() {
 }
 
 TemperatureArray::~TemperatureArray() {
+  // @@protoc_insertion_point(destructor:AssisiMsg.TemperatureArray)
   SharedDtor();
 }
 
@@ -1193,10 +1217,8 @@ TemperatureArray* TemperatureArray::New() const {
 }
 
 void TemperatureArray::Clear() {
-  if (_has_bits_[0 / 32] & (0xffu << (0 % 32))) {
-    if (has_header()) {
-      if (header_ != NULL) header_->::AssisiMsg::Header::Clear();
-    }
+  if (has_header()) {
+    if (header_ != NULL) header_->::AssisiMsg::Header::Clear();
   }
   temp_.Clear();
   ::memset(_has_bits_, 0, sizeof(_has_bits_));
@@ -1205,18 +1227,21 @@ void TemperatureArray::Clear() {
 
 bool TemperatureArray::MergePartialFromCodedStream(
     ::google::protobuf::io::CodedInputStream* input) {
-#define DO_(EXPRESSION) if (!(EXPRESSION)) return false
+#define DO_(EXPRESSION) if (!(EXPRESSION)) goto failure
   ::google::protobuf::uint32 tag;
-  while ((tag = input->ReadTag()) != 0) {
+  // @@protoc_insertion_point(parse_start:AssisiMsg.TemperatureArray)
+  for (;;) {
+    ::std::pair< ::google::protobuf::uint32, bool> p = input->ReadTagWithCutoff(127);
+    tag = p.first;
+    if (!p.second) goto handle_unusual;
     switch (::google::protobuf::internal::WireFormatLite::GetTagFieldNumber(tag)) {
       // optional .AssisiMsg.Header header = 1;
       case 1: {
-        if (::google::protobuf::internal::WireFormatLite::GetTagWireType(tag) ==
-            ::google::protobuf::internal::WireFormatLite::WIRETYPE_LENGTH_DELIMITED) {
+        if (tag == 10) {
           DO_(::google::protobuf::internal::WireFormatLite::ReadMessageNoVirtual(
                input, mutable_header()));
         } else {
-          goto handle_uninterpreted;
+          goto handle_unusual;
         }
         if (input->ExpectTag(21)) goto parse_temp;
         break;
@@ -1224,31 +1249,29 @@ bool TemperatureArray::MergePartialFromCodedStream(
 
       // repeated float temp = 2;
       case 2: {
-        if (::google::protobuf::internal::WireFormatLite::GetTagWireType(tag) ==
-            ::google::protobuf::internal::WireFormatLite::WIRETYPE_FIXED32) {
+        if (tag == 21) {
          parse_temp:
           DO_((::google::protobuf::internal::WireFormatLite::ReadRepeatedPrimitive<
                    float, ::google::protobuf::internal::WireFormatLite::TYPE_FLOAT>(
                  1, 21, input, this->mutable_temp())));
-        } else if (::google::protobuf::internal::WireFormatLite::GetTagWireType(tag)
-                   == ::google::protobuf::internal::WireFormatLite::
-                      WIRETYPE_LENGTH_DELIMITED) {
+        } else if (tag == 18) {
           DO_((::google::protobuf::internal::WireFormatLite::ReadPackedPrimitiveNoInline<
                    float, ::google::protobuf::internal::WireFormatLite::TYPE_FLOAT>(
                  input, this->mutable_temp())));
         } else {
-          goto handle_uninterpreted;
+          goto handle_unusual;
         }
         if (input->ExpectTag(21)) goto parse_temp;
-        if (input->ExpectAtEnd()) return true;
+        if (input->ExpectAtEnd()) goto success;
         break;
       }
 
       default: {
-      handle_uninterpreted:
-        if (::google::protobuf::internal::WireFormatLite::GetTagWireType(tag) ==
+      handle_unusual:
+        if (tag == 0 ||
+            ::google::protobuf::internal::WireFormatLite::GetTagWireType(tag) ==
             ::google::protobuf::internal::WireFormatLite::WIRETYPE_END_GROUP) {
-          return true;
+          goto success;
         }
         DO_(::google::protobuf::internal::WireFormat::SkipField(
               input, tag, mutable_unknown_fields()));
@@ -1256,12 +1279,18 @@ bool TemperatureArray::MergePartialFromCodedStream(
       }
     }
   }
+success:
+  // @@protoc_insertion_point(parse_success:AssisiMsg.TemperatureArray)
   return true;
+failure:
+  // @@protoc_insertion_point(parse_failure:AssisiMsg.TemperatureArray)
+  return false;
 #undef DO_
 }
 
 void TemperatureArray::SerializeWithCachedSizes(
     ::google::protobuf::io::CodedOutputStream* output) const {
+  // @@protoc_insertion_point(serialize_start:AssisiMsg.TemperatureArray)
   // optional .AssisiMsg.Header header = 1;
   if (has_header()) {
     ::google::protobuf::internal::WireFormatLite::WriteMessageMaybeToArray(
@@ -1278,10 +1307,12 @@ void TemperatureArray::SerializeWithCachedSizes(
     ::google::protobuf::internal::WireFormat::SerializeUnknownFields(
         unknown_fields(), output);
   }
+  // @@protoc_insertion_point(serialize_end:AssisiMsg.TemperatureArray)
 }
 
 ::google::protobuf::uint8* TemperatureArray::SerializeWithCachedSizesToArray(
     ::google::protobuf::uint8* target) const {
+  // @@protoc_insertion_point(serialize_to_array_start:AssisiMsg.TemperatureArray)
   // optional .AssisiMsg.Header header = 1;
   if (has_header()) {
     target = ::google::protobuf::internal::WireFormatLite::
@@ -1299,6 +1330,7 @@ void TemperatureArray::SerializeWithCachedSizes(
     target = ::google::protobuf::internal::WireFormat::SerializeUnknownFieldsToArray(
         unknown_fields(), target);
   }
+  // @@protoc_insertion_point(serialize_to_array_end:AssisiMsg.TemperatureArray)
   return target;
 }
 
@@ -1406,6 +1438,7 @@ const int TemperatureWithGradient::kDtyFieldNumber;
 TemperatureWithGradient::TemperatureWithGradient()
   : ::google::protobuf::Message() {
   SharedCtor();
+  // @@protoc_insertion_point(constructor:AssisiMsg.TemperatureWithGradient)
 }
 
 void TemperatureWithGradient::InitAsDefaultInstance() {
@@ -1416,6 +1449,7 @@ TemperatureWithGradient::TemperatureWithGradient(const TemperatureWithGradient& 
   : ::google::protobuf::Message() {
   SharedCtor();
   MergeFrom(from);
+  // @@protoc_insertion_point(copy_constructor:AssisiMsg.TemperatureWithGradient)
 }
 
 void TemperatureWithGradient::SharedCtor() {
@@ -1428,6 +1462,7 @@ void TemperatureWithGradient::SharedCtor() {
 }
 
 TemperatureWithGradient::~TemperatureWithGradient() {
+  // @@protoc_insertion_point(destructor:AssisiMsg.TemperatureWithGradient)
   SharedDtor();
 }
 
@@ -1459,32 +1494,47 @@ TemperatureWithGradient* TemperatureWithGradient::New() const {
 }
 
 void TemperatureWithGradient::Clear() {
-  if (_has_bits_[0 / 32] & (0xffu << (0 % 32))) {
+#define OFFSET_OF_FIELD_(f) (reinterpret_cast<char*>(      \
+  &reinterpret_cast<TemperatureWithGradient*>(16)->f) - \
+   reinterpret_cast<char*>(16))
+
+#define ZR_(first, last) do {                              \
+    size_t f = OFFSET_OF_FIELD_(first);                    \
+    size_t n = OFFSET_OF_FIELD_(last) - f + sizeof(last);  \
+    ::memset(&first, 0, n);                                \
+  } while (0)
+
+  if (_has_bits_[0 / 32] & 15) {
+    ZR_(temp_, dty_);
     if (has_header()) {
       if (header_ != NULL) header_->::AssisiMsg::Header::Clear();
     }
-    temp_ = 0;
-    dtx_ = 0;
-    dty_ = 0;
   }
+
+#undef OFFSET_OF_FIELD_
+#undef ZR_
+
   ::memset(_has_bits_, 0, sizeof(_has_bits_));
   mutable_unknown_fields()->Clear();
 }
 
 bool TemperatureWithGradient::MergePartialFromCodedStream(
     ::google::protobuf::io::CodedInputStream* input) {
-#define DO_(EXPRESSION) if (!(EXPRESSION)) return false
+#define DO_(EXPRESSION) if (!(EXPRESSION)) goto failure
   ::google::protobuf::uint32 tag;
-  while ((tag = input->ReadTag()) != 0) {
+  // @@protoc_insertion_point(parse_start:AssisiMsg.TemperatureWithGradient)
+  for (;;) {
+    ::std::pair< ::google::protobuf::uint32, bool> p = input->ReadTagWithCutoff(127);
+    tag = p.first;
+    if (!p.second) goto handle_unusual;
     switch (::google::protobuf::internal::WireFormatLite::GetTagFieldNumber(tag)) {
       // optional .AssisiMsg.Header header = 1;
       case 1: {
-        if (::google::protobuf::internal::WireFormatLite::GetTagWireType(tag) ==
-            ::google::protobuf::internal::WireFormatLite::WIRETYPE_LENGTH_DELIMITED) {
+        if (tag == 10) {
           DO_(::google::protobuf::internal::WireFormatLite::ReadMessageNoVirtual(
                input, mutable_header()));
         } else {
-          goto handle_uninterpreted;
+          goto handle_unusual;
         }
         if (input->ExpectTag(21)) goto parse_temp;
         break;
@@ -1492,15 +1542,14 @@ bool TemperatureWithGradient::MergePartialFromCodedStream(
 
       // required float temp = 2;
       case 2: {
-        if (::google::protobuf::internal::WireFormatLite::GetTagWireType(tag) ==
-            ::google::protobuf::internal::WireFormatLite::WIRETYPE_FIXED32) {
+        if (tag == 21) {
          parse_temp:
           DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
                    float, ::google::protobuf::internal::WireFormatLite::TYPE_FLOAT>(
                  input, &temp_)));
           set_has_temp();
         } else {
-          goto handle_uninterpreted;
+          goto handle_unusual;
         }
         if (input->ExpectTag(29)) goto parse_dtx;
         break;
@@ -1508,15 +1557,14 @@ bool TemperatureWithGradient::MergePartialFromCodedStream(
 
       // required float dtx = 3;
       case 3: {
-        if (::google::protobuf::internal::WireFormatLite::GetTagWireType(tag) ==
-            ::google::protobuf::internal::WireFormatLite::WIRETYPE_FIXED32) {
+        if (tag == 29) {
          parse_dtx:
           DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
                    float, ::google::protobuf::internal::WireFormatLite::TYPE_FLOAT>(
                  input, &dtx_)));
           set_has_dtx();
         } else {
-          goto handle_uninterpreted;
+          goto handle_unusual;
         }
         if (input->ExpectTag(37)) goto parse_dty;
         break;
@@ -1524,25 +1572,25 @@ bool TemperatureWithGradient::MergePartialFromCodedStream(
 
       // required float dty = 4;
       case 4: {
-        if (::google::protobuf::internal::WireFormatLite::GetTagWireType(tag) ==
-            ::google::protobuf::internal::WireFormatLite::WIRETYPE_FIXED32) {
+        if (tag == 37) {
          parse_dty:
           DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
                    float, ::google::protobuf::internal::WireFormatLite::TYPE_FLOAT>(
                  input, &dty_)));
           set_has_dty();
         } else {
-          goto handle_uninterpreted;
+          goto handle_unusual;
         }
-        if (input->ExpectAtEnd()) return true;
+        if (input->ExpectAtEnd()) goto success;
         break;
       }
 
       default: {
-      handle_uninterpreted:
-        if (::google::protobuf::internal::WireFormatLite::GetTagWireType(tag) ==
+      handle_unusual:
+        if (tag == 0 ||
+            ::google::protobuf::internal::WireFormatLite::GetTagWireType(tag) ==
             ::google::protobuf::internal::WireFormatLite::WIRETYPE_END_GROUP) {
-          return true;
+          goto success;
         }
         DO_(::google::protobuf::internal::WireFormat::SkipField(
               input, tag, mutable_unknown_fields()));
@@ -1550,12 +1598,18 @@ bool TemperatureWithGradient::MergePartialFromCodedStream(
       }
     }
   }
+success:
+  // @@protoc_insertion_point(parse_success:AssisiMsg.TemperatureWithGradient)
   return true;
+failure:
+  // @@protoc_insertion_point(parse_failure:AssisiMsg.TemperatureWithGradient)
+  return false;
 #undef DO_
 }
 
 void TemperatureWithGradient::SerializeWithCachedSizes(
     ::google::protobuf::io::CodedOutputStream* output) const {
+  // @@protoc_insertion_point(serialize_start:AssisiMsg.TemperatureWithGradient)
   // optional .AssisiMsg.Header header = 1;
   if (has_header()) {
     ::google::protobuf::internal::WireFormatLite::WriteMessageMaybeToArray(
@@ -1581,10 +1635,12 @@ void TemperatureWithGradient::SerializeWithCachedSizes(
     ::google::protobuf::internal::WireFormat::SerializeUnknownFields(
         unknown_fields(), output);
   }
+  // @@protoc_insertion_point(serialize_end:AssisiMsg.TemperatureWithGradient)
 }
 
 ::google::protobuf::uint8* TemperatureWithGradient::SerializeWithCachedSizesToArray(
     ::google::protobuf::uint8* target) const {
+  // @@protoc_insertion_point(serialize_to_array_start:AssisiMsg.TemperatureWithGradient)
   // optional .AssisiMsg.Header header = 1;
   if (has_header()) {
     target = ::google::protobuf::internal::WireFormatLite::
@@ -1611,6 +1667,7 @@ void TemperatureWithGradient::SerializeWithCachedSizes(
     target = ::google::protobuf::internal::WireFormat::SerializeUnknownFieldsToArray(
         unknown_fields(), target);
   }
+  // @@protoc_insertion_point(serialize_to_array_end:AssisiMsg.TemperatureWithGradient)
   return target;
 }
 
@@ -1736,6 +1793,7 @@ const int VibrationSetpoint::kAmplitudeFieldNumber;
 VibrationSetpoint::VibrationSetpoint()
   : ::google::protobuf::Message() {
   SharedCtor();
+  // @@protoc_insertion_point(constructor:AssisiMsg.VibrationSetpoint)
 }
 
 void VibrationSetpoint::InitAsDefaultInstance() {
@@ -1746,6 +1804,7 @@ VibrationSetpoint::VibrationSetpoint(const VibrationSetpoint& from)
   : ::google::protobuf::Message() {
   SharedCtor();
   MergeFrom(from);
+  // @@protoc_insertion_point(copy_constructor:AssisiMsg.VibrationSetpoint)
 }
 
 void VibrationSetpoint::SharedCtor() {
@@ -1757,6 +1816,7 @@ void VibrationSetpoint::SharedCtor() {
 }
 
 VibrationSetpoint::~VibrationSetpoint() {
+  // @@protoc_insertion_point(destructor:AssisiMsg.VibrationSetpoint)
   SharedDtor();
 }
 
@@ -1788,31 +1848,47 @@ VibrationSetpoint* VibrationSetpoint::New() const {
 }
 
 void VibrationSetpoint::Clear() {
-  if (_has_bits_[0 / 32] & (0xffu << (0 % 32))) {
+#define OFFSET_OF_FIELD_(f) (reinterpret_cast<char*>(      \
+  &reinterpret_cast<VibrationSetpoint*>(16)->f) - \
+   reinterpret_cast<char*>(16))
+
+#define ZR_(first, last) do {                              \
+    size_t f = OFFSET_OF_FIELD_(first);                    \
+    size_t n = OFFSET_OF_FIELD_(last) - f + sizeof(last);  \
+    ::memset(&first, 0, n);                                \
+  } while (0)
+
+  if (_has_bits_[0 / 32] & 7) {
+    ZR_(freq_, amplitude_);
     if (has_header()) {
       if (header_ != NULL) header_->::AssisiMsg::Header::Clear();
     }
-    freq_ = 0;
-    amplitude_ = 0;
   }
+
+#undef OFFSET_OF_FIELD_
+#undef ZR_
+
   ::memset(_has_bits_, 0, sizeof(_has_bits_));
   mutable_unknown_fields()->Clear();
 }
 
 bool VibrationSetpoint::MergePartialFromCodedStream(
     ::google::protobuf::io::CodedInputStream* input) {
-#define DO_(EXPRESSION) if (!(EXPRESSION)) return false
+#define DO_(EXPRESSION) if (!(EXPRESSION)) goto failure
   ::google::protobuf::uint32 tag;
-  while ((tag = input->ReadTag()) != 0) {
+  // @@protoc_insertion_point(parse_start:AssisiMsg.VibrationSetpoint)
+  for (;;) {
+    ::std::pair< ::google::protobuf::uint32, bool> p = input->ReadTagWithCutoff(127);
+    tag = p.first;
+    if (!p.second) goto handle_unusual;
     switch (::google::protobuf::internal::WireFormatLite::GetTagFieldNumber(tag)) {
       // optional .AssisiMsg.Header header = 1;
       case 1: {
-        if (::google::protobuf::internal::WireFormatLite::GetTagWireType(tag) ==
-            ::google::protobuf::internal::WireFormatLite::WIRETYPE_LENGTH_DELIMITED) {
+        if (tag == 10) {
           DO_(::google::protobuf::internal::WireFormatLite::ReadMessageNoVirtual(
                input, mutable_header()));
         } else {
-          goto handle_uninterpreted;
+          goto handle_unusual;
         }
         if (input->ExpectTag(17)) goto parse_freq;
         break;
@@ -1820,15 +1896,14 @@ bool VibrationSetpoint::MergePartialFromCodedStream(
 
       // required double freq = 2;
       case 2: {
-        if (::google::protobuf::internal::WireFormatLite::GetTagWireType(tag) ==
-            ::google::protobuf::internal::WireFormatLite::WIRETYPE_FIXED64) {
+        if (tag == 17) {
          parse_freq:
           DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
                    double, ::google::protobuf::internal::WireFormatLite::TYPE_DOUBLE>(
                  input, &freq_)));
           set_has_freq();
         } else {
-          goto handle_uninterpreted;
+          goto handle_unusual;
         }
         if (input->ExpectTag(25)) goto parse_amplitude;
         break;
@@ -1836,25 +1911,25 @@ bool VibrationSetpoint::MergePartialFromCodedStream(
 
       // optional double amplitude = 3;
       case 3: {
-        if (::google::protobuf::internal::WireFormatLite::GetTagWireType(tag) ==
-            ::google::protobuf::internal::WireFormatLite::WIRETYPE_FIXED64) {
+        if (tag == 25) {
          parse_amplitude:
           DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
                    double, ::google::protobuf::internal::WireFormatLite::TYPE_DOUBLE>(
                  input, &amplitude_)));
           set_has_amplitude();
         } else {
-          goto handle_uninterpreted;
+          goto handle_unusual;
         }
-        if (input->ExpectAtEnd()) return true;
+        if (input->ExpectAtEnd()) goto success;
         break;
       }
 
       default: {
-      handle_uninterpreted:
-        if (::google::protobuf::internal::WireFormatLite::GetTagWireType(tag) ==
+      handle_unusual:
+        if (tag == 0 ||
+            ::google::protobuf::internal::WireFormatLite::GetTagWireType(tag) ==
             ::google::protobuf::internal::WireFormatLite::WIRETYPE_END_GROUP) {
-          return true;
+          goto success;
         }
         DO_(::google::protobuf::internal::WireFormat::SkipField(
               input, tag, mutable_unknown_fields()));
@@ -1862,12 +1937,18 @@ bool VibrationSetpoint::MergePartialFromCodedStream(
       }
     }
   }
+success:
+  // @@protoc_insertion_point(parse_success:AssisiMsg.VibrationSetpoint)
   return true;
+failure:
+  // @@protoc_insertion_point(parse_failure:AssisiMsg.VibrationSetpoint)
+  return false;
 #undef DO_
 }
 
 void VibrationSetpoint::SerializeWithCachedSizes(
     ::google::protobuf::io::CodedOutputStream* output) const {
+  // @@protoc_insertion_point(serialize_start:AssisiMsg.VibrationSetpoint)
   // optional .AssisiMsg.Header header = 1;
   if (has_header()) {
     ::google::protobuf::internal::WireFormatLite::WriteMessageMaybeToArray(
@@ -1888,10 +1969,12 @@ void VibrationSetpoint::SerializeWithCachedSizes(
     ::google::protobuf::internal::WireFormat::SerializeUnknownFields(
         unknown_fields(), output);
   }
+  // @@protoc_insertion_point(serialize_end:AssisiMsg.VibrationSetpoint)
 }
 
 ::google::protobuf::uint8* VibrationSetpoint::SerializeWithCachedSizesToArray(
     ::google::protobuf::uint8* target) const {
+  // @@protoc_insertion_point(serialize_to_array_start:AssisiMsg.VibrationSetpoint)
   // optional .AssisiMsg.Header header = 1;
   if (has_header()) {
     target = ::google::protobuf::internal::WireFormatLite::
@@ -1913,6 +1996,7 @@ void VibrationSetpoint::SerializeWithCachedSizes(
     target = ::google::protobuf::internal::WireFormat::SerializeUnknownFieldsToArray(
         unknown_fields(), target);
   }
+  // @@protoc_insertion_point(serialize_to_array_end:AssisiMsg.VibrationSetpoint)
   return target;
 }
 
@@ -2030,6 +2114,7 @@ const int VibrationReading::kAmplitudeStdevFieldNumber;
 VibrationReading::VibrationReading()
   : ::google::protobuf::Message() {
   SharedCtor();
+  // @@protoc_insertion_point(constructor:AssisiMsg.VibrationReading)
 }
 
 void VibrationReading::InitAsDefaultInstance() {
@@ -2040,6 +2125,7 @@ VibrationReading::VibrationReading(const VibrationReading& from)
   : ::google::protobuf::Message() {
   SharedCtor();
   MergeFrom(from);
+  // @@protoc_insertion_point(copy_constructor:AssisiMsg.VibrationReading)
 }
 
 void VibrationReading::SharedCtor() {
@@ -2049,6 +2135,7 @@ void VibrationReading::SharedCtor() {
 }
 
 VibrationReading::~VibrationReading() {
+  // @@protoc_insertion_point(destructor:AssisiMsg.VibrationReading)
   SharedDtor();
 }
 
@@ -2080,10 +2167,8 @@ VibrationReading* VibrationReading::New() const {
 }
 
 void VibrationReading::Clear() {
-  if (_has_bits_[0 / 32] & (0xffu << (0 % 32))) {
-    if (has_header()) {
-      if (header_ != NULL) header_->::AssisiMsg::Header::Clear();
-    }
+  if (has_header()) {
+    if (header_ != NULL) header_->::AssisiMsg::Header::Clear();
   }
   freq_.Clear();
   amplitude_.Clear();
@@ -2094,18 +2179,21 @@ void VibrationReading::Clear() {
 
 bool VibrationReading::MergePartialFromCodedStream(
     ::google::protobuf::io::CodedInputStream* input) {
-#define DO_(EXPRESSION) if (!(EXPRESSION)) return false
+#define DO_(EXPRESSION) if (!(EXPRESSION)) goto failure
   ::google::protobuf::uint32 tag;
-  while ((tag = input->ReadTag()) != 0) {
+  // @@protoc_insertion_point(parse_start:AssisiMsg.VibrationReading)
+  for (;;) {
+    ::std::pair< ::google::protobuf::uint32, bool> p = input->ReadTagWithCutoff(127);
+    tag = p.first;
+    if (!p.second) goto handle_unusual;
     switch (::google::protobuf::internal::WireFormatLite::GetTagFieldNumber(tag)) {
       // optional .AssisiMsg.Header header = 1;
       case 1: {
-        if (::google::protobuf::internal::WireFormatLite::GetTagWireType(tag) ==
-            ::google::protobuf::internal::WireFormatLite::WIRETYPE_LENGTH_DELIMITED) {
+        if (tag == 10) {
           DO_(::google::protobuf::internal::WireFormatLite::ReadMessageNoVirtual(
                input, mutable_header()));
         } else {
-          goto handle_uninterpreted;
+          goto handle_unusual;
         }
         if (input->ExpectTag(21)) goto parse_freq;
         break;
@@ -2113,20 +2201,17 @@ bool VibrationReading::MergePartialFromCodedStream(
 
       // repeated float freq = 2;
       case 2: {
-        if (::google::protobuf::internal::WireFormatLite::GetTagWireType(tag) ==
-            ::google::protobuf::internal::WireFormatLite::WIRETYPE_FIXED32) {
+        if (tag == 21) {
          parse_freq:
           DO_((::google::protobuf::internal::WireFormatLite::ReadRepeatedPrimitive<
                    float, ::google::protobuf::internal::WireFormatLite::TYPE_FLOAT>(
                  1, 21, input, this->mutable_freq())));
-        } else if (::google::protobuf::internal::WireFormatLite::GetTagWireType(tag)
-                   == ::google::protobuf::internal::WireFormatLite::
-                      WIRETYPE_LENGTH_DELIMITED) {
+        } else if (tag == 18) {
           DO_((::google::protobuf::internal::WireFormatLite::ReadPackedPrimitiveNoInline<
                    float, ::google::protobuf::internal::WireFormatLite::TYPE_FLOAT>(
                  input, this->mutable_freq())));
         } else {
-          goto handle_uninterpreted;
+          goto handle_unusual;
         }
         if (input->ExpectTag(21)) goto parse_freq;
         if (input->ExpectTag(29)) goto parse_amplitude;
@@ -2135,20 +2220,17 @@ bool VibrationReading::MergePartialFromCodedStream(
 
       // repeated float amplitude = 3;
       case 3: {
-        if (::google::protobuf::internal::WireFormatLite::GetTagWireType(tag) ==
-            ::google::protobuf::internal::WireFormatLite::WIRETYPE_FIXED32) {
+        if (tag == 29) {
          parse_amplitude:
           DO_((::google::protobuf::internal::WireFormatLite::ReadRepeatedPrimitive<
                    float, ::google::protobuf::internal::WireFormatLite::TYPE_FLOAT>(
                  1, 29, input, this->mutable_amplitude())));
-        } else if (::google::protobuf::internal::WireFormatLite::GetTagWireType(tag)
-                   == ::google::protobuf::internal::WireFormatLite::
-                      WIRETYPE_LENGTH_DELIMITED) {
+        } else if (tag == 26) {
           DO_((::google::protobuf::internal::WireFormatLite::ReadPackedPrimitiveNoInline<
                    float, ::google::protobuf::internal::WireFormatLite::TYPE_FLOAT>(
                  input, this->mutable_amplitude())));
         } else {
-          goto handle_uninterpreted;
+          goto handle_unusual;
         }
         if (input->ExpectTag(29)) goto parse_amplitude;
         if (input->ExpectTag(37)) goto parse_amplitude_stdev;
@@ -2157,31 +2239,29 @@ bool VibrationReading::MergePartialFromCodedStream(
 
       // repeated float amplitude_stdev = 4;
       case 4: {
-        if (::google::protobuf::internal::WireFormatLite::GetTagWireType(tag) ==
-            ::google::protobuf::internal::WireFormatLite::WIRETYPE_FIXED32) {
+        if (tag == 37) {
          parse_amplitude_stdev:
           DO_((::google::protobuf::internal::WireFormatLite::ReadRepeatedPrimitive<
                    float, ::google::protobuf::internal::WireFormatLite::TYPE_FLOAT>(
                  1, 37, input, this->mutable_amplitude_stdev())));
-        } else if (::google::protobuf::internal::WireFormatLite::GetTagWireType(tag)
-                   == ::google::protobuf::internal::WireFormatLite::
-                      WIRETYPE_LENGTH_DELIMITED) {
+        } else if (tag == 34) {
           DO_((::google::protobuf::internal::WireFormatLite::ReadPackedPrimitiveNoInline<
                    float, ::google::protobuf::internal::WireFormatLite::TYPE_FLOAT>(
                  input, this->mutable_amplitude_stdev())));
         } else {
-          goto handle_uninterpreted;
+          goto handle_unusual;
         }
         if (input->ExpectTag(37)) goto parse_amplitude_stdev;
-        if (input->ExpectAtEnd()) return true;
+        if (input->ExpectAtEnd()) goto success;
         break;
       }
 
       default: {
-      handle_uninterpreted:
-        if (::google::protobuf::internal::WireFormatLite::GetTagWireType(tag) ==
+      handle_unusual:
+        if (tag == 0 ||
+            ::google::protobuf::internal::WireFormatLite::GetTagWireType(tag) ==
             ::google::protobuf::internal::WireFormatLite::WIRETYPE_END_GROUP) {
-          return true;
+          goto success;
         }
         DO_(::google::protobuf::internal::WireFormat::SkipField(
               input, tag, mutable_unknown_fields()));
@@ -2189,12 +2269,18 @@ bool VibrationReading::MergePartialFromCodedStream(
       }
     }
   }
+success:
+  // @@protoc_insertion_point(parse_success:AssisiMsg.VibrationReading)
   return true;
+failure:
+  // @@protoc_insertion_point(parse_failure:AssisiMsg.VibrationReading)
+  return false;
 #undef DO_
 }
 
 void VibrationReading::SerializeWithCachedSizes(
     ::google::protobuf::io::CodedOutputStream* output) const {
+  // @@protoc_insertion_point(serialize_start:AssisiMsg.VibrationReading)
   // optional .AssisiMsg.Header header = 1;
   if (has_header()) {
     ::google::protobuf::internal::WireFormatLite::WriteMessageMaybeToArray(
@@ -2223,10 +2309,12 @@ void VibrationReading::SerializeWithCachedSizes(
     ::google::protobuf::internal::WireFormat::SerializeUnknownFields(
         unknown_fields(), output);
   }
+  // @@protoc_insertion_point(serialize_end:AssisiMsg.VibrationReading)
 }
 
 ::google::protobuf::uint8* VibrationReading::SerializeWithCachedSizesToArray(
     ::google::protobuf::uint8* target) const {
+  // @@protoc_insertion_point(serialize_to_array_start:AssisiMsg.VibrationReading)
   // optional .AssisiMsg.Header header = 1;
   if (has_header()) {
     target = ::google::protobuf::internal::WireFormatLite::
@@ -2256,6 +2344,7 @@ void VibrationReading::SerializeWithCachedSizes(
     target = ::google::protobuf::internal::WireFormat::SerializeUnknownFieldsToArray(
         unknown_fields(), target);
   }
+  // @@protoc_insertion_point(serialize_to_array_end:AssisiMsg.VibrationReading)
   return target;
 }
 
@@ -2379,6 +2468,7 @@ const int VibrationReadingArray::kReadingFieldNumber;
 VibrationReadingArray::VibrationReadingArray()
   : ::google::protobuf::Message() {
   SharedCtor();
+  // @@protoc_insertion_point(constructor:AssisiMsg.VibrationReadingArray)
 }
 
 void VibrationReadingArray::InitAsDefaultInstance() {
@@ -2389,6 +2479,7 @@ VibrationReadingArray::VibrationReadingArray(const VibrationReadingArray& from)
   : ::google::protobuf::Message() {
   SharedCtor();
   MergeFrom(from);
+  // @@protoc_insertion_point(copy_constructor:AssisiMsg.VibrationReadingArray)
 }
 
 void VibrationReadingArray::SharedCtor() {
@@ -2398,6 +2489,7 @@ void VibrationReadingArray::SharedCtor() {
 }
 
 VibrationReadingArray::~VibrationReadingArray() {
+  // @@protoc_insertion_point(destructor:AssisiMsg.VibrationReadingArray)
   SharedDtor();
 }
 
@@ -2429,10 +2521,8 @@ VibrationReadingArray* VibrationReadingArray::New() const {
 }
 
 void VibrationReadingArray::Clear() {
-  if (_has_bits_[0 / 32] & (0xffu << (0 % 32))) {
-    if (has_header()) {
-      if (header_ != NULL) header_->::AssisiMsg::Header::Clear();
-    }
+  if (has_header()) {
+    if (header_ != NULL) header_->::AssisiMsg::Header::Clear();
   }
   reading_.Clear();
   ::memset(_has_bits_, 0, sizeof(_has_bits_));
@@ -2441,18 +2531,21 @@ void VibrationReadingArray::Clear() {
 
 bool VibrationReadingArray::MergePartialFromCodedStream(
     ::google::protobuf::io::CodedInputStream* input) {
-#define DO_(EXPRESSION) if (!(EXPRESSION)) return false
+#define DO_(EXPRESSION) if (!(EXPRESSION)) goto failure
   ::google::protobuf::uint32 tag;
-  while ((tag = input->ReadTag()) != 0) {
+  // @@protoc_insertion_point(parse_start:AssisiMsg.VibrationReadingArray)
+  for (;;) {
+    ::std::pair< ::google::protobuf::uint32, bool> p = input->ReadTagWithCutoff(127);
+    tag = p.first;
+    if (!p.second) goto handle_unusual;
     switch (::google::protobuf::internal::WireFormatLite::GetTagFieldNumber(tag)) {
       // optional .AssisiMsg.Header header = 1;
       case 1: {
-        if (::google::protobuf::internal::WireFormatLite::GetTagWireType(tag) ==
-            ::google::protobuf::internal::WireFormatLite::WIRETYPE_LENGTH_DELIMITED) {
+        if (tag == 10) {
           DO_(::google::protobuf::internal::WireFormatLite::ReadMessageNoVirtual(
                input, mutable_header()));
         } else {
-          goto handle_uninterpreted;
+          goto handle_unusual;
         }
         if (input->ExpectTag(18)) goto parse_reading;
         break;
@@ -2460,24 +2553,24 @@ bool VibrationReadingArray::MergePartialFromCodedStream(
 
       // repeated .AssisiMsg.VibrationReading reading = 2;
       case 2: {
-        if (::google::protobuf::internal::WireFormatLite::GetTagWireType(tag) ==
-            ::google::protobuf::internal::WireFormatLite::WIRETYPE_LENGTH_DELIMITED) {
+        if (tag == 18) {
          parse_reading:
           DO_(::google::protobuf::internal::WireFormatLite::ReadMessageNoVirtual(
                 input, add_reading()));
         } else {
-          goto handle_uninterpreted;
+          goto handle_unusual;
         }
         if (input->ExpectTag(18)) goto parse_reading;
-        if (input->ExpectAtEnd()) return true;
+        if (input->ExpectAtEnd()) goto success;
         break;
       }
 
       default: {
-      handle_uninterpreted:
-        if (::google::protobuf::internal::WireFormatLite::GetTagWireType(tag) ==
+      handle_unusual:
+        if (tag == 0 ||
+            ::google::protobuf::internal::WireFormatLite::GetTagWireType(tag) ==
             ::google::protobuf::internal::WireFormatLite::WIRETYPE_END_GROUP) {
-          return true;
+          goto success;
         }
         DO_(::google::protobuf::internal::WireFormat::SkipField(
               input, tag, mutable_unknown_fields()));
@@ -2485,12 +2578,18 @@ bool VibrationReadingArray::MergePartialFromCodedStream(
       }
     }
   }
+success:
+  // @@protoc_insertion_point(parse_success:AssisiMsg.VibrationReadingArray)
   return true;
+failure:
+  // @@protoc_insertion_point(parse_failure:AssisiMsg.VibrationReadingArray)
+  return false;
 #undef DO_
 }
 
 void VibrationReadingArray::SerializeWithCachedSizes(
     ::google::protobuf::io::CodedOutputStream* output) const {
+  // @@protoc_insertion_point(serialize_start:AssisiMsg.VibrationReadingArray)
   // optional .AssisiMsg.Header header = 1;
   if (has_header()) {
     ::google::protobuf::internal::WireFormatLite::WriteMessageMaybeToArray(
@@ -2507,10 +2606,12 @@ void VibrationReadingArray::SerializeWithCachedSizes(
     ::google::protobuf::internal::WireFormat::SerializeUnknownFields(
         unknown_fields(), output);
   }
+  // @@protoc_insertion_point(serialize_end:AssisiMsg.VibrationReadingArray)
 }
 
 ::google::protobuf::uint8* VibrationReadingArray::SerializeWithCachedSizesToArray(
     ::google::protobuf::uint8* target) const {
+  // @@protoc_insertion_point(serialize_to_array_start:AssisiMsg.VibrationReadingArray)
   // optional .AssisiMsg.Header header = 1;
   if (has_header()) {
     target = ::google::protobuf::internal::WireFormatLite::
@@ -2529,6 +2630,7 @@ void VibrationReadingArray::SerializeWithCachedSizes(
     target = ::google::protobuf::internal::WireFormat::SerializeUnknownFieldsToArray(
         unknown_fields(), target);
   }
+  // @@protoc_insertion_point(serialize_to_array_end:AssisiMsg.VibrationReadingArray)
   return target;
 }
 
@@ -2603,9 +2705,7 @@ bool VibrationReadingArray::IsInitialized() const {
   if (has_header()) {
     if (!this->header().IsInitialized()) return false;
   }
-  for (int i = 0; i < reading_size(); i++) {
-    if (!this->reading(i).IsInitialized()) return false;
-  }
+  if (!::google::protobuf::internal::AllAreInitialized(this->reading())) return false;
   return true;
 }
 
@@ -2639,6 +2739,7 @@ const int DiffDrive::kVelRightFieldNumber;
 DiffDrive::DiffDrive()
   : ::google::protobuf::Message() {
   SharedCtor();
+  // @@protoc_insertion_point(constructor:AssisiMsg.DiffDrive)
 }
 
 void DiffDrive::InitAsDefaultInstance() {
@@ -2649,6 +2750,7 @@ DiffDrive::DiffDrive(const DiffDrive& from)
   : ::google::protobuf::Message() {
   SharedCtor();
   MergeFrom(from);
+  // @@protoc_insertion_point(copy_constructor:AssisiMsg.DiffDrive)
 }
 
 void DiffDrive::SharedCtor() {
@@ -2660,6 +2762,7 @@ void DiffDrive::SharedCtor() {
 }
 
 DiffDrive::~DiffDrive() {
+  // @@protoc_insertion_point(destructor:AssisiMsg.DiffDrive)
   SharedDtor();
 }
 
@@ -2691,31 +2794,47 @@ DiffDrive* DiffDrive::New() const {
 }
 
 void DiffDrive::Clear() {
-  if (_has_bits_[0 / 32] & (0xffu << (0 % 32))) {
+#define OFFSET_OF_FIELD_(f) (reinterpret_cast<char*>(      \
+  &reinterpret_cast<DiffDrive*>(16)->f) - \
+   reinterpret_cast<char*>(16))
+
+#define ZR_(first, last) do {                              \
+    size_t f = OFFSET_OF_FIELD_(first);                    \
+    size_t n = OFFSET_OF_FIELD_(last) - f + sizeof(last);  \
+    ::memset(&first, 0, n);                                \
+  } while (0)
+
+  if (_has_bits_[0 / 32] & 7) {
+    ZR_(vel_left_, vel_right_);
     if (has_header()) {
       if (header_ != NULL) header_->::AssisiMsg::Header::Clear();
     }
-    vel_left_ = 0;
-    vel_right_ = 0;
   }
+
+#undef OFFSET_OF_FIELD_
+#undef ZR_
+
   ::memset(_has_bits_, 0, sizeof(_has_bits_));
   mutable_unknown_fields()->Clear();
 }
 
 bool DiffDrive::MergePartialFromCodedStream(
     ::google::protobuf::io::CodedInputStream* input) {
-#define DO_(EXPRESSION) if (!(EXPRESSION)) return false
+#define DO_(EXPRESSION) if (!(EXPRESSION)) goto failure
   ::google::protobuf::uint32 tag;
-  while ((tag = input->ReadTag()) != 0) {
+  // @@protoc_insertion_point(parse_start:AssisiMsg.DiffDrive)
+  for (;;) {
+    ::std::pair< ::google::protobuf::uint32, bool> p = input->ReadTagWithCutoff(127);
+    tag = p.first;
+    if (!p.second) goto handle_unusual;
     switch (::google::protobuf::internal::WireFormatLite::GetTagFieldNumber(tag)) {
       // optional .AssisiMsg.Header header = 1;
       case 1: {
-        if (::google::protobuf::internal::WireFormatLite::GetTagWireType(tag) ==
-            ::google::protobuf::internal::WireFormatLite::WIRETYPE_LENGTH_DELIMITED) {
+        if (tag == 10) {
           DO_(::google::protobuf::internal::WireFormatLite::ReadMessageNoVirtual(
                input, mutable_header()));
         } else {
-          goto handle_uninterpreted;
+          goto handle_unusual;
         }
         if (input->ExpectTag(17)) goto parse_vel_left;
         break;
@@ -2723,15 +2842,14 @@ bool DiffDrive::MergePartialFromCodedStream(
 
       // required double vel_left = 2;
       case 2: {
-        if (::google::protobuf::internal::WireFormatLite::GetTagWireType(tag) ==
-            ::google::protobuf::internal::WireFormatLite::WIRETYPE_FIXED64) {
+        if (tag == 17) {
          parse_vel_left:
           DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
                    double, ::google::protobuf::internal::WireFormatLite::TYPE_DOUBLE>(
                  input, &vel_left_)));
           set_has_vel_left();
         } else {
-          goto handle_uninterpreted;
+          goto handle_unusual;
         }
         if (input->ExpectTag(25)) goto parse_vel_right;
         break;
@@ -2739,25 +2857,25 @@ bool DiffDrive::MergePartialFromCodedStream(
 
       // required double vel_right = 3;
       case 3: {
-        if (::google::protobuf::internal::WireFormatLite::GetTagWireType(tag) ==
-            ::google::protobuf::internal::WireFormatLite::WIRETYPE_FIXED64) {
+        if (tag == 25) {
          parse_vel_right:
           DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
                    double, ::google::protobuf::internal::WireFormatLite::TYPE_DOUBLE>(
                  input, &vel_right_)));
           set_has_vel_right();
         } else {
-          goto handle_uninterpreted;
+          goto handle_unusual;
         }
-        if (input->ExpectAtEnd()) return true;
+        if (input->ExpectAtEnd()) goto success;
         break;
       }
 
       default: {
-      handle_uninterpreted:
-        if (::google::protobuf::internal::WireFormatLite::GetTagWireType(tag) ==
+      handle_unusual:
+        if (tag == 0 ||
+            ::google::protobuf::internal::WireFormatLite::GetTagWireType(tag) ==
             ::google::protobuf::internal::WireFormatLite::WIRETYPE_END_GROUP) {
-          return true;
+          goto success;
         }
         DO_(::google::protobuf::internal::WireFormat::SkipField(
               input, tag, mutable_unknown_fields()));
@@ -2765,12 +2883,18 @@ bool DiffDrive::MergePartialFromCodedStream(
       }
     }
   }
+success:
+  // @@protoc_insertion_point(parse_success:AssisiMsg.DiffDrive)
   return true;
+failure:
+  // @@protoc_insertion_point(parse_failure:AssisiMsg.DiffDrive)
+  return false;
 #undef DO_
 }
 
 void DiffDrive::SerializeWithCachedSizes(
     ::google::protobuf::io::CodedOutputStream* output) const {
+  // @@protoc_insertion_point(serialize_start:AssisiMsg.DiffDrive)
   // optional .AssisiMsg.Header header = 1;
   if (has_header()) {
     ::google::protobuf::internal::WireFormatLite::WriteMessageMaybeToArray(
@@ -2791,10 +2915,12 @@ void DiffDrive::SerializeWithCachedSizes(
     ::google::protobuf::internal::WireFormat::SerializeUnknownFields(
         unknown_fields(), output);
   }
+  // @@protoc_insertion_point(serialize_end:AssisiMsg.DiffDrive)
 }
 
 ::google::protobuf::uint8* DiffDrive::SerializeWithCachedSizesToArray(
     ::google::protobuf::uint8* target) const {
+  // @@protoc_insertion_point(serialize_to_array_start:AssisiMsg.DiffDrive)
   // optional .AssisiMsg.Header header = 1;
   if (has_header()) {
     target = ::google::protobuf::internal::WireFormatLite::
@@ -2816,6 +2942,7 @@ void DiffDrive::SerializeWithCachedSizes(
     target = ::google::protobuf::internal::WireFormat::SerializeUnknownFieldsToArray(
         unknown_fields(), target);
   }
+  // @@protoc_insertion_point(serialize_to_array_end:AssisiMsg.DiffDrive)
   return target;
 }
 
@@ -2935,6 +3062,7 @@ const int ObjectArray::kTypeFieldNumber;
 ObjectArray::ObjectArray()
   : ::google::protobuf::Message() {
   SharedCtor();
+  // @@protoc_insertion_point(constructor:AssisiMsg.ObjectArray)
 }
 
 void ObjectArray::InitAsDefaultInstance() {
@@ -2945,9 +3073,11 @@ ObjectArray::ObjectArray(const ObjectArray& from)
   : ::google::protobuf::Message() {
   SharedCtor();
   MergeFrom(from);
+  // @@protoc_insertion_point(copy_constructor:AssisiMsg.ObjectArray)
 }
 
 void ObjectArray::SharedCtor() {
+  ::google::protobuf::internal::GetEmptyString();
   _cached_size_ = 0;
   header_ = NULL;
   field_of_view_ = 0.5236f;
@@ -2957,6 +3087,7 @@ void ObjectArray::SharedCtor() {
 }
 
 ObjectArray::~ObjectArray() {
+  // @@protoc_insertion_point(destructor:AssisiMsg.ObjectArray)
   SharedDtor();
 }
 
@@ -2988,7 +3119,7 @@ ObjectArray* ObjectArray::New() const {
 }
 
 void ObjectArray::Clear() {
-  if (_has_bits_[0 / 32] & (0xffu << (0 % 32))) {
+  if (_has_bits_[0 / 32] & 15) {
     if (has_header()) {
       if (header_ != NULL) header_->::AssisiMsg::Header::Clear();
     }
@@ -3004,18 +3135,21 @@ void ObjectArray::Clear() {
 
 bool ObjectArray::MergePartialFromCodedStream(
     ::google::protobuf::io::CodedInputStream* input) {
-#define DO_(EXPRESSION) if (!(EXPRESSION)) return false
+#define DO_(EXPRESSION) if (!(EXPRESSION)) goto failure
   ::google::protobuf::uint32 tag;
-  while ((tag = input->ReadTag()) != 0) {
+  // @@protoc_insertion_point(parse_start:AssisiMsg.ObjectArray)
+  for (;;) {
+    ::std::pair< ::google::protobuf::uint32, bool> p = input->ReadTagWithCutoff(127);
+    tag = p.first;
+    if (!p.second) goto handle_unusual;
     switch (::google::protobuf::internal::WireFormatLite::GetTagFieldNumber(tag)) {
       // optional .AssisiMsg.Header header = 1;
       case 1: {
-        if (::google::protobuf::internal::WireFormatLite::GetTagWireType(tag) ==
-            ::google::protobuf::internal::WireFormatLite::WIRETYPE_LENGTH_DELIMITED) {
+        if (tag == 10) {
           DO_(::google::protobuf::internal::WireFormatLite::ReadMessageNoVirtual(
                input, mutable_header()));
         } else {
-          goto handle_uninterpreted;
+          goto handle_unusual;
         }
         if (input->ExpectTag(29)) goto parse_field_of_view;
         break;
@@ -3023,15 +3157,14 @@ bool ObjectArray::MergePartialFromCodedStream(
 
       // optional float field_of_view = 3 [default = 0.5236];
       case 3: {
-        if (::google::protobuf::internal::WireFormatLite::GetTagWireType(tag) ==
-            ::google::protobuf::internal::WireFormatLite::WIRETYPE_FIXED32) {
+        if (tag == 29) {
          parse_field_of_view:
           DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
                    float, ::google::protobuf::internal::WireFormatLite::TYPE_FLOAT>(
                  input, &field_of_view_)));
           set_has_field_of_view();
         } else {
-          goto handle_uninterpreted;
+          goto handle_unusual;
         }
         if (input->ExpectTag(37)) goto parse_min_range;
         break;
@@ -3039,15 +3172,14 @@ bool ObjectArray::MergePartialFromCodedStream(
 
       // optional float min_range = 4 [default = 0];
       case 4: {
-        if (::google::protobuf::internal::WireFormatLite::GetTagWireType(tag) ==
-            ::google::protobuf::internal::WireFormatLite::WIRETYPE_FIXED32) {
+        if (tag == 37) {
          parse_min_range:
           DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
                    float, ::google::protobuf::internal::WireFormatLite::TYPE_FLOAT>(
                  input, &min_range_)));
           set_has_min_range();
         } else {
-          goto handle_uninterpreted;
+          goto handle_unusual;
         }
         if (input->ExpectTag(45)) goto parse_max_range;
         break;
@@ -3055,15 +3187,14 @@ bool ObjectArray::MergePartialFromCodedStream(
 
       // optional float max_range = 5 [default = inf];
       case 5: {
-        if (::google::protobuf::internal::WireFormatLite::GetTagWireType(tag) ==
-            ::google::protobuf::internal::WireFormatLite::WIRETYPE_FIXED32) {
+        if (tag == 45) {
          parse_max_range:
           DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
                    float, ::google::protobuf::internal::WireFormatLite::TYPE_FLOAT>(
                  input, &max_range_)));
           set_has_max_range();
         } else {
-          goto handle_uninterpreted;
+          goto handle_unusual;
         }
         if (input->ExpectTag(53)) goto parse_range;
         break;
@@ -3071,20 +3202,17 @@ bool ObjectArray::MergePartialFromCodedStream(
 
       // repeated float range = 6;
       case 6: {
-        if (::google::protobuf::internal::WireFormatLite::GetTagWireType(tag) ==
-            ::google::protobuf::internal::WireFormatLite::WIRETYPE_FIXED32) {
+        if (tag == 53) {
          parse_range:
           DO_((::google::protobuf::internal::WireFormatLite::ReadRepeatedPrimitive<
                    float, ::google::protobuf::internal::WireFormatLite::TYPE_FLOAT>(
                  1, 53, input, this->mutable_range())));
-        } else if (::google::protobuf::internal::WireFormatLite::GetTagWireType(tag)
-                   == ::google::protobuf::internal::WireFormatLite::
-                      WIRETYPE_LENGTH_DELIMITED) {
+        } else if (tag == 50) {
           DO_((::google::protobuf::internal::WireFormatLite::ReadPackedPrimitiveNoInline<
                    float, ::google::protobuf::internal::WireFormatLite::TYPE_FLOAT>(
                  input, this->mutable_range())));
         } else {
-          goto handle_uninterpreted;
+          goto handle_unusual;
         }
         if (input->ExpectTag(53)) goto parse_range;
         if (input->ExpectTag(58)) goto parse_type;
@@ -3093,28 +3221,29 @@ bool ObjectArray::MergePartialFromCodedStream(
 
       // repeated string type = 7;
       case 7: {
-        if (::google::protobuf::internal::WireFormatLite::GetTagWireType(tag) ==
-            ::google::protobuf::internal::WireFormatLite::WIRETYPE_LENGTH_DELIMITED) {
+        if (tag == 58) {
          parse_type:
           DO_(::google::protobuf::internal::WireFormatLite::ReadString(
                 input, this->add_type()));
-          ::google::protobuf::internal::WireFormat::VerifyUTF8String(
+          ::google::protobuf::internal::WireFormat::VerifyUTF8StringNamedField(
             this->type(this->type_size() - 1).data(),
             this->type(this->type_size() - 1).length(),
-            ::google::protobuf::internal::WireFormat::PARSE);
+            ::google::protobuf::internal::WireFormat::PARSE,
+            "type");
         } else {
-          goto handle_uninterpreted;
+          goto handle_unusual;
         }
         if (input->ExpectTag(58)) goto parse_type;
-        if (input->ExpectAtEnd()) return true;
+        if (input->ExpectAtEnd()) goto success;
         break;
       }
 
       default: {
-      handle_uninterpreted:
-        if (::google::protobuf::internal::WireFormatLite::GetTagWireType(tag) ==
+      handle_unusual:
+        if (tag == 0 ||
+            ::google::protobuf::internal::WireFormatLite::GetTagWireType(tag) ==
             ::google::protobuf::internal::WireFormatLite::WIRETYPE_END_GROUP) {
-          return true;
+          goto success;
         }
         DO_(::google::protobuf::internal::WireFormat::SkipField(
               input, tag, mutable_unknown_fields()));
@@ -3122,12 +3251,18 @@ bool ObjectArray::MergePartialFromCodedStream(
       }
     }
   }
+success:
+  // @@protoc_insertion_point(parse_success:AssisiMsg.ObjectArray)
   return true;
+failure:
+  // @@protoc_insertion_point(parse_failure:AssisiMsg.ObjectArray)
+  return false;
 #undef DO_
 }
 
 void ObjectArray::SerializeWithCachedSizes(
     ::google::protobuf::io::CodedOutputStream* output) const {
+  // @@protoc_insertion_point(serialize_start:AssisiMsg.ObjectArray)
   // optional .AssisiMsg.Header header = 1;
   if (has_header()) {
     ::google::protobuf::internal::WireFormatLite::WriteMessageMaybeToArray(
@@ -3157,9 +3292,10 @@ void ObjectArray::SerializeWithCachedSizes(
 
   // repeated string type = 7;
   for (int i = 0; i < this->type_size(); i++) {
-  ::google::protobuf::internal::WireFormat::VerifyUTF8String(
+  ::google::protobuf::internal::WireFormat::VerifyUTF8StringNamedField(
     this->type(i).data(), this->type(i).length(),
-    ::google::protobuf::internal::WireFormat::SERIALIZE);
+    ::google::protobuf::internal::WireFormat::SERIALIZE,
+    "type");
     ::google::protobuf::internal::WireFormatLite::WriteString(
       7, this->type(i), output);
   }
@@ -3168,10 +3304,12 @@ void ObjectArray::SerializeWithCachedSizes(
     ::google::protobuf::internal::WireFormat::SerializeUnknownFields(
         unknown_fields(), output);
   }
+  // @@protoc_insertion_point(serialize_end:AssisiMsg.ObjectArray)
 }
 
 ::google::protobuf::uint8* ObjectArray::SerializeWithCachedSizesToArray(
     ::google::protobuf::uint8* target) const {
+  // @@protoc_insertion_point(serialize_to_array_start:AssisiMsg.ObjectArray)
   // optional .AssisiMsg.Header header = 1;
   if (has_header()) {
     target = ::google::protobuf::internal::WireFormatLite::
@@ -3202,9 +3340,10 @@ void ObjectArray::SerializeWithCachedSizes(
 
   // repeated string type = 7;
   for (int i = 0; i < this->type_size(); i++) {
-    ::google::protobuf::internal::WireFormat::VerifyUTF8String(
+    ::google::protobuf::internal::WireFormat::VerifyUTF8StringNamedField(
       this->type(i).data(), this->type(i).length(),
-      ::google::protobuf::internal::WireFormat::SERIALIZE);
+      ::google::protobuf::internal::WireFormat::SERIALIZE,
+      "type");
     target = ::google::protobuf::internal::WireFormatLite::
       WriteStringToArray(7, this->type(i), target);
   }
@@ -3213,6 +3352,7 @@ void ObjectArray::SerializeWithCachedSizes(
     target = ::google::protobuf::internal::WireFormat::SerializeUnknownFieldsToArray(
         unknown_fields(), target);
   }
+  // @@protoc_insertion_point(serialize_to_array_end:AssisiMsg.ObjectArray)
   return target;
 }
 
@@ -3354,6 +3494,7 @@ const int Airflow::kIntensityFieldNumber;
 Airflow::Airflow()
   : ::google::protobuf::Message() {
   SharedCtor();
+  // @@protoc_insertion_point(constructor:AssisiMsg.Airflow)
 }
 
 void Airflow::InitAsDefaultInstance() {
@@ -3364,6 +3505,7 @@ Airflow::Airflow(const Airflow& from)
   : ::google::protobuf::Message() {
   SharedCtor();
   MergeFrom(from);
+  // @@protoc_insertion_point(copy_constructor:AssisiMsg.Airflow)
 }
 
 void Airflow::SharedCtor() {
@@ -3374,6 +3516,7 @@ void Airflow::SharedCtor() {
 }
 
 Airflow::~Airflow() {
+  // @@protoc_insertion_point(destructor:AssisiMsg.Airflow)
   SharedDtor();
 }
 
@@ -3405,7 +3548,7 @@ Airflow* Airflow::New() const {
 }
 
 void Airflow::Clear() {
-  if (_has_bits_[0 / 32] & (0xffu << (0 % 32))) {
+  if (_has_bits_[0 / 32] & 3) {
     if (has_header()) {
       if (header_ != NULL) header_->::AssisiMsg::Header::Clear();
     }
@@ -3417,18 +3560,21 @@ void Airflow::Clear() {
 
 bool Airflow::MergePartialFromCodedStream(
     ::google::protobuf::io::CodedInputStream* input) {
-#define DO_(EXPRESSION) if (!(EXPRESSION)) return false
+#define DO_(EXPRESSION) if (!(EXPRESSION)) goto failure
   ::google::protobuf::uint32 tag;
-  while ((tag = input->ReadTag()) != 0) {
+  // @@protoc_insertion_point(parse_start:AssisiMsg.Airflow)
+  for (;;) {
+    ::std::pair< ::google::protobuf::uint32, bool> p = input->ReadTagWithCutoff(127);
+    tag = p.first;
+    if (!p.second) goto handle_unusual;
     switch (::google::protobuf::internal::WireFormatLite::GetTagFieldNumber(tag)) {
       // optional .AssisiMsg.Header header = 1;
       case 1: {
-        if (::google::protobuf::internal::WireFormatLite::GetTagWireType(tag) ==
-            ::google::protobuf::internal::WireFormatLite::WIRETYPE_LENGTH_DELIMITED) {
+        if (tag == 10) {
           DO_(::google::protobuf::internal::WireFormatLite::ReadMessageNoVirtual(
                input, mutable_header()));
         } else {
-          goto handle_uninterpreted;
+          goto handle_unusual;
         }
         if (input->ExpectTag(21)) goto parse_intensity;
         break;
@@ -3436,25 +3582,25 @@ bool Airflow::MergePartialFromCodedStream(
 
       // required float intensity = 2;
       case 2: {
-        if (::google::protobuf::internal::WireFormatLite::GetTagWireType(tag) ==
-            ::google::protobuf::internal::WireFormatLite::WIRETYPE_FIXED32) {
+        if (tag == 21) {
          parse_intensity:
           DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
                    float, ::google::protobuf::internal::WireFormatLite::TYPE_FLOAT>(
                  input, &intensity_)));
           set_has_intensity();
         } else {
-          goto handle_uninterpreted;
+          goto handle_unusual;
         }
-        if (input->ExpectAtEnd()) return true;
+        if (input->ExpectAtEnd()) goto success;
         break;
       }
 
       default: {
-      handle_uninterpreted:
-        if (::google::protobuf::internal::WireFormatLite::GetTagWireType(tag) ==
+      handle_unusual:
+        if (tag == 0 ||
+            ::google::protobuf::internal::WireFormatLite::GetTagWireType(tag) ==
             ::google::protobuf::internal::WireFormatLite::WIRETYPE_END_GROUP) {
-          return true;
+          goto success;
         }
         DO_(::google::protobuf::internal::WireFormat::SkipField(
               input, tag, mutable_unknown_fields()));
@@ -3462,12 +3608,18 @@ bool Airflow::MergePartialFromCodedStream(
       }
     }
   }
+success:
+  // @@protoc_insertion_point(parse_success:AssisiMsg.Airflow)
   return true;
+failure:
+  // @@protoc_insertion_point(parse_failure:AssisiMsg.Airflow)
+  return false;
 #undef DO_
 }
 
 void Airflow::SerializeWithCachedSizes(
     ::google::protobuf::io::CodedOutputStream* output) const {
+  // @@protoc_insertion_point(serialize_start:AssisiMsg.Airflow)
   // optional .AssisiMsg.Header header = 1;
   if (has_header()) {
     ::google::protobuf::internal::WireFormatLite::WriteMessageMaybeToArray(
@@ -3483,10 +3635,12 @@ void Airflow::SerializeWithCachedSizes(
     ::google::protobuf::internal::WireFormat::SerializeUnknownFields(
         unknown_fields(), output);
   }
+  // @@protoc_insertion_point(serialize_end:AssisiMsg.Airflow)
 }
 
 ::google::protobuf::uint8* Airflow::SerializeWithCachedSizesToArray(
     ::google::protobuf::uint8* target) const {
+  // @@protoc_insertion_point(serialize_to_array_start:AssisiMsg.Airflow)
   // optional .AssisiMsg.Header header = 1;
   if (has_header()) {
     target = ::google::protobuf::internal::WireFormatLite::
@@ -3503,6 +3657,7 @@ void Airflow::SerializeWithCachedSizes(
     target = ::google::protobuf::internal::WireFormat::SerializeUnknownFieldsToArray(
         unknown_fields(), target);
   }
+  // @@protoc_insertion_point(serialize_to_array_end:AssisiMsg.Airflow)
   return target;
 }
 
@@ -3610,6 +3765,7 @@ const int AirflowReading::kDirectionFieldNumber;
 AirflowReading::AirflowReading()
   : ::google::protobuf::Message() {
   SharedCtor();
+  // @@protoc_insertion_point(constructor:AssisiMsg.AirflowReading)
 }
 
 void AirflowReading::InitAsDefaultInstance() {
@@ -3620,6 +3776,7 @@ AirflowReading::AirflowReading(const AirflowReading& from)
   : ::google::protobuf::Message() {
   SharedCtor();
   MergeFrom(from);
+  // @@protoc_insertion_point(copy_constructor:AssisiMsg.AirflowReading)
 }
 
 void AirflowReading::SharedCtor() {
@@ -3631,6 +3788,7 @@ void AirflowReading::SharedCtor() {
 }
 
 AirflowReading::~AirflowReading() {
+  // @@protoc_insertion_point(destructor:AssisiMsg.AirflowReading)
   SharedDtor();
 }
 
@@ -3662,31 +3820,47 @@ AirflowReading* AirflowReading::New() const {
 }
 
 void AirflowReading::Clear() {
-  if (_has_bits_[0 / 32] & (0xffu << (0 % 32))) {
+#define OFFSET_OF_FIELD_(f) (reinterpret_cast<char*>(      \
+  &reinterpret_cast<AirflowReading*>(16)->f) - \
+   reinterpret_cast<char*>(16))
+
+#define ZR_(first, last) do {                              \
+    size_t f = OFFSET_OF_FIELD_(first);                    \
+    size_t n = OFFSET_OF_FIELD_(last) - f + sizeof(last);  \
+    ::memset(&first, 0, n);                                \
+  } while (0)
+
+  if (_has_bits_[0 / 32] & 7) {
+    ZR_(intensity_, direction_);
     if (has_header()) {
       if (header_ != NULL) header_->::AssisiMsg::Header::Clear();
     }
-    intensity_ = 0;
-    direction_ = 0;
   }
+
+#undef OFFSET_OF_FIELD_
+#undef ZR_
+
   ::memset(_has_bits_, 0, sizeof(_has_bits_));
   mutable_unknown_fields()->Clear();
 }
 
 bool AirflowReading::MergePartialFromCodedStream(
     ::google::protobuf::io::CodedInputStream* input) {
-#define DO_(EXPRESSION) if (!(EXPRESSION)) return false
+#define DO_(EXPRESSION) if (!(EXPRESSION)) goto failure
   ::google::protobuf::uint32 tag;
-  while ((tag = input->ReadTag()) != 0) {
+  // @@protoc_insertion_point(parse_start:AssisiMsg.AirflowReading)
+  for (;;) {
+    ::std::pair< ::google::protobuf::uint32, bool> p = input->ReadTagWithCutoff(127);
+    tag = p.first;
+    if (!p.second) goto handle_unusual;
     switch (::google::protobuf::internal::WireFormatLite::GetTagFieldNumber(tag)) {
       // optional .AssisiMsg.Header header = 1;
       case 1: {
-        if (::google::protobuf::internal::WireFormatLite::GetTagWireType(tag) ==
-            ::google::protobuf::internal::WireFormatLite::WIRETYPE_LENGTH_DELIMITED) {
+        if (tag == 10) {
           DO_(::google::protobuf::internal::WireFormatLite::ReadMessageNoVirtual(
                input, mutable_header()));
         } else {
-          goto handle_uninterpreted;
+          goto handle_unusual;
         }
         if (input->ExpectTag(21)) goto parse_intensity;
         break;
@@ -3694,15 +3868,14 @@ bool AirflowReading::MergePartialFromCodedStream(
 
       // required float intensity = 2;
       case 2: {
-        if (::google::protobuf::internal::WireFormatLite::GetTagWireType(tag) ==
-            ::google::protobuf::internal::WireFormatLite::WIRETYPE_FIXED32) {
+        if (tag == 21) {
          parse_intensity:
           DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
                    float, ::google::protobuf::internal::WireFormatLite::TYPE_FLOAT>(
                  input, &intensity_)));
           set_has_intensity();
         } else {
-          goto handle_uninterpreted;
+          goto handle_unusual;
         }
         if (input->ExpectTag(29)) goto parse_direction;
         break;
@@ -3710,25 +3883,25 @@ bool AirflowReading::MergePartialFromCodedStream(
 
       // required float direction = 3;
       case 3: {
-        if (::google::protobuf::internal::WireFormatLite::GetTagWireType(tag) ==
-            ::google::protobuf::internal::WireFormatLite::WIRETYPE_FIXED32) {
+        if (tag == 29) {
          parse_direction:
           DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
                    float, ::google::protobuf::internal::WireFormatLite::TYPE_FLOAT>(
                  input, &direction_)));
           set_has_direction();
         } else {
-          goto handle_uninterpreted;
+          goto handle_unusual;
         }
-        if (input->ExpectAtEnd()) return true;
+        if (input->ExpectAtEnd()) goto success;
         break;
       }
 
       default: {
-      handle_uninterpreted:
-        if (::google::protobuf::internal::WireFormatLite::GetTagWireType(tag) ==
+      handle_unusual:
+        if (tag == 0 ||
+            ::google::protobuf::internal::WireFormatLite::GetTagWireType(tag) ==
             ::google::protobuf::internal::WireFormatLite::WIRETYPE_END_GROUP) {
-          return true;
+          goto success;
         }
         DO_(::google::protobuf::internal::WireFormat::SkipField(
               input, tag, mutable_unknown_fields()));
@@ -3736,12 +3909,18 @@ bool AirflowReading::MergePartialFromCodedStream(
       }
     }
   }
+success:
+  // @@protoc_insertion_point(parse_success:AssisiMsg.AirflowReading)
   return true;
+failure:
+  // @@protoc_insertion_point(parse_failure:AssisiMsg.AirflowReading)
+  return false;
 #undef DO_
 }
 
 void AirflowReading::SerializeWithCachedSizes(
     ::google::protobuf::io::CodedOutputStream* output) const {
+  // @@protoc_insertion_point(serialize_start:AssisiMsg.AirflowReading)
   // optional .AssisiMsg.Header header = 1;
   if (has_header()) {
     ::google::protobuf::internal::WireFormatLite::WriteMessageMaybeToArray(
@@ -3762,10 +3941,12 @@ void AirflowReading::SerializeWithCachedSizes(
     ::google::protobuf::internal::WireFormat::SerializeUnknownFields(
         unknown_fields(), output);
   }
+  // @@protoc_insertion_point(serialize_end:AssisiMsg.AirflowReading)
 }
 
 ::google::protobuf::uint8* AirflowReading::SerializeWithCachedSizesToArray(
     ::google::protobuf::uint8* target) const {
+  // @@protoc_insertion_point(serialize_to_array_start:AssisiMsg.AirflowReading)
   // optional .AssisiMsg.Header header = 1;
   if (has_header()) {
     target = ::google::protobuf::internal::WireFormatLite::
@@ -3787,6 +3968,7 @@ void AirflowReading::SerializeWithCachedSizes(
     target = ::google::protobuf::internal::WireFormat::SerializeUnknownFieldsToArray(
         unknown_fields(), target);
   }
+  // @@protoc_insertion_point(serialize_to_array_end:AssisiMsg.AirflowReading)
   return target;
 }
 
