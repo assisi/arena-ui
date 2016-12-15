@@ -103,7 +103,7 @@ debsign ../assisi-arena-ui_x.y.z.-0ubuntu1~xenial1_source.changes
 Official Launchpad instructions are here: https://developer.ubuntu.com/en/publish/other-forms-of-submitting-apps/ppa/
 
 ```
-dput ppa:damjan-miklic-larics/assisi ../assisi-arena-ui_x.y.z-?ubuntu?_source.changes
+dput ppa:damjan-miklic-larics/assisi ../assisi-arena-ui_x.y.z-0ubuntu1~xenial1_source.changes
 ```
 
 Getting the `Successfully uploaded packages.` message does not necessarily mean that your upload was successful :) You should get an e-mail confirmation of the successful upload. If the e-mail states that your upload has been rejected try to fix the issue, delete the `assisi-arena-ui_x.y.z-?ubuntu?_source.ppa.upload` file and re-upload. Repeat as necessary :)
