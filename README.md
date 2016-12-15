@@ -35,7 +35,9 @@ From Qt Creator ...
 ## Debian packaging ##
 
 
-Instructions for making a Debian package have been taken from here: https://bhavyanshu.me/how-to-make-debian-packages-for-qt-c-based-applications/11/10/2014
+Instructions for making a Debian package have been taken from [here](https://bhavyanshu.me/how-to-make-debian-packages-for-qt-c-based-applications/11/10/2014).
+
+General instructions for using the Pbuilder packaging tool on Ubuntu are available [here](https://wiki.ubuntu.com/PbuilderHowto).
 
 ### Environment setup ###
 
@@ -72,6 +74,7 @@ After making any changes to `.pbuilderrc` you might need to `sudo pbuilder updat
 
 ### Building the package ###
 
+Make sure you have updated the `debian/changelog` file appropriately.
 
 Switch to the folder where you have cloned the git repo, and export the source. All changes need to be committed! Pay special attention to `-` and `_` signs, they are different in different commands. This is a bit convoluted but supposedly necessary. (TODO: try using git-buildpackage, it should be simpler).
 
