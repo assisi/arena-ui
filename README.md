@@ -90,12 +90,12 @@ pdebuild --debbuildopts -sa
 It's good form to run a lintian check on the generated source package:
 
 ```
-lintian ../assisi-arena-ui_x.y.z.-?ubuntu?_source.changes
+lintian ../assisi-arena-ui_x.y.z.-0ubuntu1~xenial1_source.changes
 ```
 
 Sign the source package:
 ```
-debsign ../assisi-arena-ui_x.y.z.-?ubuntu?_source.changes
+debsign ../assisi-arena-ui_x.y.z.-0ubuntu1~xenial1_source.changes
 ```
 
 ### Uploading to the PPA ###

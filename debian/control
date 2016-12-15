@@ -3,7 +3,7 @@ Section: science
 Priority: optional
 Maintainer: Damjan Miklic (LARICS Lab) <damjan.miklic@fer.hr>
 Build-Depends: debhelper (>= 9), qtbase5-dev, qtbase5-dev-tools, qt5-qmake, libprotobuf-dev, libprotoc-dev, libzmq3-dev, libzmqpp-dev, libyaml-cpp-dev, libboost-dev
-Standards-Version: 3.9.5
+Standards-Version: 3.9.7
 homepage: https://github.com/larics/assisi-arena-ui.git
 
 Package: assisi-arena-ui
