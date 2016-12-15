@@ -2,13 +2,13 @@ Source: assisi-arena-ui
 Section: science
 Priority: optional
 Maintainer: Damjan Miklic (LARICS Lab) <damjan.miklic@fer.hr>
-Build-Depends: debhelper (>= 9), qtbase5-dev, qtbase5-dev-tools, qt5-qmake, libprotobuf-dev, libprotoc-dev, libzmq3-dev, libzmqpp-dev, libyaml-cpp-dev, libboost-dev
+Build-Depends: debhelper (>= 9), qtbase5-dev, qtbase5-dev-tools, qt5-qmake, libprotobuf-dev, libprotoc-dev, libzmq-dev, libzmqpp-dev, libyaml-cpp-dev, libboost-dev
 Standards-Version: 3.9.5
 homepage: https://github.com/larics/assisi-arena-ui.git
 
 Package: assisi-arena-ui
 Architecture: any
-Depends: libqt5gui5, libqt5widgets5, libqt5core5a, libqt5printsupport5, libprotobuf8, libzmq3, libzmqpp3, libyaml-cpp0.5, ${misc:Depends}
+Depends: libqt5gui5, libqt5widgets5, libqt5core5a, libqt5printsupport5, libprotobuf9v5, libzmq5, libyaml-cpp0.5v5, ${misc:Depends}
 Description: assisi-arena-ui is an user interface for scientific experiments on honeybees.
  assisi-arena-ui is an application for remotely monitoring and controlling honeybee experiments. 
  It is being developed within the ASSISIbf EU FP7 project.
