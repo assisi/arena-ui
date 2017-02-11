@@ -19,7 +19,7 @@ RCC_DIR = ../build/rcc
 UI_DIR = ../build/ui
 OBJECTS_DIR = ../build/o
 
-INCLUDEPATH += msg \
+INCLUDEPATH += msg
 
 SOURCES += main.cpp\
         arenaui.cpp\

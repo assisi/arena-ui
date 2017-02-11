@@ -483,6 +483,10 @@ void ArenaUI::customContextMenu(const QPoint &pos)
         error_single = true; // Check if object is single casu
     }
 
+    bool error_group  = true;
+    for(auto& item : m_arenaScene->selectedItems())
+        if(item->childItems().size()) error_group = false;
+
     bool error_multiple = m_arenaScene->selectedItems().size() < 2;
 
     // FIXME: Qt 5.6 QMenu::addAction accepts Qt5 style connect (possible lambda expressions)
@@ -512,7 +516,7 @@ void ArenaUI::customContextMenu(const QPoint &pos)
     tempAction = menu->addAction("Group selected", this,SLOT(on_actionGroup_triggered()));
     if(error_multiple) tempAction->setEnabled(false);
     tempAction = menu->addAction("Ungroup selected", this,SLOT(on_actionUngroup_triggered()));
-    if(error_multiple) tempAction->setEnabled(false);
+    if(error_group) tempAction->setEnabled(false);
     menu->addSeparator();
     tempAction = menu->addAction("Set connection", this,SLOT(on_actionConnect_triggered()));
     if(error_single) tempAction->setEnabled(false);
