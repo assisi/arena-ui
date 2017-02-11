@@ -132,7 +132,12 @@ void QCasuZMQ::closeLogFile()
 
 void QCasuZMQ::addToBuffer(dataType key, QCPData data)
 {
-    m_buffers[key]->insert(data.key, data);
+    if(m_buffers[key]->empty() || (data.key -  m_buffers[key]->lastKey())*1000 >g_settings->value("trendSampleTime_ms").toDouble()){
+        if(!m_buffers[key]->empty())
+        qDebug()<< (data.key -  m_buffers[key]->lastKey())*1000 << "  " << g_settings->value("trendSampleTime_ms").toDouble();
+
+        m_buffers[key]->insert(data.key, data);
+    }
     while(data.key - m_buffers[key]->firstKey() > QTime(0,0,0).secsTo(g_settings->value("trendTimeSpan").toTime())){
         m_buffers[key]->erase(m_buffers[key]->begin()); //Delete data older than $timeSpan
     }
