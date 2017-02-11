@@ -39,7 +39,9 @@ public:
      * \brief Calls QTreeWigdetItem constructor with same parameters
      * \param params
      */
-    QNoSortTreeItem(Params&&... params) : QTreeWidgetItem(std::forward<Params>(params)...) {}
+    QNoSortTreeItem(Params&&... params) : QTreeWidgetItem(std::forward<Params>(params)...) {
+        setTextAlignment(1, Qt::AlignRight);
+    }
     /*!
      * \brief reimplemented operator <
      * \param other [unused]

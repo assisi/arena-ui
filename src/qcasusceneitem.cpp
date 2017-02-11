@@ -161,8 +161,8 @@ void QCasuSceneItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *op
 
     //paint vibration marker
     if(g_settings->value("vibr_on").toBool() && m_zmqObject->isConnected() && m_zmqObject->getState(Speaker)){
-        double freq = m_zmqObject->getValue(Frequency);
-        double amplitude = m_zmqObject->getValue(Amplitude);
+        double freq = m_zmqObject->getValue(Freq1);
+        double amplitude = m_zmqObject->getValue(Amp1);
 
         pen.setColor(QColor(255,255,255,96));
         pen.setWidth(2);

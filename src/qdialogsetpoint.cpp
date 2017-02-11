@@ -75,8 +75,8 @@ QDialogSetpoint::QDialogSetpoint(QWidget *parent, QString command, QList<QGraphi
             ui->value1->setText("500.00");
             ui->value2->setText("50.00");
         } else {
-            double temp1 = tempItem->getZmqObject()->getValue(Frequency);
-            double temp2 = tempItem->getZmqObject()->getValue(Amplitude);
+            double temp1 = tempItem->getZmqObject()->getValue(Speaker_freq);
+            double temp2 = tempItem->getZmqObject()->getValue(Speaker_amp);
 
             if(temp1 >= 50){
                 ui->value1->setText(QString::number(temp1,'f',2));
