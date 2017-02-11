@@ -187,6 +187,7 @@ void QTrendPlot::showContextMenu(QPoint position){
     });
 
     tempAction = menu->addAction("Add graphs (selected in tree)");
+    connect(tempAction, &QAction::triggered, this, &QTrendPlot::addSelectedGraphs);
     if(!casuTree->selectedItems().count() && !groupTree->selectedItems().size()) tempAction->setEnabled(false);
 
     tempAction = menu->addAction("Save to pdf");

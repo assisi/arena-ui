@@ -28,13 +28,15 @@ bool QDeploy::isSimulatorStarted()
     tempString = tempString.right(tempString.size() - tempString.lastIndexOf("/") - 1);
     tempString = tempString.left(15);
 
+    toggleOutput(false);
     m_shell->start("sh");
     m_shell->write("pgrep ");
     m_shell->write(tempString.toStdString().c_str());
     m_shell->closeWriteChannel();
     m_shell->waitForFinished();
-
     QString out(m_shell->readAll());
+    toggleOutput(true);
+
     if(out.size()) m_simulatorPID = out.toLongLong();
     return out.size();
 }
