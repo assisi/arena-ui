@@ -35,7 +35,9 @@ From Qt Creator ...
 ## Debian packaging ##
 
 
-Instructions for making a Debian package have been taken from here: https://bhavyanshu.me/how-to-make-debian-packages-for-qt-c-based-applications/11/10/2014
+Instructions for making a Debian package have been taken from [here](https://bhavyanshu.me/how-to-make-debian-packages-for-qt-c-based-applications/11/10/2014).
+
+General instructions for using the Pbuilder packaging tool on Ubuntu are available [here](https://wiki.ubuntu.com/PbuilderHowto).
 
 ### Environment setup ###
 
@@ -72,6 +74,7 @@ After making any changes to `.pbuilderrc` you might need to `sudo pbuilder updat
 
 ### Building the package ###
 
+Make sure you have updated the `debian/changelog` file appropriately.
 
 Switch to the folder where you have cloned the git repo, and export the source. All changes need to be committed! Pay special attention to `-` and `_` signs, they are different in different commands. This is a bit convoluted but supposedly necessary. (TODO: try using git-buildpackage, it should be simpler).
 
@@ -87,12 +90,12 @@ pdebuild --debbuildopts -sa
 It's good form to run a lintian check on the generated source package:
 
 ```
-lintian ../assisi-arena-ui_x.y.z.-?ubuntu?_source.changes
+lintian ../assisi-arena-ui_x.y.z.-0ubuntu1~xenial1_source.changes
 ```
 
 Sign the source package:
 ```
-debsign ../assisi-arena-ui_x.y.z.-?ubuntu?_source.changes
+debsign ../assisi-arena-ui_x.y.z.-0ubuntu1~xenial1_source.changes
 ```
 
 ### Uploading to the PPA ###
@@ -100,7 +103,7 @@ debsign ../assisi-arena-ui_x.y.z.-?ubuntu?_source.changes
 Official Launchpad instructions are here: https://developer.ubuntu.com/en/publish/other-forms-of-submitting-apps/ppa/
 
 ```
-dput ppa:damjan-miklic-larics/assisi ../assisi-arena-ui_x.y.z-?ubuntu?_source.changes
+dput ppa:damjan-miklic-larics/assisi ../assisi-arena-ui_x.y.z-0ubuntu1~xenial1_source.changes
 ```
 
 Getting the `Successfully uploaded packages.` message does not necessarily mean that your upload was successful :) You should get an e-mail confirmation of the successful upload. If the e-mail states that your upload has been rejected try to fix the issue, delete the `assisi-arena-ui_x.y.z-?ubuntu?_source.ppa.upload` file and re-upload. Repeat as necessary :)
