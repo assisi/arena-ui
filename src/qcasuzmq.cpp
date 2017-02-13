@@ -207,7 +207,7 @@ void QCasuZMQ::messageReceived(const QList<QByteArray> &message)
             }
         }
     }
-    if (device == "FFT"){
+    if (device == "Fft"){
         AssisiMsg::VibrationReading vibrations;
         vibrations.ParseFromString(data);
         m_lastDataTime[dCast(m_VIBR_START)] = m_buffers[dCast(m_VIBR_START)]->getLastTime();
