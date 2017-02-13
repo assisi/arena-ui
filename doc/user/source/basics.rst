@@ -47,7 +47,7 @@ actuator setpoints can be provided.
 
 * **Physical position** - CASUs are visualized at their respective
   positions (as specified in the .assisi file); Orientation is
-  indicated by a short dash;
+  indicated by a short dash at the front;
 * **Selections status** - CASUs are selected by left mouse click;
   selected CASUs are indicated by a solid outline, whereas unselected
   CASUs have a dashed outline; a treeview with actuator setpoints and
@@ -55,7 +55,7 @@ actuator setpoints can be provided.
   selected CASU; *Ctrl-Click* on an CASU toggles its selection state;
 * **Connection status** - Unconnected CASUs have a red outline,
   connected CASUs have a green outline;
-* **Temeprature readings** - Temperature readings are displayed as circular
+* **Temperature readings** - Temperature readings are displayed as circular
   segments at 2cm distance from the CASU body; They are color-coded,
   with a colorbar displayed in the bottom-left corner of the
   visualization area;
@@ -63,8 +63,12 @@ actuator setpoints can be provided.
   visualized as six triangles radiating out of the CASU body;
 * **Diagnostic LED actuator** - Diagnostic LED state is indicated by
   the color of the CASU body;
-* **Airflow actuator** - When the airflow actuator is turned on, a
-  shaded circular area is displayed around the CASU body;
+* **Airflow actuator** - When the airflow actuator is turned on, light
+  yellow indicators are circling around the CASU body;
+* **Vibration actuator** - When the vibration actuator is turned on, a
+  light grey waveform is shown circling around the CASU body; Frequency is
+  visualized by the number of minima/maxima of the waveform, and
+  amplitude is visualized by the speed of motion of the waveform;
 * **Context menu** - Activated by right-click in the arena
   visualization area; Enables on/off toggling of sensor
   visualizations, CASU grouping/ungrouping, customizing connection
@@ -79,7 +83,7 @@ values for all actuator setpoints and sensor values. Several devices
 can be selected simultaneously by clicking and dragging on their name
 in the treeview. A context menu, accessed by right-clicking on a
 device name, enables the plotting of sensor value trends in time, as
-described in more detail in `Displaying data trends`_.
+described in more detail in :ref:`trends`.
 
 
 

@@ -1,3 +1,4 @@
+.. trends:
 Displaying data trends
 ======================
 
@@ -23,7 +24,7 @@ through the **Settings** menu:
 Creating data trends
 --------------------
 
-To start trending some data, select the sensor names you are interested in
+To start showing some data trends, select the sensor names you are interested in
 from the **Casu data Configuration tab**, and bring up the context
 menu by *right-clicking* on one of the selected names. This will bring
 up a context menu with two options:
@@ -59,5 +60,7 @@ of the trends brings up a context menu with the following options:
   *left-click* in the current axis) is removed from the axis;
 * **Add graphs (selected in tree)** - Data that is currently selected
   in the **Casu data Configuration tab** is added to the current axis;
-* **Save to pdf** - The current view is saved to a pdf document;
+* **Save to pdf** - The current view is saved to a pdf document (a
+  File save dialog is shown which enables the user to choose the
+  filename and location);
 * **Close trend** - Closes the trend;
