@@ -55,9 +55,9 @@ void QArenaScene::drawForeground(QPainter *painter, const QRectF &rect)
     auto font = painter->font();
     font.setPointSizeF(11 / scale);
     painter->setFont(font);
-    painter->drawText(m_view->mapToScene(QPoint(11,36)), "20 °C");
-    painter->drawText(m_view->mapToScene(QPoint(101,36)), "35 °C");
-    painter->drawText(m_view->mapToScene(QPoint(191,36)), "50 °C");
+    painter->drawText(m_view->mapToScene(QPoint(11,36)), "22 °C");
+    painter->drawText(m_view->mapToScene(QPoint(101,36)), "32 °C");
+    painter->drawText(m_view->mapToScene(QPoint(191,36)), "42 °C");
 
     int time = 0;
     int connectedItems = 0;

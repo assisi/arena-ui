@@ -88,10 +88,11 @@ void QCasuSceneItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *op
         for(int k = 0; k < 4; k++){
             if(m_zmqObject->isConnected()){
                 double tempTemp = m_zmqObject->getValue(dCast(6 + k));
-                if (tempTemp > 50) tempTemp = 50;
-                if (tempTemp < 20) tempTemp = 20;
+                // temperature range is from 22 - 42 C°
+                if (tempTemp > 42) tempTemp = 42;
+                if (tempTemp < 22) tempTemp = 22;
 
-                double tempGradient = (tempTemp - 20) / 30;
+                double tempGradient = (tempTemp - 22) / 20;
                 tempGradient = ((240 + (int)(tempGradient * 180)) % 360); // / 360; // calculate color gradiend in HSV space 
                 QColor tempColor;
                 tempColor.setHsv(tempGradient, 255, 255);
