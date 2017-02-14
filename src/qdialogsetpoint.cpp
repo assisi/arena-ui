@@ -6,7 +6,8 @@ using namespace zmqData;
 QDialogSetpoint::QDialogSetpoint(QWidget *parent, QString command, QList<QGraphicsItem *> group) :
     QDialog(parent),
     ui(new Ui::QDialogSetpoint),
-    m_command(command)
+    m_command(command),
+    m_group(group)
 {
     ui->setupUi(this);
 
@@ -14,13 +15,13 @@ QDialogSetpoint::QDialogSetpoint(QWidget *parent, QString command, QList<QGraphi
 
     QCasuSceneItem *tempItem;
 
-    if(group.size() > 1){
+    if(m_group.size() > 1){
         groupSelected = true;
-    } else if(sCast(group.first())->isGroup()){
+    } else if(sCast(m_group.first())->isGroup()){
             groupSelected = true;
         } else {
         groupSelected = false;
-        tempItem = siCast(group.first());
+        tempItem = siCast(m_group.first());
         }
 
     this->setWindowTitle(command + " data to send to CASUs");
@@ -127,16 +128,23 @@ QList<QByteArray> QDialogSetpoint::getMessage() const
     return m_message;
 }
 
-void QDialogSetpoint::prepareMessage()
+void QDialogSetpoint::sendSetPoint()
+{
+    if(prepareMessage()){
+        for(auto& item : m_group){
+            sCast(item)->sendSetpoint(m_message);
+        }
+    }
+}
+
+bool QDialogSetpoint::prepareMessage()
 {
     if (m_command != "IR Proximity" && !ui->value1->hasAcceptableInput()){
-        reject();
-        return;
+        return false;
     }
     if (m_command == "Vibration" && !ui->value2->hasAcceptableInput()){
-            reject();
-            return;
-        }
+        return false;
+    }
 
     if(m_command == "Temperature"){
         AssisiMsg::Temperature temp;
@@ -200,10 +208,16 @@ void QDialogSetpoint::prepareMessage()
         m_message.push_back(QByteArray((char*) buffer,sizeof(int)));
     }
 
-    accept();
+    return true;
 }
 
 void QDialogSetpoint::colorDialog()
 {
     ui->value1->setText(QColorDialog::getColor(ui->value1->text(),this,"Choose color").name());
+}
+
+void QDialogSetpoint::accept()
+{
+    sendSetPoint();
+    QDialog::accept();
 }

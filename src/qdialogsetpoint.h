@@ -43,9 +43,12 @@ private:
 
     QString m_command;
     QList<QByteArray> m_message;
+    QList<QGraphicsItem *> m_group;
+
+    void prepareMessage();
 
 private slots:
-    void prepareMessage();
+    void sendSetPoint();
     void colorDialog();
 };
 

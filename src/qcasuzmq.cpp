@@ -246,9 +246,9 @@ void QCasuZMQ::messageReceived(const QList<QByteArray> &message)
         else emit updated(Freq1); // emit if there is 1 frequencie in message
     }
     if (device == "Peltier"){
-        AssisiMsg::Temperature pelt;
-        pelt.ParseFromString(data);
-        newData.value = pelt.temp();
+        AssisiMsg::Temperature peltier;
+        peltier.ParseFromString(data);
+        newData.value = peltier.temp();
         m_lastDataTime[Peltier] = m_values[Peltier].key;
         m_values[Peltier] = newData;
         m_state[Peltier] = command == "On";
@@ -259,10 +259,10 @@ void QCasuZMQ::messageReceived(const QList<QByteArray> &message)
         }
      }
     if (device == "Airflow"){
-        AssisiMsg::Airflow air;
-        air.ParseFromString(data);
+        AssisiMsg::Airflow airflow;
+        airflow.ParseFromString(data);
         m_lastDataTime[Airflow] = m_values[Airflow].key;
-        newData.value = air.intensity();
+        newData.value = airflow.intensity();
         m_values[Airflow] = newData;
         m_state[Airflow] = command == "On";
         emit updated(Airflow);
@@ -273,12 +273,12 @@ void QCasuZMQ::messageReceived(const QList<QByteArray> &message)
 
      }
     if (device == "Speaker"){
-        AssisiMsg::VibrationSetpoint vibr;
-        vibr.ParseFromString(data);
+        AssisiMsg::VibrationSetpoint airflows;
+        airflow.ParseFromString(data);
         m_lastDataTime[Speaker_freq] = m_values[Speaker_freq].key;
-        newData.value = vibr.freq();
+        newData.value = airflow.freq();
         m_values[Speaker_freq] = newData;
-        newData.value = vibr.amplitude();
+        newData.value = airflow.amplitude();
         m_values[Speaker_amp] = newData;
         m_state[Speaker] = command == "On";
         m_state[Speaker_freq] = command == "On";

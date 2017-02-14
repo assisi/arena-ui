@@ -540,10 +540,7 @@ void ArenaUI::customContextMenu(const QPoint &pos)
 
     connect(signalMapper, static_cast<void (QSignalMapper::*)(const QString &)>(&QSignalMapper::mapped), this,[&](QString actuator){
         auto dialog = new QDialogSetpoint(this, actuator, m_arenaScene->selectedItems());
-        if(dialog->exec())
-            for(auto& item : m_arenaScene->selectedItems()){
-                sCast(item)->sendSetpoint(dialog->getMessage());
-            }
+        dialog->exec();
     });
 
     menu->popup(ui->arenaSpace->mapToGlobal(pos));
