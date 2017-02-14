@@ -4,7 +4,7 @@ MAINTAINER Mirko Kokot
 ## essential
 RUN ln -snf /bin/bash /bin/sh
 RUN apt-get update
-RUN apt-get -y install make build-essential
+RUN apt-get -y install make build-essential git
 
 ## dependencies
 RUN apt-get -y install qt5-default \
@@ -20,6 +20,7 @@ RUN apt-get -y install qt5-default \
 COPY . /root/assisi-ui
 
 ## build
+RUN cd /root/assisi-ui; git submodule update --init
 RUN cd /root/assisi-ui; sh compile_msgs.sh
 RUN cd /root/assisi-ui; qmake
 RUN cd /root/assisi-ui; make -j12
