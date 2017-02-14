@@ -13,12 +13,15 @@ class QTreeWidgetItem;
 class QArenaScene : public QGraphicsScene
 {
     Q_OBJECT
+private:
+    QMetaObject::Connection m_lambda;
 protected:
     void drawBackground(QPainter *painter, const QRectF &rect) Q_DECL_OVERRIDE;
     void drawForeground(QPainter *painter, const QRectF &rect) Q_DECL_OVERRIDE;
     QTreeWidgetItem *m_treeItem;
 public:
     explicit QArenaScene(QWidget *parent);
+    ~QArenaScene();
     void mousePressEvent(QGraphicsSceneMouseEvent *event) Q_DECL_OVERRIDE;
     void setTreeItem(QTreeWidgetItem *treeItem);
 };

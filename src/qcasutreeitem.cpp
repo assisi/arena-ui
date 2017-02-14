@@ -1,4 +1,5 @@
 #include "qcasutreeitem.h"
+#define roundF2D(x) (round(x*100.0)/100.0)
 
 using namespace zmqData;
 
@@ -90,14 +91,9 @@ QCasuTreeItem::QCasuTreeItem(QCasuZMQ *zmqObject) :
             m_widgetMap[key]->setTextColor(1, m_zmqObject->getLedColor());
             return;
         }
-        if(key == Freq1){
-            m_widgetMap[Freq1]->setData(1, Qt::DisplayRole, QVariant(m_zmqObject->getValue(Freq1)));
-            m_widgetMap[Amp1]->setData(1, Qt::DisplayRole, QVariant(m_zmqObject->getValue(Amp1)));
-            return;
-        }
-        if(key == Freq2){
-            QString temp_freq = QString::number(m_zmqObject->getValue(Freq1)) + " " + QString::number(m_zmqObject->getValue(Amp1));
-            QString temp_amp = QString::number(m_zmqObject->getValue(Amp2)) + " " + QString::number(m_zmqObject->getValue(Amp2));
+        if(key == dCast(m_VIBR_START)){
+            QString temp_freq = QString::number(roundF2D(m_zmqObject->getValue(Freq1))) + " " + QString::number(roundF2D(m_zmqObject->getValue(Freq2)));
+            QString temp_amp = QString::number(roundF2D(m_zmqObject->getValue(Amp2))) + " " + QString::number(roundF2D(m_zmqObject->getValue(Amp2)));
             m_widgetMap[Freq1]->setData(1, Qt::DisplayRole, QVariant(temp_freq));
             m_widgetMap[Amp1]->setData(1, Qt::DisplayRole, QVariant(temp_amp));
             return;

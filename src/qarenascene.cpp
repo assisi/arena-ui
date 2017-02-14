@@ -80,7 +80,7 @@ QArenaScene::QArenaScene(QWidget *parent) : QGraphicsScene(parent)
 {
     this->setItemIndexMethod(QGraphicsScene::NoIndex);
 
-    connect(this, &QGraphicsScene::selectionChanged, [&](){
+    m_lambda = connect(this, &QGraphicsScene::selectionChanged, [&](){
         auto tempList = this->selectedItems();
         if(tempList.size()>1) m_treeItem->setHidden(false);
         else m_treeItem->setHidden(true);
@@ -93,6 +93,11 @@ QArenaScene::QArenaScene(QWidget *parent) : QGraphicsScene(parent)
             }
         }
     });
+}
+
+QArenaScene::~QArenaScene()
+{
+    disconnect(m_lambda);
 }
 
 void QArenaScene::mousePressEvent(QGraphicsSceneMouseEvent *event)

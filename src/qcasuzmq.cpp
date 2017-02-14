@@ -212,7 +212,8 @@ void QCasuZMQ::messageReceived(const QList<QByteArray> &message)
         vibrationsArray.ParseFromString(data);
         AssisiMsg::VibrationReading vibrations = vibrationsArray.reading(0);
         m_lastDataTime[dCast(m_VIBR_START)] = m_values[dCast(m_VIBR_START)].key;
-        for(int k = 0; k < vibrations.freq_size(); k++){
+        int k = 0;
+        for(; k < vibrations.freq_size(); k++){
             if(k == 2) break; //stop at second reading
             newData.value = vibrations.freq(k);
             m_values[dCast(m_VIBR_START+2*k)] = newData;
@@ -223,8 +224,16 @@ void QCasuZMQ::messageReceived(const QList<QByteArray> &message)
                           << ";" << m_values[dCast(m_VIBR_START+2*k+1)].value;
             }
         }
-        if(vibrations.freq_size() == 1) emit(Freq1);
-        else if(vibrations.freq_size() == 2) emit(Freq2);
+        for(; k < 2; k++){// Fill rest of values with zero
+            newData.value = 0.0123454136;
+            m_values[dCast(m_VIBR_START+2*k)] = newData;
+            m_values[dCast(m_VIBR_START+2*k+1)] = newData;
+            if(g_settings->value("log_on").toBool()){
+                m_logFile << ";" << m_values[dCast(m_VIBR_START+2*k)].value
+                          << ";" << m_values[dCast(m_VIBR_START+2*k+1)].value;
+            }
+        }
+        emit updated(dCast(m_VIBR_START));
     }
     if (device == "Peltier"){
         AssisiMsg::Temperature peltier;
