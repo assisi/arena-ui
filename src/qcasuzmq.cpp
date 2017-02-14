@@ -218,12 +218,13 @@ void QCasuZMQ::messageReceived(const QList<QByteArray> &message)
             m_values[dCast(m_VIBR_START+2*k)] = newData;
             newData.value = vibrations.amplitude(k);
             m_values[dCast(m_VIBR_START+2*k+1)] = newData;
-            emit(dCast(m_VIBR_START+2*k));
             if(g_settings->value("log_on").toBool()){
                 m_logFile << ";" << m_values[dCast(m_VIBR_START+2*k)].value
                           << ";" << m_values[dCast(m_VIBR_START+2*k+1)].value;
             }
         }
+        if(vibrations.freq_size() == 1) emit(Freq1);
+        else if(vibrations.freq_size() == 2) emit(Freq2);
     }
     if (device == "Peltier"){
         AssisiMsg::Temperature peltier;
