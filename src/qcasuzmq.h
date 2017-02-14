@@ -90,14 +90,14 @@ private:
     QMap<zmqData::dataType, bool> m_state;
     QColor m_ledColor;
 
-    std::ofstream m_logFile;
-    QString m_logName;
-    bool m_logOpen;
+    std::map<QString, std::ofstream> m_logFile;
+    std::map<QString, QString> m_logName;
+    std::map<QString, bool> m_logOpen;
 
     bool m_connected = false;
 
-    void openLogFile();
-    void closeLogFile();
+    void openLogFile(QString);
+    void closeLogFile(QString);
 
     void addToBuffer(zmqData::dataType key, QCPData data);
     void connectZMQ();

@@ -117,17 +117,19 @@ bool QCasuZMQ::isConnected() const
     return m_connected;
 }
 
-void QCasuZMQ::openLogFile()
+void QCasuZMQ::openLogFile(QString device)
 {
-    m_logName = g_settings->value("logSubFolder").toString() + QDateTime::currentDateTime().toString(g_date_time_format) + m_name + ".log";
-    m_logFile.open(m_logName.toStdString().c_str(), std::ofstream::out | std::ofstream::app);
-    m_logOpen = true;
+    if(!QDir(g_settings->value("logSubFolder").toString() + m_name).exists())QDir().mkdir(g_settings->value("logSubFolder").toString() + m_name);
+    if(!QDir(g_settings->value("logSubFolder").toString() + m_name + "/" + device).exists())QDir().mkdir(g_settings->value("logSubFolder").toString() + m_name + "/" + device);
+    m_logName[device] = g_settings->value("logSubFolder").toString() + m_name + "/" + device + "/" + QDateTime::currentDateTime().toString(g_date_time_format) + ".log";
+    m_logFile[device].open(m_logName[device].toStdString().c_str(), std::ofstream::out | std::ofstream::app);
+    m_logOpen[device] = true;
 }
 
-void QCasuZMQ::closeLogFile()
+void QCasuZMQ::closeLogFile(QString device)
 {
-    m_logFile.close();
-    m_logOpen = false;
+    m_logFile[device].close();
+    m_logOpen[device] = false;
 }
 
 void QCasuZMQ::addToBuffer(dataType key, QCPData data)
@@ -165,8 +167,6 @@ void QCasuZMQ::messageReceived(const QList<QByteArray> &message)
         m_connected = true;
          emit connectMsg("[ZMQ][" + m_name + "] Connected");
     }
-    if(g_settings->value("log_on").toBool() && !m_logOpen) openLogFile();
-    if(!g_settings->value("log_on").toBool() && m_logOpen) closeLogFile();
 
     m_connectionTimer->start(2000);
 
@@ -177,7 +177,9 @@ void QCasuZMQ::messageReceived(const QList<QByteArray> &message)
     QCPData newData;
     newData.key = (double) QTime(0,0,0).msecsTo(QTime::currentTime())/1000;
 
-    m_logFile << device.toStdString() << ";" << (float) QDateTime::currentDateTime().toMSecsSinceEpoch() / 1000 ;
+    if(g_settings->value("log_on").toBool() && !m_logOpen[device]) openLogFile(device);
+    if(!g_settings->value("log_on").toBool() && m_logOpen[device]) closeLogFile(device);
+    m_logFile[device] << (float) QDateTime::currentDateTime().toMSecsSinceEpoch() / 1000 ;
 
     if (device == "IR"){
         AssisiMsg::RangeArray ranges;
@@ -189,7 +191,7 @@ void QCasuZMQ::messageReceived(const QList<QByteArray> &message)
             this->addToBuffer(dCast(k), newData);
             emit updated(dCast(k));
             if(g_settings->value("log_on").toBool()){
-                m_logFile << ";" << newData.value;
+                m_logFile[device]<< ";" << newData.value;
             }
         }
     }
@@ -203,7 +205,7 @@ void QCasuZMQ::messageReceived(const QList<QByteArray> &message)
             this->addToBuffer(dCast(k+m_TEMP_START), newData);
             emit updated(dCast(k+m_TEMP_START));
             if(g_settings->value("log_on").toBool()){
-                m_logFile << ";" << newData.value;
+                m_logFile[device]<< ";" << newData.value;
             }
         }
     }
@@ -220,7 +222,7 @@ void QCasuZMQ::messageReceived(const QList<QByteArray> &message)
             newData.value = vibrations.amplitude(k);
             m_values[dCast(m_VIBR_START+2*k+1)] = newData;
             if(g_settings->value("log_on").toBool()){
-                m_logFile << ";" << m_values[dCast(m_VIBR_START+2*k)].value
+                m_logFile[device]<< ";" << m_values[dCast(m_VIBR_START+2*k)].value
                           << ";" << m_values[dCast(m_VIBR_START+2*k+1)].value;
             }
         }
@@ -229,7 +231,7 @@ void QCasuZMQ::messageReceived(const QList<QByteArray> &message)
             m_values[dCast(m_VIBR_START+2*k)] = newData;
             m_values[dCast(m_VIBR_START+2*k+1)] = newData;
             if(g_settings->value("log_on").toBool()){
-                m_logFile << ";" << m_values[dCast(m_VIBR_START+2*k)].value
+                m_logFile[device]<< ";" << m_values[dCast(m_VIBR_START+2*k)].value
                           << ";" << m_values[dCast(m_VIBR_START+2*k+1)].value;
             }
         }
@@ -244,7 +246,7 @@ void QCasuZMQ::messageReceived(const QList<QByteArray> &message)
         m_state[Peltier] = command == "On";
         emit updated(Peltier);
         if(g_settings->value("log_on").toBool()){
-            m_logFile << ";" << m_values[Peltier].value
+            m_logFile[device]<< ";" << m_values[Peltier].value
                       << ";" << m_state[Peltier];
         }
      }
@@ -257,7 +259,7 @@ void QCasuZMQ::messageReceived(const QList<QByteArray> &message)
         m_state[Airflow] = command == "On";
         emit updated(Airflow);
         if(g_settings->value("log_on").toBool()){
-            m_logFile << ";" << m_values[Airflow].value
+            m_logFile[device]<< ";" << m_values[Airflow].value
                       << ";" << m_state[Airflow];
         }
 
@@ -276,7 +278,7 @@ void QCasuZMQ::messageReceived(const QList<QByteArray> &message)
         emit updated(Speaker_freq);
         emit updated(Speaker_amp);
         if(g_settings->value("log_on").toBool()){
-            m_logFile << ";" << m_values[Speaker_freq].value
+            m_logFile[device]<< ";" << m_values[Speaker_freq].value
                       << ";" << m_values[Speaker_amp].value
                       << ";" << m_state[Speaker];
         }
@@ -291,12 +293,12 @@ void QCasuZMQ::messageReceived(const QList<QByteArray> &message)
         m_state[LED] = command == "On";
         emit updated(LED);
         if(g_settings->value("log_on").toBool()){
-            m_logFile << ";" << m_ledColor.name().toStdString()
+            m_logFile[device]<< ";" << m_ledColor.name().toStdString()
                       << ";" << m_state[LED];
         }
     }
 
-    m_logFile << std::endl;
+    m_logFile[device] << std::endl;
 }
 
 // ----------------------------------------------------------------
