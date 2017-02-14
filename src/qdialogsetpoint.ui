@@ -221,38 +221,6 @@
  </resources>
  <connections>
   <connection>
-   <sender>buttonBox</sender>
-   <signal>accepted()</signal>
-   <receiver>QDialogSetpoint</receiver>
-   <slot>prepareMessage()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>248</x>
-     <y>254</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>157</x>
-     <y>274</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>buttonBox</sender>
-   <signal>rejected()</signal>
-   <receiver>QDialogSetpoint</receiver>
-   <slot>reject()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>316</x>
-     <y>260</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>286</x>
-     <y>274</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
    <sender>colorButton</sender>
    <signal>clicked()</signal>
    <receiver>QDialogSetpoint</receiver>
@@ -268,9 +236,25 @@
     </hint>
    </hints>
   </connection>
+  <connection>
+   <sender>buttonBox</sender>
+   <signal>clicked(QAbstractButton*)</signal>
+   <receiver>QDialogSetpoint</receiver>
+   <slot>sendSetPoint(QAbstractButton*)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>186</x>
+     <y>278</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>186</x>
+     <y>154</y>
+    </hint>
+   </hints>
+  </connection>
  </connections>
  <slots>
   <slot>colorDialog()</slot>
-  <slot>prepareMessage()</slot>
+  <slot>sendSetPoint(QAbstractButton*)</slot>
  </slots>
 </ui>

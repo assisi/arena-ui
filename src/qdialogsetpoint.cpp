@@ -128,13 +128,19 @@ QList<QByteArray> QDialogSetpoint::getMessage() const
     return m_message;
 }
 
-void QDialogSetpoint::sendSetPoint()
+void QDialogSetpoint::sendSetPoint(QAbstractButton* button)
 {
+    if(!button->text().compare("Cancel")){
+        reject();
+        return;
+    }
     if(prepareMessage()){
         for(auto& item : m_group){
             sCast(item)->sendSetpoint(m_message);
         }
     }
+    if(!button->text().compare("OK"))
+        accept();
 }
 
 bool QDialogSetpoint::prepareMessage()
@@ -214,10 +220,4 @@ bool QDialogSetpoint::prepareMessage()
 void QDialogSetpoint::colorDialog()
 {
     ui->value1->setText(QColorDialog::getColor(ui->value1->text(),this,"Choose color").name());
-}
-
-void QDialogSetpoint::accept()
-{
-    sendSetPoint();
-    QDialog::accept();
 }

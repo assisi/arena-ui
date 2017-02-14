@@ -9,7 +9,7 @@ QCasuZMQ::QCasuZMQ(QObject *parent, QString casuName) :
     for(int k = 0; k < m_IR_NUM + m_TEMP_NUM; k++){
         m_buffers.insert(dCast(k), new zmqBuffer(m_name, dCast(k)));
     }
-    for(int k = m_VIBR_START; k < m_DATATYPE_NUM; k++){
+    for(int k = m_SETPOINT_START; k < m_DATATYPE_NUM; k++){
         m_state.insert(dCast(k), false);
     }
 
@@ -208,42 +208,22 @@ void QCasuZMQ::messageReceived(const QList<QByteArray> &message)
         }
     }
     if (device == "Fft"){
-        AssisiMsg::VibrationReading vibrations;
-        vibrations.ParseFromString(data);
-        m_lastDataTime[dCast(m_VIBR_START)] = m_buffers[dCast(m_VIBR_START)]->getLastTime();
-        // first item
-        // - freq
-        newData.value = vibrations.freq(0);
-        this->addToBuffer(Freq1, newData);
-        if(g_settings->value("log_on").toBool()){
-            m_logFile << ";" << newData.value;
-        }
-        // - amp
-        /*
-        newData.value = vibrations.amplitude(0);
-        this->addToBuffer(Amp1, newData);
-        if(g_settings->value("log_on").toBool()){
-            m_logFile << ";" << newData.value;
-        } */
-
-        // second item
-        if(vibrations.freq_size() > 1){
-            // - freq
-            newData.value = vibrations.freq(1);
-            this->addToBuffer(Freq2, newData);
+        AssisiMsg::VibrationReadingArray vibrationsArray;
+        vibrationsArray.ParseFromString(data);
+        AssisiMsg::VibrationReading vibrations = vibrationsArray.reading(0);
+        m_lastDataTime[dCast(m_VIBR_START)] = m_values[dCast(m_VIBR_START)].key;
+        for(int k = 0; k < vibrations.freq_size(); k++){
+            if(k == 2) break; //stop at second reading
+            newData.value = vibrations.freq(k);
+            m_values[dCast(m_VIBR_START+2*k)] = newData;
+            newData.value = vibrations.amplitude(k);
+            m_values[dCast(m_VIBR_START+2*k+1)] = newData;
+            emit(dCast(m_VIBR_START+2*k));
             if(g_settings->value("log_on").toBool()){
-                m_logFile << ";" << newData.value;
+                m_logFile << ";" << m_values[dCast(m_VIBR_START+2*k)].value
+                          << ";" << m_values[dCast(m_VIBR_START+2*k+1)].value;
             }
-            // - amp
-            /*
-            newData.value = vibrations.amplitude(1);
-            this->addToBuffer(Amp2, newData);
-            if(g_settings->value("log_on").toBool()){
-                m_logFile << ";" << newData.value;
-            } */
-            emit updated(Freq2); // emit if there are 2 frequencies in message
         }
-        else emit updated(Freq1); // emit if there is 1 frequencie in message
     }
     if (device == "Peltier"){
         AssisiMsg::Temperature peltier;
@@ -273,7 +253,7 @@ void QCasuZMQ::messageReceived(const QList<QByteArray> &message)
 
      }
     if (device == "Speaker"){
-        AssisiMsg::VibrationSetpoint airflows;
+        AssisiMsg::VibrationSetpoint airflow;
         airflow.ParseFromString(data);
         m_lastDataTime[Speaker_freq] = m_values[Speaker_freq].key;
         newData.value = airflow.freq();

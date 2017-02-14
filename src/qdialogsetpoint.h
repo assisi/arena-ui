@@ -45,10 +45,10 @@ private:
     QList<QByteArray> m_message;
     QList<QGraphicsItem *> m_group;
 
-    void prepareMessage();
+    bool prepareMessage();
 
 private slots:
-    void sendSetPoint();
+    void sendSetPoint(QAbstractButton*);
     void colorDialog();
 };
 
