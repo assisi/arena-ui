@@ -2,6 +2,32 @@
 
 using namespace zmqData;
 
+const std::vector<QString> graphColors = {"bisque", "blanchedalmond", "blue", "blueviolet", "brown",
+                                          "burlywood", "cadetblue", "chartreuse", "chocolate", "coral",
+                                          "cornflowerblue", "crimson", "cyan", "darkblue", "darkcyan",
+                                          "darkgoldenrod", "darkgray", "darkgreen", "darkgrey", "darkkhaki",
+                                          "darkmagenta", "darkolivegreen", "darkorange", "darkorchid",
+                                          "darkred", "darksalmon", "darkseagreen", "darkslateblue",
+                                          "darkslategray", "darkslategrey", "darkturquoise", "darkviolet",
+                                          "deeppink", "deepskyblue", "dimgray", "dimgrey", "dodgerblue",
+                                          "firebrick", "forestgreen", "fuchsia", "gainsboro", "gold",
+                                          "goldenrod", "green", "greenyellow", "hotpink", "indianred",
+                                          "indigo", "khaki", "lawngreen", "lightblue", "lightcoral",
+                                          "lightgreen", "lightgrey", "lightpink", "lightsalmon",
+                                          "lightseagreen", "lightskyblue", "lightslategray","lightslategrey",
+                                          "lightsteelblue", "lime", "limegreen", "magenta", "maroon",
+                                          "mediumaquamarine", "mediumblue", "mediumorchid", "mediumpurple",
+                                          "mediumseagreen", "mediumslateblue", "mediumspringgreen",
+                                          "mediumturquoise", "mediumvioletred", "midnightblue", "mintcream",
+                                          "mistyrose", "moccasin", "navajowhite", "navy", "olive", "olivedrab",
+                                          "orange", "orangered", "orchid", "palegoldenrod", "palegreen",
+                                          "paleturquoise", "palevioletred", "papayawhip", "peachpuff", "peru",
+                                          "pink", "plum", "powderblue", "purple", "red", "rosybrown",
+                                          "royalblue", "saddlebrown", "salmon", "sandybrown", "seagreen",
+                                          "seashell", "sienna", "silver", "skyblue", "slateblue", "slategray",
+                                          "slategrey", "springgreen", "steelblue", "tan", "teal", "thistle",
+                                          "tomato", "turquoise", "violet", "wheat", "yellow", "yellowgreen"};
+
 QTrendPlot::QTrendPlot(QTreeWidget* tree1,QTreeWidget* tree2 , QWidget *parent) :
     QCustomPlot(parent),
     casuTree(tree1),
@@ -65,13 +91,14 @@ void QTrendPlot::addGraph(zmqBuffer *buffer){
     graph()->setName(buffer->getLegendName());
     graph()->setPen(QPen(Qt::black));
 
-    for(int k=7; k < 20; k++){
+    while(1){
         bool color_used = false;
+        QString color = graphColors[std::rand() % graphColors.size()];
         for(int i = 0; i < graphCount() ; i++){
-            if(graph(i)->pen().color() == (Qt::GlobalColor) k) color_used = true;
+            if(graph(i)->pen().color() == color) color_used = true;
         }
         if(!color_used){
-            graph()->setPen(QPen((Qt::GlobalColor) k));
+            graph()->setPen(QPen(color));
             break;
         }
     }
