@@ -159,6 +159,9 @@ void QDialogSetpoint::sendSetPoint(QAbstractButton* button)
 
 bool QDialogSetpoint::prepareMessage()
 {
+    // First, clear the message
+    m_message.clear();
+
     if (m_command != "IR Proximity" && !ui->value1->hasAcceptableInput()){
         return false;
     }
