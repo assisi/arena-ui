@@ -58,7 +58,7 @@ public:
 
     zmqData::zmqBuffer* getBuffer(zmqData::dataType key) const;
     double getLastValue(zmqData::dataType key) const;
-    QList<QCPData> getLastValueList(zmqData::dataType key) const;
+    QList<QCPData> getLastValuesList(zmqData::dataType key) const;
     QColor getLedColor() const;
     bool getState(zmqData::dataType key) const;
     int getAvgSamplingTime() const;

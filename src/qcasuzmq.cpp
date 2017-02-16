@@ -43,7 +43,7 @@ double QCasuZMQ::getLastValue(dataType key) const
     return m_values.value(key).value;
 }
 
-QList<QCPData> QCasuZMQ::getLastValueList(dataType key) const
+QList<QCPData> QCasuZMQ::getLastValuesList(dataType key) const
 {
     if(key < m_IR_NUM + m_TEMP_NUM) return QList<QCPData>();
     return m_values.values(key);

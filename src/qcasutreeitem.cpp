@@ -94,9 +94,9 @@ QCasuTreeItem::QCasuTreeItem(QCasuZMQ *zmqObject) :
         if(key == Freq){
             QString temp_freq;
             QString temp_amp;
-            for(auto &item : m_zmqObject->getLastValueList(Freq))
+            for(auto &item : m_zmqObject->getLastValuesList(Freq))
                 temp_freq = temp_freq + " " + QString::number(roundF2D(item.value));
-            for(auto &item : m_zmqObject->getLastValueList(Amp))
+            for(auto &item : m_zmqObject->getLastValuesList(Amp))
                 temp_amp = temp_amp + " " + QString::number(roundF2D(item.value));
 
             m_widgetMap[Freq]->setData(1, Qt::DisplayRole, QVariant(temp_freq));
