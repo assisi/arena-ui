@@ -1,3 +1,11 @@
+assisi-arena-ui (0.16.3-0ubuntu1~xenial1) xenial; urgency=high
+
+  * Show Fft measurements
+  * New VibrationPattern setpoint dialog
+  * Apply button on all setpoint dialogs
+
+ -- Damjan Miklic (LARICS Lab) <damjan.miklic@fer.hr>  Thu, 15 Jan 2017 20:10:00 +0100
+
 assisi-arena-ui (0.16.2-0ubuntu1~xenial1) xenial; urgency=high
 
   * Updated to Xenial
