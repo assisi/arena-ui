@@ -69,13 +69,21 @@ QCasuTreeItem::QCasuTreeItem(QCasuZMQ *zmqObject) :
         tempWidget->addChild(new QNoSortTreeItem(QStringList("Speaker")));
         tempWidget->child(2)->addChild(new QNoSortTreeItem(QStringList("Frequency")));
         tempWidget->child(2)->addChild(new QNoSortTreeItem(QStringList("Amplitude")));
-        for(int k = 0; k < 2; k++){
+        tempWidget->addChild(new QNoSortTreeItem(QStringList("VibrationPattern")));
+        tempWidget->child(3)->addChild(new QNoSortTreeItem(QStringList("Period")));
+        tempWidget->child(3)->addChild(new QNoSortTreeItem(QStringList("Frequency")));
+        tempWidget->child(3)->addChild(new QNoSortTreeItem(QStringList("Amplitude")));
+        for(int k = 0; k < m_SETPOINT_NUM; k++){
             m_widgetMap.insert(dCast(k + m_SETPOINT_START), tempWidget->child(k));
             tempWidget->child(k)->setFlags(Qt::ItemIsEnabled);
         }
-        for(int k = 0; k < 2; k++){
-            m_widgetMap.insert(dCast(k + m_SETPOINT_START + 3), tempWidget->child(2)->child(k));
-            tempWidget->child(k)->setFlags(Qt::ItemIsEnabled);
+        for(int k = 0; k < m_SETPOINT_SPEAKER_NUM; k++){
+            m_widgetMap.insert(dCast(k + m_SETPOINT_SPEAKER_START), tempWidget->child(2)->child(k));
+            tempWidget->child(2)->child(k)->setFlags(Qt::ItemIsEnabled);
+        }
+        for(int k = 0; k < m_SETPOINT_VIBEPATT_NUM; k++){
+            m_widgetMap.insert(dCast(k + m_SETPOINT_VIBEPATT_START), tempWidget->child(3)->child(k));
+            tempWidget->child(3)->child(k)->setFlags(Qt::ItemIsEnabled);
         }
         tempWidget->setFlags(Qt::ItemIsEnabled);
         addChild(tempWidget);

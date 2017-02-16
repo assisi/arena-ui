@@ -18,16 +18,21 @@ namespace zmqData {
     enum dataType {IR_F, IR_FL, IR_BL, IR_B, IR_BR, IR_FR, // m_IR_num = 6
         Temp_F, Temp_L, Temp_B, Temp_R, Temp_Top, Temp_Pcb, Temp_Ring, Temp_Wax, // m_Temp_num = 8
         Freq, Amp, // m_vibr_num = 2
-        Peltier, Airflow, Speaker, Speaker_freq, Speaker_amp, LED};
+        Peltier, Airflow, Speaker, VibePatt, Speaker_freq, Speaker_amp, VibePatt_per, VibePatt_freq, VibePatt_amp,  LED};
 
     const static int m_TEMP_START = 6;
     const static int m_VIBR_START = 14;
     const static int m_SETPOINT_START = 16;
+    const static int m_SETPOINT_SPEAKER_START = 20;
+    const static int m_SETPOINT_VIBEPATT_START = 22;
 
     const static int m_IR_NUM = 6;
     const static int m_TEMP_NUM = 8;
     const static int m_VIBR_NUM = 2;
-    const static int m_DATATYPE_NUM = 22;
+    const static int m_SETPOINT_NUM = 4;
+    const static int m_SETPOINT_SPEAKER_NUM = 2;
+    const static int m_SETPOINT_VIBEPATT_NUM = 3;
+    const static int m_DATATYPE_NUM = 26;
 
     class zmqBuffer : public QObject, public QCPDataMap
         {
