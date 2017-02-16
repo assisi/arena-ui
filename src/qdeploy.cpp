@@ -2,6 +2,7 @@
 
 QDeploy::QDeploy(QWidget *parent) :
     QTextEdit(parent),
+    m_shellCatch(false),
     m_simulatorPID(0)
 {
     setReadOnly(true);
@@ -28,14 +29,16 @@ bool QDeploy::isSimulatorStarted()
     tempString = tempString.right(tempString.size() - tempString.lastIndexOf("/") - 1);
     tempString = tempString.left(15);
 
+    bool temp = m_shellCatch;
+    toggleOutput(false);
     m_shell->start("sh");
     m_shell->write("pgrep ");
     m_shell->write(tempString.toStdString().c_str());
     m_shell->closeWriteChannel();
     m_shell->waitForFinished();
-
     QString out(m_shell->readAll());
     if(out.size()) m_simulatorPID = out.toLongLong();
+    toggleOutput(temp);
     return out.size();
 }
 
@@ -119,10 +122,12 @@ void QDeploy::toggleOutput(bool state){
             append("\n[SHELL][ERR]");
             append(m_shell->readAllStandardError());
         });
+        m_shellCatch = true;
     }
     else{
         disconnect(m_shellOut1);
         disconnect(m_shellOut2);
+        m_shellCatch = false;
     }
 
 }

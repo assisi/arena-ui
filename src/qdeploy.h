@@ -31,6 +31,7 @@ private:
      * \brief Individual process for executing shell commands
      */
     QProcess* m_shell;
+    bool m_shellCatch;
 
     qint64 m_simulatorPID;
 

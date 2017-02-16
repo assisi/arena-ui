@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>359</width>
-    <height>225</height>
+    <width>374</width>
+    <height>349</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -210,7 +210,7 @@
       <enum>Qt::Horizontal</enum>
      </property>
      <property name="standardButtons">
-      <set>QDialogButtonBox::Cancel|QDialogButtonBox::Ok</set>
+      <set>QDialogButtonBox::Apply|QDialogButtonBox::Cancel|QDialogButtonBox::Ok</set>
      </property>
     </widget>
    </item>
@@ -220,38 +220,6 @@
   <include location="images.qrc"/>
  </resources>
  <connections>
-  <connection>
-   <sender>buttonBox</sender>
-   <signal>accepted()</signal>
-   <receiver>QDialogSetpoint</receiver>
-   <slot>prepareMessage()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>248</x>
-     <y>254</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>157</x>
-     <y>274</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>buttonBox</sender>
-   <signal>rejected()</signal>
-   <receiver>QDialogSetpoint</receiver>
-   <slot>reject()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>316</x>
-     <y>260</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>286</x>
-     <y>274</y>
-    </hint>
-   </hints>
-  </connection>
   <connection>
    <sender>colorButton</sender>
    <signal>clicked()</signal>
@@ -268,9 +236,25 @@
     </hint>
    </hints>
   </connection>
+  <connection>
+   <sender>buttonBox</sender>
+   <signal>clicked(QAbstractButton*)</signal>
+   <receiver>QDialogSetpoint</receiver>
+   <slot>sendSetPoint(QAbstractButton*)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>186</x>
+     <y>278</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>186</x>
+     <y>154</y>
+    </hint>
+   </hints>
+  </connection>
  </connections>
  <slots>
   <slot>colorDialog()</slot>
-  <slot>prepareMessage()</slot>
+  <slot>sendSetPoint(QAbstractButton*)</slot>
  </slots>
 </ui>

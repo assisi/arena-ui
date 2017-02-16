@@ -5,6 +5,7 @@
 
 #include "arenaui.h"
 #include "ui_arenaui.h"
+#include "qdialogsetpointvibepattern.h"
 
 using namespace zmqData;
 
@@ -483,6 +484,10 @@ void ArenaUI::customContextMenu(const QPoint &pos)
         error_single = true; // Check if object is single casu
     }
 
+    bool error_group  = true;
+    for(auto& item : m_arenaScene->selectedItems())
+        if(item->childItems().size()) error_group = false;
+
     bool error_multiple = m_arenaScene->selectedItems().size() < 2;
 
     // FIXME: Qt 5.6 QMenu::addAction accepts Qt5 style connect (possible lambda expressions)
@@ -512,7 +517,7 @@ void ArenaUI::customContextMenu(const QPoint &pos)
     tempAction = menu->addAction("Group selected", this,SLOT(on_actionGroup_triggered()));
     if(error_multiple) tempAction->setEnabled(false);
     tempAction = menu->addAction("Ungroup selected", this,SLOT(on_actionUngroup_triggered()));
-    if(error_multiple) tempAction->setEnabled(false);
+    if(error_group) tempAction->setEnabled(false);
     menu->addSeparator();
     tempAction = menu->addAction("Set connection", this,SLOT(on_actionConnect_triggered()));
     if(error_single) tempAction->setEnabled(false);
@@ -529,18 +534,25 @@ void ArenaUI::customContextMenu(const QPoint &pos)
     signalMapper->setMapping(tempAction,"Vibration");
     tempAction = sendMenu->addAction("Airflow",signalMapper,SLOT(map()));
     signalMapper->setMapping(tempAction,"Airflow");
-    tempAction = sendMenu->addAction("LED",signalMapper,SLOT(map()));
-    signalMapper->setMapping(tempAction,"LED");
     tempAction = sendMenu->addAction("IR Proximity",signalMapper,SLOT(map()));
     signalMapper->setMapping(tempAction,"IR Proximity");
+    tempAction = sendMenu->addAction("LED",signalMapper,SLOT(map()));
+    signalMapper->setMapping(tempAction,"LED");
 
     connect(signalMapper, static_cast<void (QSignalMapper::*)(const QString &)>(&QSignalMapper::mapped), this,[&](QString actuator){
         auto dialog = new QDialogSetpoint(this, actuator, m_arenaScene->selectedItems());
-        if(dialog->exec())
-            for(auto& item : m_arenaScene->selectedItems()){
-                sCast(item)->sendSetpoint(dialog->getMessage());
-            }
+        dialog->exec();
     });
+
+    tempAction = sendMenu->addAction("VibrationPattern");
+    connect(tempAction, &QAction::triggered, this,
+            [&](){
+                auto dialog = new QDialogSetpointVibePattern(this, m_arenaScene->selectedItems());
+                dialog->exec();
+            });
+    // The shortcut adding below is not working :(
+    // Maybe this bug: http://stackoverflow.com/questions/23916623/qt5-doesnt-recognised-shortcuts-unless-actions-are-added-to-a-toolbar
+    //tempAction->setShortcut(QKeySequence(tr("Ctrl+p")));
 
     menu->popup(ui->arenaSpace->mapToGlobal(pos));
 }

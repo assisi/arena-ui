@@ -55,9 +55,9 @@ void QArenaScene::drawForeground(QPainter *painter, const QRectF &rect)
     auto font = painter->font();
     font.setPointSizeF(11 / scale);
     painter->setFont(font);
-    painter->drawText(m_view->mapToScene(QPoint(11,36)), "20 °C");
-    painter->drawText(m_view->mapToScene(QPoint(101,36)), "35 °C");
-    painter->drawText(m_view->mapToScene(QPoint(191,36)), "50 °C");
+    painter->drawText(m_view->mapToScene(QPoint(11,36)), "22 °C");
+    painter->drawText(m_view->mapToScene(QPoint(101,36)), "32 °C");
+    painter->drawText(m_view->mapToScene(QPoint(191,36)), "42 °C");
 
     int time = 0;
     int connectedItems = 0;
@@ -80,7 +80,7 @@ QArenaScene::QArenaScene(QWidget *parent) : QGraphicsScene(parent)
 {
     this->setItemIndexMethod(QGraphicsScene::NoIndex);
 
-    connect(this, &QGraphicsScene::selectionChanged, [&](){
+    m_lambda = connect(this, &QGraphicsScene::selectionChanged, [&](){
         auto tempList = this->selectedItems();
         if(tempList.size()>1) m_treeItem->setHidden(false);
         else m_treeItem->setHidden(true);
@@ -93,6 +93,11 @@ QArenaScene::QArenaScene(QWidget *parent) : QGraphicsScene(parent)
             }
         }
     });
+}
+
+QArenaScene::~QArenaScene()
+{
+    disconnect(m_lambda);
 }
 
 void QArenaScene::mousePressEvent(QGraphicsSceneMouseEvent *event)

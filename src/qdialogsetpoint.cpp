@@ -6,7 +6,8 @@ using namespace zmqData;
 QDialogSetpoint::QDialogSetpoint(QWidget *parent, QString command, QList<QGraphicsItem *> group) :
     QDialog(parent),
     ui(new Ui::QDialogSetpoint),
-    m_command(command)
+    m_command(command),
+    m_group(group)
 {
     ui->setupUi(this);
 
@@ -14,13 +15,13 @@ QDialogSetpoint::QDialogSetpoint(QWidget *parent, QString command, QList<QGraphi
 
     QCasuSceneItem *tempItem;
 
-    if(group.size() > 1){
+    if(m_group.size() > 1){
         groupSelected = true;
-    } else if(sCast(group.first())->isGroup()){
+    } else if(sCast(m_group.first())->isGroup()){
             groupSelected = true;
         } else {
         groupSelected = false;
-        tempItem = siCast(group.first());
+        tempItem = siCast(m_group.first());
         }
 
     this->setWindowTitle(command + " data to send to CASUs");
@@ -34,12 +35,13 @@ QDialogSetpoint::QDialogSetpoint(QWidget *parent, QString command, QList<QGraphi
         delete ui->text21;
         delete ui->text22;
         delete ui->value2;
+        if(command == "IR Proximity"){
+            delete ui->text11;
+            delete ui->text12;
+            delete ui->value1;
+        }
     }
-    if(command == "IR Proximity"){
-        delete ui->text11;
-        delete ui->text12;
-        delete ui->value1;
-    }
+
     if(command != "LED") delete ui->colorButton;
 
     if(command == "Temperature"){
@@ -75,8 +77,8 @@ QDialogSetpoint::QDialogSetpoint(QWidget *parent, QString command, QList<QGraphi
             ui->value1->setText("500.00");
             ui->value2->setText("50.00");
         } else {
-            double temp1 = tempItem->getZmqObject()->getValue(Frequency);
-            double temp2 = tempItem->getZmqObject()->getValue(Amplitude);
+            double temp1 = tempItem->getZmqObject()->getValue(Speaker_freq);
+            double temp2 = tempItem->getZmqObject()->getValue(Speaker_amp);
 
             if(temp1 >= 50){
                 ui->value1->setText(QString::number(temp1,'f',2));
@@ -127,16 +129,32 @@ QList<QByteArray> QDialogSetpoint::getMessage() const
     return m_message;
 }
 
-void QDialogSetpoint::prepareMessage()
+void QDialogSetpoint::sendSetPoint(QAbstractButton* button)
 {
-    if (m_command != "IR Proximity" && !ui->value1->hasAcceptableInput()){
+    if(!button->text().compare(ui->buttonBox->button(QDialogButtonBox::Cancel)->text())){
         reject();
         return;
     }
-    if (m_command == "Vibration" && !ui->value2->hasAcceptableInput()){
-            reject();
-            return;
+    if(prepareMessage()){
+        for(auto& item : m_group){
+            sCast(item)->sendSetpoint(m_message);
         }
+    }
+    if(!button->text().compare(ui->buttonBox->button(QDialogButtonBox::Ok)->text()))
+        accept();
+}
+
+bool QDialogSetpoint::prepareMessage()
+{
+    // First, clear the message
+    m_message.clear();
+
+    if (m_command != "IR Proximity" && !ui->value1->hasAcceptableInput()){
+        return false;
+    }
+    if (m_command == "Vibration" && !ui->value2->hasAcceptableInput()){
+        return false;
+    }
 
     if(m_command == "Temperature"){
         AssisiMsg::Temperature temp;
@@ -200,7 +218,7 @@ void QDialogSetpoint::prepareMessage()
         m_message.push_back(QByteArray((char*) buffer,sizeof(int)));
     }
 
-    accept();
+    return true;
 }
 
 void QDialogSetpoint::colorDialog()
