@@ -132,10 +132,13 @@
               <bool>true</bool>
              </property>
              <attribute name="headerVisible">
-              <bool>false</bool>
+              <bool>true</bool>
              </attribute>
              <attribute name="headerDefaultSectionSize">
               <number>200</number>
+             </attribute>
+             <attribute name="headerHighlightSections">
+              <bool>false</bool>
              </attribute>
              <column>
               <property name="text">
@@ -147,7 +150,7 @@
                <string>Value</string>
               </property>
               <property name="textAlignment">
-               <set>AlignRight|AlignVCenter</set>
+               <set>AlignTrailing|AlignVCenter</set>
               </property>
              </column>
             </widget>
@@ -481,8 +484,8 @@
               <rect>
                <x>0</x>
                <y>0</y>
-               <width>742</width>
-               <height>573</height>
+               <width>734</width>
+               <height>466</height>
               </rect>
              </property>
             </widget>

@@ -1,4 +1,5 @@
 #include "qcasutreeitem.h"
+#define roundF2D(x) (round(x*100.0)/100.0)
 
 using namespace zmqData;
 
@@ -41,26 +42,25 @@ QCasuTreeItem::QCasuTreeItem(QCasuZMQ *zmqObject) :
         tempWidget->addChild(new QNoSortTreeItem(QStringList("Temp - PCB")));
         tempWidget->addChild(new QNoSortTreeItem(QStringList("Temp - RING")));
         tempWidget->addChild(new QNoSortTreeItem(QStringList("Temp - WAX")));
-        for(int k = 0; k < m_temp_NUM; k++){
-            m_widgetMap.insert(dCast(k + m_IR_NUM), tempWidget->child(k));
+        for(int k = 0; k < m_TEMP_NUM; k++){
+            m_widgetMap.insert(dCast(k + m_TEMP_START), tempWidget->child(k));
             tempWidget->child(k)->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled);
         }
         tempWidget->setFlags(Qt::ItemIsEnabled);
         addChild(tempWidget);
     }
     //zadavanje djece vibr grani:
-    /*{
-        tempWidget = new customQTreeWidgetItem(QStringList("Vibration"));
-        tempWidget->addChild(new customQTreeWidgetItem(QStringList("Frequency"), name + ": Vibration - freq"));
-        tempWidget->addChild(new customQTreeWidgetItem(QStringList("Amplitude"), name + ": Vibration - amp"));
-        tempWidget->addChild(new customQTreeWidgetItem(QStringList("StdDev"), name + ": Vibration - stdDev"));
-        for(int k = 0; k < 3; k++){
-            m_widgetMap.insert(sCast(k + 14), tempWidget->child(k));
+    {
+        tempWidget = new QNoSortTreeItem(QStringList("Vibration"));
+        tempWidget->addChild(new QNoSortTreeItem(QStringList("Frequency")));
+        tempWidget->addChild(new QNoSortTreeItem(QStringList("Amplitude")));
+        for(int k = 0; k < 2; k++){
+            m_widgetMap.insert(dCast(k + m_VIBR_START), tempWidget->child(k));
             tempWidget->setFlags(Qt::ItemIsEnabled);
         }
         tempWidget->setFlags(Qt::ItemIsEnabled);
         addChild(tempWidget);
-    } */
+    }
     //zadavanje djece setpoint grani:
     {
         tempWidget = new QNoSortTreeItem(QStringList("Current setpoints"));
@@ -70,11 +70,11 @@ QCasuTreeItem::QCasuTreeItem(QCasuZMQ *zmqObject) :
         tempWidget->child(2)->addChild(new QNoSortTreeItem(QStringList("Frequency")));
         tempWidget->child(2)->addChild(new QNoSortTreeItem(QStringList("Amplitude")));
         for(int k = 0; k < 2; k++){
-            m_widgetMap.insert(dCast(k + 17), tempWidget->child(k));
+            m_widgetMap.insert(dCast(k + m_SETPOINT_START), tempWidget->child(k));
             tempWidget->child(k)->setFlags(Qt::ItemIsEnabled);
         }
         for(int k = 0; k < 2; k++){
-            m_widgetMap.insert(dCast(k + 14), tempWidget->child(2)->child(k));
+            m_widgetMap.insert(dCast(k + m_SETPOINT_START + 3), tempWidget->child(2)->child(k));
             tempWidget->child(k)->setFlags(Qt::ItemIsEnabled);
         }
         tempWidget->setFlags(Qt::ItemIsEnabled);
@@ -91,8 +91,15 @@ QCasuTreeItem::QCasuTreeItem(QCasuZMQ *zmqObject) :
             m_widgetMap[key]->setTextColor(1, m_zmqObject->getLedColor());
             return;
         }
+        if(key == dCast(m_VIBR_START)){
+            QString temp_freq = QString::number(roundF2D(m_zmqObject->getValue(Freq1))) + " " + QString::number(roundF2D(m_zmqObject->getValue(Freq2)));
+            QString temp_amp = QString::number(roundF2D(m_zmqObject->getValue(Amp2))) + " " + QString::number(roundF2D(m_zmqObject->getValue(Amp2)));
+            m_widgetMap[Freq1]->setData(1, Qt::DisplayRole, QVariant(temp_freq));
+            m_widgetMap[Amp1]->setData(1, Qt::DisplayRole, QVariant(temp_amp));
+            return;
+        }
         m_widgetMap[key]->setData(1, Qt::DisplayRole, QVariant(m_zmqObject->getValue(key)));
-        if(key >= 14){
+        if(key >= m_SETPOINT_START){
             m_widgetMap[key]->setTextColor(1, m_zmqObject->getState(key)? Qt::green : Qt::red);
         }
     });

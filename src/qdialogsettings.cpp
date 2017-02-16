@@ -8,7 +8,7 @@ QDialogSettings::QDialogSettings(QWidget *parent) :
     ui->setupUi(this);
 
     ui->trendTimeSpan->setTime(g_settings->value("trendTimeSpan").toTime());
-    ui->trendSampleTime->setValue(g_settings->value("trendSampleTime_ms").toInt());
+    ui->trendSampleTime->setValue(g_settings->value("trendSampleTime_ms").toDouble()/1000);
     ui->logFolder->setText(g_settings->value("logFolder").toString());
     ui->camFolder->setText(g_settings->value("camFolder").toString());
     ui->arenaFolder->setText(g_settings->value("arenaFolder").toString());
@@ -46,7 +46,7 @@ void QDialogSettings::saveConfig()
     g_settings->setValue("arenaFolder", ui->arenaFolder->text() + (ui->arenaFolder->text().endsWith("/")? "" : "/"));
     g_settings->setValue("simulator", ui->simFile->text());
     g_settings->setValue("trendTimeSpan", QTime::fromString(ui->trendTimeSpan->text(),"mm:ss"));
-    g_settings->setValue("trendSampleTime_ms", ui->trendSampleTime->text());
+    g_settings->setValue("trendSampleTime_ms", ui->trendSampleTime->text().toDouble()*1000);
     g_settings->setValue("forceLog", ui->forceLog->isChecked());
     g_settings->setValue("forceScene", ui->forceScene->isChecked());
 

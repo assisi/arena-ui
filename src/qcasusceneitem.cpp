@@ -39,6 +39,7 @@ QCasuSceneItem::QCasuSceneItem(QPointF coordinates, double yaw, QCasuZMQ *zmqObj
     m_zmqObject(zmqObject)
 {
     FPScheck = new QElapsedTimer();
+    FPScheck->start();
 }
 
 QCasuZMQ *QCasuSceneItem::getZmqObject()
@@ -88,10 +89,11 @@ void QCasuSceneItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *op
         for(int k = 0; k < 4; k++){
             if(m_zmqObject->isConnected()){
                 double tempTemp = m_zmqObject->getValue(dCast(6 + k));
-                if (tempTemp > 50) tempTemp = 50;
-                if (tempTemp < 20) tempTemp = 20;
+                // temperature range is from 22 - 42 C°
+                if (tempTemp > 42) tempTemp = 42;
+                if (tempTemp < 22) tempTemp = 22;
 
-                double tempGradient = (tempTemp - 20) / 30;
+                double tempGradient = (tempTemp - 22) / 20;
                 tempGradient = ((240 + (int)(tempGradient * 180)) % 360); // / 360; // calculate color gradiend in HSV space 
                 QColor tempColor;
                 tempColor.setHsv(tempGradient, 255, 255);
@@ -161,8 +163,8 @@ void QCasuSceneItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *op
 
     //paint vibration marker
     if(g_settings->value("vibr_on").toBool() && m_zmqObject->isConnected() && m_zmqObject->getState(Speaker)){
-        double freq = m_zmqObject->getValue(Frequency);
-        double amplitude = m_zmqObject->getValue(Amplitude);
+        double freq = m_zmqObject->getValue(Freq1);
+        double amplitude = m_zmqObject->getValue(Amp1);
 
         pen.setColor(QColor(255,255,255,96));
         pen.setWidth(2);

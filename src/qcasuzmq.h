@@ -17,12 +17,17 @@
 namespace zmqData {
     enum dataType {IR_F, IR_FL, IR_BL, IR_B, IR_BR, IR_FR, // m_IR_num = 6
         Temp_F, Temp_L, Temp_B, Temp_R, Temp_Top, Temp_Pcb, Temp_Ring, Temp_Wax, // m_Temp_num = 8
-        Frequency, Amplitude, StdDev,
-        Peltier, Airflow, Speaker, LED};
+        Freq1, Amp1, Freq2, Amp2, // m_vibr_num = 4
+        Peltier, Airflow, Speaker, Speaker_freq, Speaker_amp, LED};
+
+    const static int m_TEMP_START = 6;
+    const static int m_VIBR_START = 14;
+    const static int m_SETPOINT_START = 18;
 
     const static int m_IR_NUM = 6;
-    const static int m_temp_NUM = 8;
-    const static int m_dataType_NUM = 21;
+    const static int m_TEMP_NUM = 8;
+    const static int m_VIBR_NUM = 4;
+    const static int m_DATATYPE_NUM = 24;
 
     class zmqBuffer : public QObject, public QCPDataMap
         {
@@ -85,14 +90,14 @@ private:
     QMap<zmqData::dataType, bool> m_state;
     QColor m_ledColor;
 
-    std::ofstream m_logFile;
-    QString m_logName;
-    bool m_logOpen;
+    std::map<QString, std::ofstream> m_logFile;
+    std::map<QString, QString> m_logName;
+    std::map<QString, bool> m_logOpen;
 
     bool m_connected = false;
 
-    void openLogFile();
-    void closeLogFile();
+    void openLogFile(QString);
+    void closeLogFile(QString);
 
     void addToBuffer(zmqData::dataType key, QCPData data);
     void connectZMQ();
