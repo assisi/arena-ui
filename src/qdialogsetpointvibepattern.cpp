@@ -20,6 +20,10 @@ QDialogSetpointVibePattern::QDialogSetpointVibePattern(QWidget *parent, const QL
 {
     ui->setupUi(this);
 
+    // TODO: Set input limit info programatically
+
+    // TODO: Initialize lineEdit box values with current setpoints
+    // (requires the resolution of Issue #96)
     QCasuSceneItem *tempItem = NULL;
 
     if (!isGroup(group))
@@ -51,74 +55,102 @@ void QDialogSetpointVibePattern::sendSetPoint()
 
     m_done = false;
     QList<QByteArray> message;
-
-    // Fill message header
-    message.push_back(QString("VibrationPattern").toLocal8Bit());
-    message.push_back(QString(ui->radioButton_on->isChecked() ? "On" : "Off").toLocal8Bit());
-
-    // Fill message data
-    try
+    
+    if (ui->radioButton_on->isChecked())
     {
+        // Turning on!
+        
+        // Fill message header
+        message.push_back(QString("VibrationPattern").toLocal8Bit());
+        message.push_back(QString("On").toLocal8Bit());
+        
+        // Fill message data
         AssisiMsg::VibrationPattern vp;
-
-        // Periods
-        string tmp_str = ui->lineEdit_periods->text().toStdString();
-        boost::tokenizer<> tok(tmp_str);
-        for (auto token: tok)
+        try
         {
-            int p = std::stoi(token);
-            if (isInBounds(p, period_min, period_max))
+            // Periods
+            string tmp_str = ui->lineEdit_periods->text().toStdString();
+            boost::tokenizer<> tok(tmp_str);
+            for (auto token: tok)
             {
-                vp.add_vibe_periods(p);
+                int p = std::stoi(token);
+                if (isInBounds(p, period_min, period_max))
+                {
+                    vp.add_vibe_periods(p);
+                }
+                else
+                {
+                    throw std::invalid_argument("Period out of bounds.");
+                }
             }
-            else
-            {
-                throw std::invalid_argument("Period out of bounds.");
-            }
-        }
 
-        // Frequencies
-        int num_frequencies = 0;
-        tmp_str = ui->lineEdit_frequencies->text().toStdString();
-        tok.assign(tmp_str);
-        for (auto token: tok)
+            // Frequencies
+            tmp_str = ui->lineEdit_frequencies->text().toStdString();
+            tok.assign(tmp_str);
+            for (auto token: tok)
+            {
+                int f = std::stoi(token);
+                if (isInBounds(f, frequency_min, frequency_max))
+                {
+                    vp.add_vibe_freqs(f);
+                }
+                else
+                {
+                    throw std::invalid_argument("Frequency out of bounds");
+                }
+            }
+
+            // Amplitudes
+            tmp_str = ui->lineEdit_amplitudes->text().toStdString();
+            tok.assign(tmp_str);
+            for (auto token: tok)
+            {
+                int a = std::stoi(token);
+                if (isInBounds(a, amplitude_min, amplitude_max))
+                {
+                    vp.add_vibe_amps(a);
+                }
+                else
+                {
+                    throw std::invalid_argument("Amplitude out of bounds");
+                }
+            }
+
+            // Check input sizes
+            if (vp.vibe_periods_size() != vp.vibe_freqs_size() ||
+                vp.vibe_freqs_size() != vp.vibe_amps_size())
+            {
+                throw std::invalid_argument("Input size mismatch");
+            }
+
+            // Send the message
+            string msg_str = vp.SerializeAsString();
+            message.push_back(QByteArray(msg_str.c_str(),msg_str.length()));
+
+            for (auto& item : m_group)
+            {
+                sCast(item)->sendSetpoint(message);
+            }
+            m_done = true;
+        }
+        catch (std::invalid_argument& e)
         {
-            int f = std::stoi(token);
-            if (isInBounds(f, frequency_min, frequency_max))
-            {
-                vp.add_vibe_freqs(f);
-            }
-            else
-            {
-                throw std::invalid_argument("Frequency out of bounds");
-            }
+            QMessageBox err(QMessageBox::Critical, "Input Error",
+                            (string("Please check your inputs:\n")
+                            + e.what()).c_str());
+            err.exec();
         }
+    }
+    else
+    {
+        // Turn actuator off
+        message.push_back(QString("Speaker").toLocal8Bit());
+        message.push_back(QString("Off").toLocal8Bit());
+        AssisiMsg::VibrationSetpoint v;
+        v.set_amplitude(0);
+        v.set_freq(1);
 
-        // Amplitudes
-        tmp_str = ui->lineEdit_amplitudes->text().toStdString();
-        tok.assign(tmp_str);
-        for (auto token: tok)
-        {
-            int a = std::stoi(token);
-            if (isInBounds(a, amplitude_min, amplitude_max))
-            {
-                vp.add_vibe_amps(a);
-            }
-            else
-            {
-                throw std::invalid_argument("Amplitude out of bounds");
-            }
-        }
-
-        // Check input sizes
-        if (vp.vibe_periods_size() != vp.vibe_freqs_size() ||
-            vp.vibe_freqs_size() != vp.vibe_amps_size())
-        {
-            throw std::invalid_argument("Input size mismatch");
-        }
-
-        // Send the message
-        string msg_str = vp.SerializeAsString();
+        string msg_str = v.SerializeAsString();
         message.push_back(QByteArray(msg_str.c_str(),msg_str.length()));
 
         for (auto& item : m_group)
@@ -126,13 +158,6 @@ void QDialogSetpointVibePattern::sendSetPoint()
             sCast(item)->sendSetpoint(message);
         }
         m_done = true;
-    }
-    catch (std::invalid_argument& e)
-    {
-        QMessageBox err(QMessageBox::Critical, "Input Error",
-                        (string("Please check your inputs:\n")
-                        + e.what()).c_str());
-        err.exec();
     }
 
 
@@ -156,3 +181,16 @@ void QDialogSetpointVibePattern::on_buttonBox_clicked(QAbstractButton *button)
     }
 }
 
+void QDialogSetpointVibePattern::on_radioButton_off_clicked(void)
+{
+    this->ui->lineEdit_periods->setDisabled(true);
+    this->ui->lineEdit_frequencies->setDisabled(true);
+    this->ui->lineEdit_amplitudes->setDisabled(true);
+}
+
+void QDialogSetpointVibePattern::on_radioButton_on_clicked(void)
+{
+    this->ui->lineEdit_periods->setDisabled(false);
+    this->ui->lineEdit_frequencies->setDisabled(false);
+    this->ui->lineEdit_amplitudes->setDisabled(false);
+}

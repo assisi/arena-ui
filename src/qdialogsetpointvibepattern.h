@@ -42,6 +42,9 @@ private slots:
 
     // Connected automagically by Qt
     void on_buttonBox_clicked(QAbstractButton *button);
+    void on_radioButton_off_clicked(void);
+    void on_radioButton_on_clicked(void);
+
 };
 
 #endif // QDIALOGSETPOINTVIBEPATTERN_H
