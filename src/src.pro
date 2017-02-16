@@ -43,7 +43,9 @@ SOURCES += main.cpp\
     qcasutreegroup.cpp \
     qabstractsceneitem.cpp \
     qabstracttreeitem.cpp \
-    qdialogconnect.cpp
+    qdialogconnect.cpp \
+    qdialogsetpointvibepattern.cpp \
+    utils.cpp
 
 
 HEADERS  += arenaui.h\
@@ -65,13 +67,16 @@ HEADERS  += arenaui.h\
     qabstractsceneitem.h \
     qabstracttreeitem.h \
     qcasutreegroup.h \
-    qdialogconnect.h
+    qdialogconnect.h \
+    qdialogsetpointvibepattern.h \
+    utils.h
 
 
 FORMS    += arenaui.ui \
     qdialogconnect.ui \
     qdialogsettings.ui \
-    qdialogsetpoint.ui
+    qdialogsetpoint.ui \
+    qdialogsetpointvibepattern.ui
 
 LIBS += -lzmq\
         -lprotobuf\

@@ -5,6 +5,7 @@
 
 #include "arenaui.h"
 #include "ui_arenaui.h"
+#include "qdialogsetpointvibepattern.h"
 
 using namespace zmqData;
 
@@ -542,6 +543,16 @@ void ArenaUI::customContextMenu(const QPoint &pos)
         auto dialog = new QDialogSetpoint(this, actuator, m_arenaScene->selectedItems());
         dialog->exec();
     });
+
+    tempAction = sendMenu->addAction("VibrationPattern");
+    connect(tempAction, &QAction::triggered, this,
+            [&](){
+                auto dialog = new QDialogSetpointVibePattern(this, m_arenaScene->selectedItems());
+                dialog->exec();
+            });
+    // The shortcut adding below is not working :(
+    // Maybe this bug: http://stackoverflow.com/questions/23916623/qt5-doesnt-recognised-shortcuts-unless-actions-are-added-to-a-toolbar
+    //tempAction->setShortcut(QKeySequence(tr("Ctrl+p")));
 
     menu->popup(ui->arenaSpace->mapToGlobal(pos));
 }

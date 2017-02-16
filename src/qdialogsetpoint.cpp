@@ -154,7 +154,7 @@ void QDialogSetpoint::sendSetPoint(QAbstractButton* button)
         }
     }
     if(!button->text().compare("OK"))
-        accept();
+        this->done(0);
 }
 
 bool QDialogSetpoint::prepareMessage()
