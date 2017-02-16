@@ -53,7 +53,7 @@ QDialogSetpoint::QDialogSetpoint(QWidget *parent, QString command, QList<QGraphi
 
         if(groupSelected) ui->value1->setText("26.00");
         else{
-            double temp = tempItem->getZmqObject()->getValue(Peltier);
+            double temp = tempItem->getZmqObject()->getLastValue(Peltier);
             if(temp > 26){
                 ui->value1->setText(QString::number(temp,'f',2));
             } else {
@@ -77,8 +77,8 @@ QDialogSetpoint::QDialogSetpoint(QWidget *parent, QString command, QList<QGraphi
             ui->value1->setText("500.00");
             ui->value2->setText("50.00");
         } else {
-            double temp1 = tempItem->getZmqObject()->getValue(Speaker_freq);
-            double temp2 = tempItem->getZmqObject()->getValue(Speaker_amp);
+            double temp1 = tempItem->getZmqObject()->getLastValue(Speaker_freq);
+            double temp2 = tempItem->getZmqObject()->getLastValue(Speaker_amp);
 
             if(temp1 >= 50){
                 ui->value1->setText(QString::number(temp1,'f',2));
@@ -108,7 +108,7 @@ QDialogSetpoint::QDialogSetpoint(QWidget *parent, QString command, QList<QGraphi
 
         if(groupSelected) ui->value1->setText("1.00");
         else{
-            double temp = tempItem->getZmqObject()->getValue(Airflow);
+            double temp = tempItem->getZmqObject()->getLastValue(Airflow);
             if(temp > 1)
                 ui->value1->setText(QString::number(temp,'f',2));
             else

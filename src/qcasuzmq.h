@@ -17,17 +17,17 @@
 namespace zmqData {
     enum dataType {IR_F, IR_FL, IR_BL, IR_B, IR_BR, IR_FR, // m_IR_num = 6
         Temp_F, Temp_L, Temp_B, Temp_R, Temp_Top, Temp_Pcb, Temp_Ring, Temp_Wax, // m_Temp_num = 8
-        Freq1, Amp1, Freq2, Amp2, // m_vibr_num = 4
+        Freq, Amp, // m_vibr_num = 2
         Peltier, Airflow, Speaker, Speaker_freq, Speaker_amp, LED};
 
     const static int m_TEMP_START = 6;
     const static int m_VIBR_START = 14;
-    const static int m_SETPOINT_START = 18;
+    const static int m_SETPOINT_START = 16;
 
     const static int m_IR_NUM = 6;
     const static int m_TEMP_NUM = 8;
-    const static int m_VIBR_NUM = 4;
-    const static int m_DATATYPE_NUM = 24;
+    const static int m_VIBR_NUM = 2;
+    const static int m_DATATYPE_NUM = 22;
 
     class zmqBuffer : public QObject, public QCPDataMap
         {
@@ -57,7 +57,8 @@ public:
     explicit QCasuZMQ(QObject *parent = 0, QString casuName = QString());
 
     zmqData::zmqBuffer* getBuffer(zmqData::dataType key) const;
-    double getValue(zmqData::dataType key) const;
+    double getLastValue(zmqData::dataType key) const;
+    QList<QCPData> getLastValueList(zmqData::dataType key) const;
     QColor getLedColor() const;
     bool getState(zmqData::dataType key) const;
     int getAvgSamplingTime() const;
@@ -85,7 +86,7 @@ private:
     QTimer* m_connectionTimer;
 
     QMap<zmqData::dataType, zmqData::zmqBuffer*> m_buffers;
-    QMap<zmqData::dataType, QCPData> m_values;
+    QMultiMap<zmqData::dataType, QCPData> m_values;
     QMap<zmqData::dataType, double> m_lastDataTime;
     QMap<zmqData::dataType, bool> m_state;
     QColor m_ledColor;

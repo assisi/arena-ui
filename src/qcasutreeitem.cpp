@@ -91,14 +91,19 @@ QCasuTreeItem::QCasuTreeItem(QCasuZMQ *zmqObject) :
             m_widgetMap[key]->setTextColor(1, m_zmqObject->getLedColor());
             return;
         }
-        if(key == dCast(m_VIBR_START)){
-            QString temp_freq = QString::number(roundF2D(m_zmqObject->getValue(Freq1))) + " " + QString::number(roundF2D(m_zmqObject->getValue(Freq2)));
-            QString temp_amp = QString::number(roundF2D(m_zmqObject->getValue(Amp2))) + " " + QString::number(roundF2D(m_zmqObject->getValue(Amp2)));
-            m_widgetMap[Freq1]->setData(1, Qt::DisplayRole, QVariant(temp_freq));
-            m_widgetMap[Amp1]->setData(1, Qt::DisplayRole, QVariant(temp_amp));
+        if(key == Freq){
+            QString temp_freq;
+            QString temp_amp;
+            for(auto &item : m_zmqObject->getLastValueList(Freq))
+                temp_freq = temp_freq + " " + QString::number(roundF2D(item.value));
+            for(auto &item : m_zmqObject->getLastValueList(Amp))
+                temp_amp = temp_amp + " " + QString::number(roundF2D(item.value));
+
+            m_widgetMap[Freq]->setData(1, Qt::DisplayRole, QVariant(temp_freq));
+            m_widgetMap[Amp]->setData(1, Qt::DisplayRole, QVariant(temp_amp));
             return;
         }
-        m_widgetMap[key]->setData(1, Qt::DisplayRole, QVariant(m_zmqObject->getValue(key)));
+        m_widgetMap[key]->setData(1, Qt::DisplayRole, QVariant(m_zmqObject->getLastValue(key)));
         if(key >= m_SETPOINT_START){
             m_widgetMap[key]->setTextColor(1, m_zmqObject->getState(key)? Qt::green : Qt::red);
         }

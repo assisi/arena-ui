@@ -34,13 +34,19 @@ zmqBuffer *QCasuZMQ::getBuffer(dataType key) const
     return 0;
 }
 
-double QCasuZMQ::getValue(dataType key) const
+double QCasuZMQ::getLastValue(dataType key) const
 {
     if (key < m_IR_NUM + m_TEMP_NUM){
         if (m_buffers[key]->isEmpty()) return 0;
         else return m_buffers[key]->last().value;
     }
-    return m_values[key].value;
+    return m_values.value(key).value;
+}
+
+QList<QCPData> QCasuZMQ::getLastValueList(dataType key) const
+{
+    if(key < m_IR_NUM + m_TEMP_NUM) return QList<QCPData>();
+    return m_values.values(key);
 }
 
 QColor QCasuZMQ::getLedColor() const
@@ -62,7 +68,7 @@ int QCasuZMQ::getAvgSamplingTime() const
         dataType key = m_lastDataTime.key(oldTime, LED);
         if(key == LED) continue;
         if(key >= m_VIBR_START){
-            result += m_values[key].key - oldTime;
+            result += m_values.value(key).key - oldTime;
         } else {
             result += m_buffers[key]->getLastTime() - oldTime;
         }
@@ -213,74 +219,75 @@ void QCasuZMQ::messageReceived(const QList<QByteArray> &message)
         AssisiMsg::VibrationReadingArray vibrationsArray;
         vibrationsArray.ParseFromString(data);
         AssisiMsg::VibrationReading vibrations = vibrationsArray.reading(0);
-        m_lastDataTime[dCast(m_VIBR_START)] = m_values[dCast(m_VIBR_START)].key;
+        m_lastDataTime[dCast(m_VIBR_START)] = m_values.value(dCast(m_VIBR_START)).key;
+        m_values.remove(Freq);
+        m_values.remove(Amp);
         int k = 0;
         for(; k < vibrations.freq_size(); k++){
             if(k == 2) break; //stop at second reading
             newData.value = vibrations.freq(k);
-            m_values[dCast(m_VIBR_START+2*k)] = newData;
+            m_values.insert(Freq, newData);
             newData.value = vibrations.amplitude(k);
-            m_values[dCast(m_VIBR_START+2*k+1)] = newData;
+            m_values.insert(Amp, newData);
             if(g_settings->value("log_on").toBool()){
-                m_logFile[device]<< ";" << m_values[dCast(m_VIBR_START+2*k)].value
-                          << ";" << m_values[dCast(m_VIBR_START+2*k+1)].value;
+                m_logFile[device] << ";" << m_values.value(Freq).value
+                                  << ";" << m_values.value(Amp).value;
             }
         }
         for(; k < 2; k++){// Fill rest of values with zero
             newData.value = 0.0;
-            m_values[dCast(m_VIBR_START+2*k)] = newData;
-            m_values[dCast(m_VIBR_START+2*k+1)] = newData;
+            m_values.insert(Freq, newData);
+            m_values.insert(Amp, newData);
             if(g_settings->value("log_on").toBool()){
-                m_logFile[device]<< ";" << m_values[dCast(m_VIBR_START+2*k)].value
-                          << ";" << m_values[dCast(m_VIBR_START+2*k+1)].value;
+                m_logFile[device] << ";" << m_values.value(Freq).value
+                                  << ";" << m_values.value(Amp).value;
             }
         }
-        emit updated(dCast(m_VIBR_START));
+        emit updated(Freq);
     }
     if (device == "Peltier"){
         AssisiMsg::Temperature peltier;
         peltier.ParseFromString(data);
         newData.value = peltier.temp();
-        m_lastDataTime[Peltier] = m_values[Peltier].key;
-        m_values[Peltier] = newData;
+        m_lastDataTime[Peltier] = m_values.value(Peltier).key;
+        m_values.replace(Peltier, newData);
         m_state[Peltier] = command == "On";
         emit updated(Peltier);
         if(g_settings->value("log_on").toBool()){
-            m_logFile[device]<< ";" << m_values[Peltier].value
-                      << ";" << m_state[Peltier];
+            m_logFile[device] << ";" << m_values.value(Peltier).value
+                              << ";" << m_state[Peltier];
         }
      }
     if (device == "Airflow"){
         AssisiMsg::Airflow airflow;
         airflow.ParseFromString(data);
-        m_lastDataTime[Airflow] = m_values[Airflow].key;
         newData.value = airflow.intensity();
-        m_values[Airflow] = newData;
+        m_lastDataTime[Airflow] = m_values.value(Airflow).key;
+        m_values.replace(Airflow, newData);
         m_state[Airflow] = command == "On";
         emit updated(Airflow);
         if(g_settings->value("log_on").toBool()){
-            m_logFile[device]<< ";" << m_values[Airflow].value
-                      << ";" << m_state[Airflow];
+            m_logFile[device] << ";" << m_values.value(Airflow).value
+                              << ";" << m_state[Airflow];
         }
-
      }
     if (device == "Speaker"){
         AssisiMsg::VibrationSetpoint airflow;
         airflow.ParseFromString(data);
-        m_lastDataTime[Speaker_freq] = m_values[Speaker_freq].key;
         newData.value = airflow.freq();
-        m_values[Speaker_freq] = newData;
+        m_lastDataTime[Speaker_freq] = m_values.value(Speaker_freq).key;
+        m_values.replace(Speaker_freq, newData);
         newData.value = airflow.amplitude();
-        m_values[Speaker_amp] = newData;
+        m_values.replace(Speaker_amp, newData);
         m_state[Speaker] = command == "On";
         m_state[Speaker_freq] = command == "On";
         m_state[Speaker_amp] = command == "On";
         emit updated(Speaker_freq);
         emit updated(Speaker_amp);
         if(g_settings->value("log_on").toBool()){
-            m_logFile[device]<< ";" << m_values[Speaker_freq].value
-                      << ";" << m_values[Speaker_amp].value
-                      << ";" << m_state[Speaker];
+            m_logFile[device] << ";" << m_values.value(Speaker_freq).value
+                              << ";" << m_values.value(Speaker_amp).value
+                              << ";" << m_state[Speaker];
         }
     }
     if (device == "DiagnosticLed")

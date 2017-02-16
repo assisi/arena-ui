@@ -78,7 +78,7 @@ void QCasuSceneItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *op
             painter->setBrush(brush);
             double tempIR;
 
-            if (m_zmqObject->isConnected()) tempIR = m_zmqObject->getValue(dCast(k)) / 65536;
+            if (m_zmqObject->isConnected()) tempIR = m_zmqObject->getLastValue(dCast(k)) / 65536;
             else tempIR = 0;
             painter->drawPie(QIRTriangle(m_coordinates, m_yaw + k*60, tempIR), (m_yaw + k*60 - 25)*16, 50*16); // 0° is at 3 o'clock, ccw direction
         }
@@ -88,7 +88,7 @@ void QCasuSceneItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *op
     if(g_settings->value("temp_on").toBool()){
         for(int k = 0; k < 4; k++){
             if(m_zmqObject->isConnected()){
-                double tempTemp = m_zmqObject->getValue(dCast(6 + k));
+                double tempTemp = m_zmqObject->getLastValue(dCast(6 + k));
                 // temperature range is from 22 - 42 C°
                 if (tempTemp > 42) tempTemp = 42;
                 if (tempTemp < 22) tempTemp = 22;
@@ -147,7 +147,7 @@ void QCasuSceneItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *op
 
     //paint airflow marker
     if(g_settings->value("air_on").toBool() && m_zmqObject->isConnected() && m_zmqObject->getState(Airflow)){
-        double value = m_zmqObject->getValue(Airflow);
+        double value = m_zmqObject->getLastValue(Airflow);
 
         pen.setColor(Qt::transparent);
         brush.setColor(QColor(250, 218, 94, 96));
@@ -163,8 +163,8 @@ void QCasuSceneItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *op
 
     //paint vibration marker
     if(g_settings->value("vibr_on").toBool() && m_zmqObject->isConnected() && m_zmqObject->getState(Speaker)){
-        double freq = m_zmqObject->getValue(Freq1);
-        double amplitude = m_zmqObject->getValue(Amp1);
+        double freq = m_zmqObject->getLastValue(Freq);
+        double amplitude = m_zmqObject->getLastValue(Amp);
 
         pen.setColor(QColor(255,255,255,96));
         pen.setWidth(2);
