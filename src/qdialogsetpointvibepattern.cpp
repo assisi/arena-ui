@@ -165,17 +165,18 @@ void QDialogSetpointVibePattern::sendSetPoint()
 
 void QDialogSetpointVibePattern::on_buttonBox_clicked(QAbstractButton *button)
 {
-    if (button->text() == QString("&Cancel"))
+
+    if (button->text().compare(ui->buttonBox->button(QDialogButtonBox::Cancel)->text()) == 0)
     {
         m_done = true;
     }
-    else if (button->text() == QString("Apply"))
+    else if (button->text().compare(ui->buttonBox->button(QDialogButtonBox::Apply)->text()) == 0)
     {
         this->sendSetPoint();
         // The user hit Apply, so we're not done
         m_done = false;
     }
-    else if (button->text() == QString("&OK"))
+    else if (button->text().compare(ui->buttonBox->button(QDialogButtonBox::Ok)->text()) == 0)
     {
         this->sendSetPoint();
     }

@@ -534,10 +534,10 @@ void ArenaUI::customContextMenu(const QPoint &pos)
     signalMapper->setMapping(tempAction,"Vibration");
     tempAction = sendMenu->addAction("Airflow",signalMapper,SLOT(map()));
     signalMapper->setMapping(tempAction,"Airflow");
-    tempAction = sendMenu->addAction("LED",signalMapper,SLOT(map()));
-    signalMapper->setMapping(tempAction,"LED");
     tempAction = sendMenu->addAction("IR Proximity",signalMapper,SLOT(map()));
     signalMapper->setMapping(tempAction,"IR Proximity");
+    tempAction = sendMenu->addAction("LED",signalMapper,SLOT(map()));
+    signalMapper->setMapping(tempAction,"LED");
 
     connect(signalMapper, static_cast<void (QSignalMapper::*)(const QString &)>(&QSignalMapper::mapped), this,[&](QString actuator){
         auto dialog = new QDialogSetpoint(this, actuator, m_arenaScene->selectedItems());
