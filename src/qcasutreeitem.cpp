@@ -145,14 +145,14 @@ QCasuTreeItem::QCasuTreeItem(QCasuZMQ *zmqObject) :
             m_widgetMap[VibePatt_freq]->setData(1, Qt::DisplayRole, QVariant(temp_freq));
             m_widgetMap[VibePatt_amp]->setData(1, Qt::DisplayRole, QVariant(temp_amp));
 
-            m_widgetMap[VibePatt_period]->setTextColor(1, m_zmqObject->getState(VibePatt_period)? Qt::green : Qt::red);
-            m_widgetMap[VibePatt_freq]->setTextColor(1, m_zmqObject->getState(VibePatt_freq)? Qt::green : Qt::red);
-            m_widgetMap[VibePatt_amp]->setTextColor(1, m_zmqObject->getState(VibePatt_amp)? Qt::green : Qt::red);
+            m_widgetMap[VibePatt_period]->setTextColor(1, m_zmqObject->getState(VibePatt_period)? Qt::darkGreen : Qt::red);
+            m_widgetMap[VibePatt_freq]->setTextColor(1, m_zmqObject->getState(VibePatt_freq)? Qt::darkGreen : Qt::red);
+            m_widgetMap[VibePatt_amp]->setTextColor(1, m_zmqObject->getState(VibePatt_amp)? Qt::darkGreen : Qt::red);
             return;
         }
         m_widgetMap[key]->setData(1, Qt::DisplayRole, QVariant(m_zmqObject->getLastValue(key)));
         if(key >= m_SETPOINT_START){
-            m_widgetMap[key]->setTextColor(1, m_zmqObject->getState(key)? Qt::green : Qt::red);
+            m_widgetMap[key]->setTextColor(1, m_zmqObject->getState(key)? Qt::darkGreen : Qt::red);
         }
     });
 }
