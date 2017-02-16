@@ -131,7 +131,7 @@ QList<QByteArray> QDialogSetpoint::getMessage() const
 
 void QDialogSetpoint::sendSetPoint(QAbstractButton* button)
 {
-    if(!button->text().compare("Cancel")){
+    if(!button->text().compare(ui->buttonBox->button(QDialogButtonBox::Cancel)->text())){
         reject();
         return;
     }
@@ -140,7 +140,7 @@ void QDialogSetpoint::sendSetPoint(QAbstractButton* button)
             sCast(item)->sendSetpoint(m_message);
         }
     }
-    if(!button->text().compare("OK"))
+    if(!button->text().compare(ui->buttonBox->button(QDialogButtonBox::Ok)->text()))
         accept();
 }
 
