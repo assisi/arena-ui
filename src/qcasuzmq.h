@@ -18,7 +18,7 @@ namespace zmqData {
     enum dataType {IR_F, IR_FL, IR_BL, IR_B, IR_BR, IR_FR, // m_IR_num = 6
         Temp_F, Temp_L, Temp_B, Temp_R, Temp_Top, Temp_Pcb, Temp_Ring, Temp_Wax, // m_Temp_num = 8
         Freq, Amp, // m_vibr_num = 2
-        Peltier, Airflow, Speaker, VibePatt, Speaker_freq, Speaker_amp, VibePatt_per, VibePatt_freq, VibePatt_amp,  LED};
+        Peltier, Airflow, Speaker, VibePatt, Speaker_freq, Speaker_amp, VibePatt_period, VibePatt_freq, VibePatt_amp,  LED};
 
     const static int m_TEMP_START = 6;
     const static int m_VIBR_START = 14;

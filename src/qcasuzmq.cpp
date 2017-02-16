@@ -304,6 +304,33 @@ void QCasuZMQ::messageReceived(const QList<QByteArray> &message)
                       << ";" << m_state[LED];
         }
     }
+    if (device == "VibrationPattern"){
+        AssisiMsg::VibrationPattern vibrationPattern;
+        vibrationPattern.ParseFromString(data);
+        m_lastDataTime[VibePatt_freq] = m_values.value(VibePatt_freq).key;
+        m_values.remove(VibePatt_period);
+        m_values.remove(VibePatt_freq);
+        m_values.remove(VibePatt_amp);
+        m_state[VibePatt] = command == "On";
+        m_state[VibePatt_period] = command == "On";
+        m_state[VibePatt_freq] = command == "On";
+        m_state[VibePatt_amp] = command == "On";
+        int k = 0;
+        for(; k < vibrationPattern.vibe_freqs_size(); k++){
+            newData.value = vibrationPattern.vibe_periods(k);
+            m_values.insert(VibePatt_period, newData);
+            newData.value = vibrationPattern.vibe_freqs(k);
+            m_values.insert(VibePatt_freq, newData);
+            newData.value = vibrationPattern.vibe_amps(k);
+            m_values.insert(VibePatt_amp, newData);
+            if(g_settings->value("log_on").toBool()){
+                m_logFile[device] << ";" << m_values.value(VibePatt_period).value
+                                  << ";" << m_values.value(VibePatt_freq).value
+                                  << ";" << m_values.value(VibePatt_amp).value;
+            }
+        }
+        emit updated(VibePatt);
+    }
 
     m_logFile[device] << std::endl;
 }

@@ -111,6 +111,22 @@ QCasuTreeItem::QCasuTreeItem(QCasuZMQ *zmqObject) :
             m_widgetMap[Amp]->setData(1, Qt::DisplayRole, QVariant(temp_amp));
             return;
         }
+        if(key == VibePatt){
+            QString temp_period;
+            QString temp_freq;
+            QString temp_amp;
+            for(auto &item : m_zmqObject->getLastValuesList(VibePatt_period))
+                temp_freq = temp_freq + " " + QString::number(roundF2D(item.value));
+            for(auto &item : m_zmqObject->getLastValuesList(VibePatt_freq))
+                temp_freq = temp_freq + " " + QString::number(roundF2D(item.value));
+            for(auto &item : m_zmqObject->getLastValuesList(VibePatt_amp))
+                temp_amp = temp_amp + " " + QString::number(roundF2D(item.value));
+
+            m_widgetMap[VibePatt_period]->setData(1, Qt::DisplayRole, QVariant(temp_freq));
+            m_widgetMap[VibePatt_freq]->setData(1, Qt::DisplayRole, QVariant(temp_freq));
+            m_widgetMap[VibePatt_amp]->setData(1, Qt::DisplayRole, QVariant(temp_amp));
+            return;
+        }
         m_widgetMap[key]->setData(1, Qt::DisplayRole, QVariant(m_zmqObject->getLastValue(key)));
         if(key >= m_SETPOINT_START){
             m_widgetMap[key]->setTextColor(1, m_zmqObject->getState(key)? Qt::green : Qt::red);
