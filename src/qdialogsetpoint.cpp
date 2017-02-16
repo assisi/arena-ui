@@ -31,21 +31,17 @@ QDialogSetpoint::QDialogSetpoint(QWidget *parent, QString command, QList<QGraphi
     validator1->setNotation(QDoubleValidator::StandardNotation);
     validator2->setNotation(QDoubleValidator::StandardNotation);
 
-    if(command != "VibrationPattern"){
-        delete ui->text31;
-        delete ui->text32;
-        delete ui->value3;
-        if(command != "Vibration"){
-            delete ui->text21;
-            delete ui->text22;
-            delete ui->value2;
-            if(command == "IR Proximity"){
-                delete ui->text11;
-                delete ui->text12;
-                delete ui->value1;
-            }
+    if(command != "Vibration"){
+        delete ui->text21;
+        delete ui->text22;
+        delete ui->value2;
+        if(command == "IR Proximity"){
+            delete ui->text11;
+            delete ui->text12;
+            delete ui->value1;
         }
     }
+
     if(command != "LED") delete ui->colorButton;
 
     if(command == "Temperature"){
@@ -64,15 +60,6 @@ QDialogSetpoint::QDialogSetpoint(QWidget *parent, QString command, QList<QGraphi
                 ui->value1->setText("26.00");
             }
         }
-    }
-
-    if(command == "VibrationPattern"){
-        ui->text11->setText("Frequency array:");
-        ui->text12->setText("Allowed frequency range: [50,1500]Hz");
-        ui->text21->setText("Amplitude array:");
-        ui->text22->setText("Allowed amplitude range: [0,50]\%");
-        ui->text31->setText("Duration array:");
-        ui->text32->setText("Resolution: 1s");
     }
 
     if(command == "Vibration"){
