@@ -227,7 +227,7 @@ void QCasuZMQ::messageReceived(const QList<QByteArray> &message)
             }
         }
         for(; k < 2; k++){// Fill rest of values with zero
-            newData.value = 0.0123454136;
+            newData.value = 0.0;
             m_values[dCast(m_VIBR_START+2*k)] = newData;
             m_values[dCast(m_VIBR_START+2*k+1)] = newData;
             if(g_settings->value("log_on").toBool()){

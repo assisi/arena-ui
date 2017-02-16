@@ -39,6 +39,7 @@ QCasuSceneItem::QCasuSceneItem(QPointF coordinates, double yaw, QCasuZMQ *zmqObj
     m_zmqObject(zmqObject)
 {
     FPScheck = new QElapsedTimer();
+    FPScheck->start();
 }
 
 QCasuZMQ *QCasuSceneItem::getZmqObject()
