@@ -103,9 +103,17 @@ QCasuTreeItem::QCasuTreeItem(QCasuZMQ *zmqObject) :
             QString temp_freq;
             QString temp_amp;
             for(auto &item : m_zmqObject->getLastValuesList(Freq))
-                temp_freq = temp_freq + " " + QString::number(roundF2D(item.value));
+                temp_freq = temp_freq + QString::number((int)item.value)+ "\t";
             for(auto &item : m_zmqObject->getLastValuesList(Amp))
-                temp_amp = temp_amp + " " + QString::number(roundF2D(item.value));
+                temp_amp = temp_amp + QString::number((int)item.value)+ "\t";
+
+            // padding last values to left justify last column
+            temp_freq.chop(1);
+            temp_amp.chop(1);
+            int max_size = temp_freq.size() - temp_freq.lastIndexOf('\t');
+            if(temp_amp.size() - temp_amp.lastIndexOf('\t') > max_size) max_size = temp_amp.size() - temp_amp.lastIndexOf('\t');
+            temp_freq = temp_freq.leftJustified(temp_freq.lastIndexOf('\t') + max_size);
+            temp_amp = temp_amp.leftJustified(temp_amp.lastIndexOf('\t') + max_size);
 
             m_widgetMap[Freq]->setData(1, Qt::DisplayRole, QVariant(temp_freq));
             m_widgetMap[Amp]->setData(1, Qt::DisplayRole, QVariant(temp_amp));
@@ -116,13 +124,24 @@ QCasuTreeItem::QCasuTreeItem(QCasuZMQ *zmqObject) :
             QString temp_freq;
             QString temp_amp;
             for(auto &item : m_zmqObject->getLastValuesList(VibePatt_period))
-                temp_freq = temp_freq + " " + QString::number(roundF2D(item.value));
+                temp_period = temp_period + QString::number((int)item.value)+ "\t";
             for(auto &item : m_zmqObject->getLastValuesList(VibePatt_freq))
-                temp_freq = temp_freq + " " + QString::number(roundF2D(item.value));
+                temp_freq = temp_freq + QString::number((int)item.value)+ "\t";
             for(auto &item : m_zmqObject->getLastValuesList(VibePatt_amp))
-                temp_amp = temp_amp + " " + QString::number(roundF2D(item.value));
+                temp_amp = temp_amp + QString::number((int)item.value)+ "\t";
 
-            m_widgetMap[VibePatt_period]->setData(1, Qt::DisplayRole, QVariant(temp_freq));
+            // padding last values to left justify last column
+            temp_period.chop(1);
+            temp_freq.chop(1);
+            temp_amp.chop(1);
+            int max_size = temp_period.size() - temp_period.lastIndexOf('\t');
+            if(temp_freq.size() - temp_freq.lastIndexOf('\t') > max_size) temp_freq = temp_freq.size() - temp_amp.lastIndexOf('\t');
+            if(temp_amp.size() - temp_amp.lastIndexOf('\t') > max_size) max_size = temp_amp.size() - temp_amp.lastIndexOf('\t');
+            temp_period = temp_period.leftJustified(temp_period.lastIndexOf('\t') + max_size);
+            temp_freq = temp_freq.leftJustified(temp_freq.lastIndexOf('\t') + max_size);
+            temp_amp = temp_amp.leftJustified(temp_amp.lastIndexOf('\t') + max_size);
+
+            m_widgetMap[VibePatt_period]->setData(1, Qt::DisplayRole, QVariant(temp_period));
             m_widgetMap[VibePatt_freq]->setData(1, Qt::DisplayRole, QVariant(temp_freq));
             m_widgetMap[VibePatt_amp]->setData(1, Qt::DisplayRole, QVariant(temp_amp));
             return;

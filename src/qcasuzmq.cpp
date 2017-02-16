@@ -219,7 +219,7 @@ void QCasuZMQ::messageReceived(const QList<QByteArray> &message)
         AssisiMsg::VibrationReadingArray vibrationsArray;
         vibrationsArray.ParseFromString(data);
         AssisiMsg::VibrationReading vibrations = vibrationsArray.reading(0);
-        m_lastDataTime[dCast(m_VIBR_START)] = m_values.value(dCast(m_VIBR_START)).key;
+        m_lastDataTime[Freq] = m_values.value(Freq).key;
         m_values.remove(Freq);
         m_values.remove(Amp);
         int k = 0;
