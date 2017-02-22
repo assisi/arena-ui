@@ -103,9 +103,9 @@ QCasuTreeItem::QCasuTreeItem(QCasuZMQ *zmqObject) :
             QString temp_freq;
             QString temp_amp;
             for(auto &item : m_zmqObject->getLastValuesList(Freq))
-                temp_freq = temp_freq + QString::number((int)item.value)+ "\t";
+                temp_freq = QString::number((int)item.value)+ "\t" + temp_freq;
             for(auto &item : m_zmqObject->getLastValuesList(Amp))
-                temp_amp = temp_amp + QString::number((int)item.value)+ "\t";
+                temp_amp = QString::number((int)item.value)+ "\t" + temp_amp;
 
             // padding last values to left justify last column
             temp_freq.chop(1);
@@ -124,11 +124,11 @@ QCasuTreeItem::QCasuTreeItem(QCasuZMQ *zmqObject) :
             QString temp_freq;
             QString temp_amp;
             for(auto &item : m_zmqObject->getLastValuesList(VibePatt_period))
-                temp_period = temp_period + QString::number((int)item.value)+ "\t";
+                temp_period = QString::number((int)item.value)+ "\t" + temp_period;
             for(auto &item : m_zmqObject->getLastValuesList(VibePatt_freq))
-                temp_freq = temp_freq + QString::number((int)item.value)+ "\t";
+                temp_freq = QString::number((int)item.value)+ "\t" + temp_freq;
             for(auto &item : m_zmqObject->getLastValuesList(VibePatt_amp))
-                temp_amp = temp_amp + QString::number((int)item.value)+ "\t";
+                temp_amp = QString::number((int)item.value)+ "\t" + temp_amp;
 
             // padding last values to left justify last column
             temp_period.chop(1);

@@ -82,7 +82,7 @@ QDialogSetpoint::QDialogSetpoint(QWidget *parent, QString command, QList<QGraphi
 
             if(temp1 >= 50){
                 ui->value1->setText(QString::number(temp1,'f',2));
-                ui->value1->setText(QString::number(temp2,'f',2));
+                ui->value2->setText(QString::number(temp2,'f',2));
             } else {
                 ui->value1->setText("500.00");
                 ui->value2->setText("50.00");

@@ -153,7 +153,7 @@ void QCasuSceneItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *op
         brush.setColor(QColor(250, 218, 94, 96));
         painter->setPen(pen);
         painter->setBrush(brush);
-        // 30 FPS, max_speed = 6 deg/frame -> w = 0.5 rpm
+        // 30 FPS, max_speed = 6 deg/frame -> w = 0.5 rps
         // CURRENTLY THERE IS ONLY ONE INTENSITY, WHEN INTESITY RANGE WILL BE ENABLED, MAX_SPEED SHOULD BE 12
         m_airflowAngle = fmod(m_airflowAngle + value * 6 * FPSrepaint, 360);
         painter->drawPath(QPetal(m_coordinates, m_airflowAngle));       // petal 1
@@ -163,8 +163,11 @@ void QCasuSceneItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *op
 
     //paint vibration marker
     if(g_settings->value("vibr_on").toBool() && m_zmqObject->isConnected() && m_zmqObject->getState(Speaker)){
-        double freq = m_zmqObject->getLastValue(Freq);
-        double amplitude = m_zmqObject->getLastValue(Amp);
+        double freq = 0;
+        double amplitude = 1;
+        if(m_zmqObject->getLastValuesList(Freq).size())
+            freq = m_zmqObject->getLastValuesList(Freq).last().value;
+            //amplitude = m_zmqObject->getLastValuesList(Amp).last().value;
 
         pen.setColor(QColor(255,255,255,96));
         pen.setWidth(2);
@@ -172,8 +175,8 @@ void QCasuSceneItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *op
         brush.setColor(Qt::transparent);
         painter->setPen(pen);
         painter->setBrush(brush);
-        // 30 FPS, max_speed = 12 deg/frame -> w = 1 rpm
-        m_vibrAngle = fmod(m_vibrAngle - amplitude/50* 12*FPSrepaint, 360);
+        // 30 FPS, speed = 18 deg/frame -> w = 1.5 rps
+        m_vibrAngle = fmod(m_vibrAngle - amplitude* 18 *FPSrepaint, 360);
         // wawesNum = [6 .. 15]
         int wawesNum = 6+9*freq/1500;
         auto tempItem = std::move(QVibratingCircle(m_coordinates, wawesNum, m_vibrAngle));
