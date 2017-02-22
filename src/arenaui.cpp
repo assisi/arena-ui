@@ -348,7 +348,7 @@ void ArenaUI::on_actionOpenArena_triggered()
             for(int i = 0; i < graphSize; i++){
                 loadSession.setArrayIndex(i);
                 auto casuName = loadSession.value("casuName").toString();
-                auto key = dCast(loadSession.value("key").toInt());
+                auto key = static_cast<dataType>(loadSession.value("key").toInt());
                 toAdd.append(linker[casuName]->getBuffer(key));
             }
             if(toAdd.size()){

@@ -17,8 +17,8 @@ QCasuTreeGroup::QCasuTreeGroup(QString name) :
         tempWidget->addChild(new QNoSortTreeItem(QStringList("IR - B")));
         tempWidget->addChild(new QNoSortTreeItem(QStringList("IR - BR")));
         tempWidget->addChild(new QNoSortTreeItem(QStringList("IR - FR")));
-        for(int k = 0; k < m_IR_NUM; k++){
-            m_widgetMap.insert(dCast(k), tempWidget->child(k));
+        for(uint k = 0; k < m_IR_ARRAY.size(); k++){
+            m_widgetMap.insert(m_IR_ARRAY[k], tempWidget->child(k));
             tempWidget->child(k)->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled);
         }
         tempWidget->setFlags(Qt::ItemIsEnabled);
@@ -35,8 +35,8 @@ QCasuTreeGroup::QCasuTreeGroup(QString name) :
         tempWidget->addChild(new QNoSortTreeItem(QStringList("Temp - PCB")));
         tempWidget->addChild(new QNoSortTreeItem(QStringList("Temp - RING")));
         tempWidget->addChild(new QNoSortTreeItem(QStringList("Temp - WAX")));
-        for(int k = 0; k < m_TEMP_NUM; k++){
-            m_widgetMap.insert(dCast(k + m_TEMP_START), tempWidget->child(k));
+        for(uint k = 0; k < m_TEMP_ARRAY.size(); k++){
+            m_widgetMap.insert(m_TEMP_ARRAY[k], tempWidget->child(k));
             tempWidget->child(k)->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled);
         }
         tempWidget->setFlags(Qt::ItemIsEnabled);
@@ -54,10 +54,10 @@ QSelectionTreeItem::QSelectionTreeItem(QGraphicsScene *scene) :
 QList<zmqBuffer *> QSelectionTreeItem::getBuffers() const
 {
     QList<zmqBuffer *> outList;
-    for(int k = 0; k < m_IR_NUM + m_TEMP_NUM; k++){
-        if(m_widgetMap[dCast(k)]->isSelected()){
+    for(auto &key : m_DATA_BUFFERS){
+        if(m_widgetMap[key]->isSelected()){
             for(auto& item : m_scene->selectedItems()){
-                outList.append((sCast(item))->getBuffers(dCast(k)));
+                outList.append((sCast(item))->getBuffers(key));
             }
         }
     }

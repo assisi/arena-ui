@@ -6,11 +6,11 @@ QCasuZMQ::QCasuZMQ(QObject *parent, QString casuName) :
     QObject(parent),
     m_name(casuName)
 {
-    for(int k = 0; k < m_IR_NUM + m_TEMP_NUM; k++){
-        m_buffers.insert(dCast(k), new zmqBuffer(m_name, dCast(k)));
+    for(uint k = 0; k < m_DATA_BUFFERS.size(); k++){
+        m_buffers.insert(m_DATA_BUFFERS[k], new zmqBuffer(m_name, m_DATA_BUFFERS[k]));
     }
-    for(int k = m_SETPOINT_START; k < m_DATATYPE_NUM; k++){
-        m_state.insert(dCast(k), false);
+    for(uint k = 0; k < m_DATA_SETPOINT.size(); k++){
+        m_state.insert(m_DATA_SETPOINT[k], false);
     }
 
     m_connectionTimer = new QTimer(this);
@@ -30,13 +30,13 @@ QCasuZMQ::QCasuZMQ(QObject *parent, QString casuName) :
 
 zmqBuffer *QCasuZMQ::getBuffer(dataType key) const
 {
-    if (key < m_IR_NUM + m_TEMP_NUM) return m_buffers[key];
+    if (findKey(m_DATA_BUFFERS, key)) return m_buffers[key];
     return 0;
 }
 
 double QCasuZMQ::getLastValue(dataType key) const
 {
-    if (key < m_IR_NUM + m_TEMP_NUM){
+    if (findKey(m_DATA_BUFFERS, key)){
         if (m_buffers[key]->isEmpty()) return 0;
         else return m_buffers[key]->last().value;
     }
@@ -45,7 +45,7 @@ double QCasuZMQ::getLastValue(dataType key) const
 
 QList<QCPData> QCasuZMQ::getLastValuesList(dataType key) const
 {
-    if(key < m_IR_NUM + m_TEMP_NUM) return QList<QCPData>();
+    if(findKey(m_DATA_BUFFERS, key)) return QList<QCPData>();
     return m_values.values(key);
 }
 
@@ -67,10 +67,10 @@ int QCasuZMQ::getAvgSamplingTime() const
     for(auto& oldTime : m_lastDataTime){
         dataType key = m_lastDataTime.key(oldTime, LED);
         if(key == LED) continue;
-        if(key >= m_VIBR_START){
-            result += m_values.value(key).key - oldTime;
-        } else {
+        if(findKey(m_DATA_BUFFERS, key)){
             result += m_buffers[key]->getLastTime() - oldTime;
+        } else {
+            result += m_values.value(key).key - oldTime;
         }
         itemNum++;
     }
@@ -190,12 +190,12 @@ void QCasuZMQ::messageReceived(const QList<QByteArray> &message)
     if (device == "IR"){
         AssisiMsg::RangeArray ranges;
         ranges.ParseFromString(data);
-        m_lastDataTime[dCast(0)] = m_buffers[dCast(0)]->getLastTime();
-        for (int k = 0; k < ranges.raw_value_size(); k++){
-            if( k == m_IR_NUM) break;
+        m_lastDataTime[IR_F] = m_buffers[IR_F]->getLastTime();
+        for (uint k = 0; k < ranges.raw_value_size(); k++){
+            if( k == m_IR_ARRAY.size()) break;
             newData.value = ranges.raw_value(k);
-            this->addToBuffer(dCast(k), newData);
-            emit updated(dCast(k));
+            this->addToBuffer(m_IR_ARRAY[k], newData);
+            emit updated(m_IR_ARRAY[k]);
             if(g_settings->value("log_on").toBool()){
                 m_logFile[device]<< ";" << newData.value;
             }
@@ -204,12 +204,12 @@ void QCasuZMQ::messageReceived(const QList<QByteArray> &message)
     if (device == "Temp"){
         AssisiMsg::TemperatureArray temperatures;
         temperatures.ParseFromString(data);
-        m_lastDataTime[dCast(m_TEMP_START)] = m_buffers[dCast(m_TEMP_START)]->getLastTime();
-        for (int k = 0; k < temperatures.temp_size(); k++){
-            if( k == m_TEMP_NUM) break;
+        m_lastDataTime[Temp_F] = m_buffers[Temp_F]->getLastTime();
+        for (uint k = 0; k < temperatures.temp_size(); k++){
+            if( k == m_TEMP_ARRAY.size()) break;
             newData.value = temperatures.temp(k);
-            this->addToBuffer(dCast(k+m_TEMP_START), newData);
-            emit updated(dCast(k+m_TEMP_START));
+            this->addToBuffer(m_TEMP_ARRAY[k], newData);
+            emit updated(m_TEMP_ARRAY[k]);
             if(g_settings->value("log_on").toBool()){
                 m_logFile[device]<< ";" << newData.value;
             }

@@ -73,12 +73,12 @@ void QCasuSceneItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *op
 
     //paint IR sensor readings
     if(g_settings->value("IR_on").toBool()){
-        for(int k = 0; k < m_IR_NUM; k++){
+        for(uint k = 0; k < m_IR_ARRAY.size(); k++){
             brush.setColor(Qt::black);
             painter->setBrush(brush);
             double tempIR;
 
-            if (m_zmqObject->isConnected()) tempIR = m_zmqObject->getLastValue(dCast(k)) / 65536;
+            if (m_zmqObject->isConnected()) tempIR = m_zmqObject->getLastValue(m_IR_ARRAY[k]) / 65536;
             else tempIR = 0;
             painter->drawPie(QIRTriangle(m_coordinates, m_yaw + k*60, tempIR), (m_yaw + k*60 - 25)*16, 50*16); // 0° is at 3 o'clock, ccw direction
         }
@@ -88,7 +88,7 @@ void QCasuSceneItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *op
     if(g_settings->value("temp_on").toBool()){
         for(int k = 0; k < 4; k++){
             if(m_zmqObject->isConnected()){
-                double tempTemp = m_zmqObject->getLastValue(dCast(6 + k));
+                double tempTemp = m_zmqObject->getLastValue(m_TEMP_ARRAY[k]);
                 // temperature range is from 22 - 42 C°
                 if (tempTemp > 42) tempTemp = 42;
                 if (tempTemp < 22) tempTemp = 22;
