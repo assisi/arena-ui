@@ -15,7 +15,8 @@ QDialogSetpoint::QDialogSetpoint(QWidget *parent, QString command, QList<QGraphi
 
     QCasuSceneItem *tempItem;
 
-    connect(ui->value1, &QLineEdit::textEdited, [&](const QString s){
+    // Disable "OK" & "Apply" buttons if validation fails
+    connect(ui->value1, &QLineEdit::textEdited, [&](){
         if (ui->value1->hasAcceptableInput()) {
             ui->buttonBox->button(QDialogButtonBox::Ok)->setEnabled(true);
             ui->buttonBox->button(QDialogButtonBox::Apply)->setEnabled(true);
@@ -29,8 +30,7 @@ QDialogSetpoint::QDialogSetpoint(QWidget *parent, QString command, QList<QGraphi
             ui->buttonBox->button(QDialogButtonBox::Apply)->setDisabled(true);
         }
     });
-
-    connect(ui->value2, &QLineEdit::textEdited, [&](QString s){
+    connect(ui->value2, &QLineEdit::textEdited, [&](){
         if (ui->value1->hasAcceptableInput() && ui->value2->hasAcceptableInput()) {
             ui->buttonBox->button(QDialogButtonBox::Ok)->setEnabled(true);
             ui->buttonBox->button(QDialogButtonBox::Apply)->setEnabled(true);
@@ -38,6 +38,12 @@ QDialogSetpoint::QDialogSetpoint(QWidget *parent, QString command, QList<QGraphi
             ui->buttonBox->button(QDialogButtonBox::Ok)->setDisabled(true);
             ui->buttonBox->button(QDialogButtonBox::Apply)->setDisabled(true);
         }
+    });
+
+    // Disable input fields if radio button is "OFF"
+    connect(ui->radioON, &QRadioButton::toggled, [&](bool state){
+        if(m_command != "IR Proximity") ui->value1->setEnabled(state);
+        if(m_command == "Vibration") ui->value2->setEnabled(state);
     });
 
     if(m_group.size() > 1){
@@ -49,27 +55,27 @@ QDialogSetpoint::QDialogSetpoint(QWidget *parent, QString command, QList<QGraphi
         tempItem = siCast(m_group.first());
         }
 
-    this->setWindowTitle(command + " data to send to CASUs");
+    this->setWindowTitle(m_command + " data to send to CASUs");
 
     auto validator1 = new QDoubleValidator;
     auto validator2 = new QDoubleValidator;
     validator1->setNotation(QDoubleValidator::StandardNotation);
     validator2->setNotation(QDoubleValidator::StandardNotation);
 
-    if(command != "Vibration"){
+    if(m_command != "Vibration"){
         delete ui->text21;
         delete ui->text22;
         delete ui->value2;
-        if(command == "IR Proximity"){
+        if(m_command == "IR Proximity"){
             delete ui->text11;
             delete ui->text12;
             delete ui->value1;
         }
     }
 
-    if(command != "LED") delete ui->colorButton;
+    if(m_command != "LED") delete ui->colorButton;
 
-    if(command == "Temperature"){
+    if(m_command == "Temperature"){
         ui->text11->setText("Temperature setpoint:");
         ui->text12->setText("Allowed temperature range: [26,45]°C");
 
@@ -87,7 +93,7 @@ QDialogSetpoint::QDialogSetpoint(QWidget *parent, QString command, QList<QGraphi
         }
     }
 
-    if(command == "Vibration"){
+    if(m_command == "Vibration"){
         ui->text11->setText("Vibration frequency setpoint:");
         ui->text12->setText("Allowed frequency range: [50,1500]Hz");
         ui->text21->setText("Vibration amplitude setpoint:");
@@ -115,7 +121,7 @@ QDialogSetpoint::QDialogSetpoint(QWidget *parent, QString command, QList<QGraphi
         }
     }
 
-    if(command == "LED"){
+    if(m_command == "LED"){
         ui->text11->setText("Color:");
         ui->text12->setText("[hex #rrggbb], [hex #RRGGBB]");
         QRegularExpression re("^#([A-Fa-f0-9]{6})$");
@@ -123,7 +129,7 @@ QDialogSetpoint::QDialogSetpoint(QWidget *parent, QString command, QList<QGraphi
         ui->value1->setText("#7aba71");
     }
 
-    if(command == "Airflow"){
+    if(m_command == "Airflow"){
         ui->text11->setText("Intensity setpoint:");
         ui->text12->setText("Allowed intensity range: 1 (value is discarded)");
 
