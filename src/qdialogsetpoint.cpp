@@ -11,10 +11,6 @@ QDialogSetpoint::QDialogSetpoint(QWidget *parent, QString command, QList<QGraphi
 {
     ui->setupUi(this);
 
-    bool groupSelected;
-
-    QCasuSceneItem *tempItem;
-
     // Disable "OK" & "Apply" buttons if validation fails
     connect(ui->value1, &QLineEdit::textEdited, [&](){
         if (ui->value1->hasAcceptableInput()) {
@@ -46,13 +42,16 @@ QDialogSetpoint::QDialogSetpoint(QWidget *parent, QString command, QList<QGraphi
         if(m_command == "Vibration") ui->value2->setEnabled(state);
     });
 
-    if(m_group.size() > 1){
+    bool groupSelected;
+    QCasuSceneItem *tempItem;
+
+    if(m_group.size() > 1){ // if there is more than one child, it is a group
         groupSelected = true;
-    } else if(sCast(m_group.first())->isGroup()){
+    } else if(sCast(m_group.first())->isGroup()){ // if there is single child, ask if he is a group
             groupSelected = true;
         } else {
-        groupSelected = false;
-        tempItem = siCast(m_group.first());
+            groupSelected = false;
+            tempItem = siCast(m_group.first());
         }
 
     this->setWindowTitle(m_command + " data to send to CASUs");
