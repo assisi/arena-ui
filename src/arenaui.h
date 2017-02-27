@@ -5,6 +5,7 @@
 #include <QGraphicsScene>
 #include <QProgressBar>
 #include <QSplitter>
+#include <QKeySequence>
 
 #include <nzmqt/nzmqt.hpp>
 #include <yaml-cpp/yaml.h>
@@ -69,6 +70,8 @@ private:
      * \brief Timer responsible for 30FPS graphics scene refresh rate
      */
     QTimer* m_sceneUpdate;
+    QSignalMapper* m_signalMapper;
+    QList<QAction*> m_setpointActions;
 
     /*!
      * \brief Function which sorts arenaScene elements so overlaping items won't hide smaller items (rendering them unselectable)
