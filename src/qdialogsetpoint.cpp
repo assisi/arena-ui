@@ -15,6 +15,31 @@ QDialogSetpoint::QDialogSetpoint(QWidget *parent, QString command, QList<QGraphi
 
     QCasuSceneItem *tempItem;
 
+    connect(ui->value1, &QLineEdit::textEdited, [&](const QString s){
+        if (ui->value1->hasAcceptableInput()) {
+            ui->buttonBox->button(QDialogButtonBox::Ok)->setEnabled(true);
+            ui->buttonBox->button(QDialogButtonBox::Apply)->setEnabled(true);
+        } else {
+            ui->buttonBox->button(QDialogButtonBox::Ok)->setDisabled(true);
+            ui->buttonBox->button(QDialogButtonBox::Apply)->setDisabled(true);
+        }
+        // If command is "Vibration", we should also check second input field
+        if (m_command == "Vibration" && !ui->value2->hasAcceptableInput()){
+            ui->buttonBox->button(QDialogButtonBox::Ok)->setDisabled(true);
+            ui->buttonBox->button(QDialogButtonBox::Apply)->setDisabled(true);
+        }
+    });
+
+    connect(ui->value2, &QLineEdit::textEdited, [&](QString s){
+        if (ui->value1->hasAcceptableInput() && ui->value2->hasAcceptableInput()) {
+            ui->buttonBox->button(QDialogButtonBox::Ok)->setEnabled(true);
+            ui->buttonBox->button(QDialogButtonBox::Apply)->setEnabled(true);
+        } else {
+            ui->buttonBox->button(QDialogButtonBox::Ok)->setDisabled(true);
+            ui->buttonBox->button(QDialogButtonBox::Apply)->setDisabled(true);
+        }
+    });
+
     if(m_group.size() > 1){
         groupSelected = true;
     } else if(sCast(m_group.first())->isGroup()){
@@ -148,13 +173,6 @@ bool QDialogSetpoint::prepareMessage()
 {
     // First, clear the message
     m_message.clear();
-
-    if (m_command != "IR Proximity" && !ui->value1->hasAcceptableInput()){
-        return false;
-    }
-    if (m_command == "Vibration" && !ui->value2->hasAcceptableInput()){
-        return false;
-    }
 
     if(m_command == "Temperature"){
         AssisiMsg::Temperature temp;
