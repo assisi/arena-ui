@@ -1,3 +1,5 @@
+.. _trends_link:
+
 Displaying data trends
 ======================
 
@@ -13,12 +15,12 @@ through the **Settings** menu:
 * **Trend buffer size** - Defines the maximum duration of a trend that
   can be stored, in mm:ss (minutes:seconds) format.
 * **Trend sample time** - How often should the displayed data be
-  sampled, in miliseconds; This value is limited from below by the
+  sampled, in miliseconds. This value is limited from below by the
   underlying communication mechanism between the User interface and
-  the CASUs, so be careful when changing it; Setting it too low will
-  put an unnecessary load on the system; Generally, considering
+  the CASUs, so be careful when changing it. Setting it too low will
+  put an unnecessary load on the system. Generally, considering
   the speed at which the bees move, a value of 500ms seems reasonable
-  and should not be modified without a compelling reason;
+  and should not be modified without a compelling reason.
 
 Creating data trends
 --------------------
@@ -29,7 +31,7 @@ menu by *right-clicking* on one of the selected names. This will bring
 up a context menu with two options:
 
 * **Plot selected in same trend** - Plots data from all selected
-  sources in the same graph;
+  sources in the same graph.
 * **Plot selected in different trends** - Creates a new graph for each
   selected source
 
@@ -53,11 +55,11 @@ controls* are available for manipulating the trend graphs
 of the trends brings up a context menu with the following options:
 
 * **(Un)Dock from main window** - Depending on the current docking
-  state, the trend can either be docked or undocked;
-* **Hide/Show legend** - Allows toggling of legend display;
+  state, the trend can either be docked or undocked.
+* **Hide/Show legend** - Allows toggling of legend display.
 * **Remove selected graphs** - The graph that is selected (by
-  *left-click* in the current axis) is removed from the axis;
+  *left-click* in the current axis) is removed from the axis.
 * **Add graphs (selected in tree)** - Data that is currently selected
-  in the **Casu data Configuration tab** is added to the current axis;
-* **Save to pdf** - The current view is saved to a pdf document;
-* **Close trend** - Closes the trend;
+  in the **Casu data Configuration tab** is added to the current axis.
+* **Save to pdf** - The current view is saved to a pdf document.
+* **Close trend** - Closes the trend.
