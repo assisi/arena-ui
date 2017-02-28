@@ -546,11 +546,14 @@ void ArenaUI::customContextMenu(const QPoint &pos)
     menu->addSeparator();
 
     tempAction = menu->addAction("Group selected", this,SLOT(on_actionGroup_triggered()));
+    tempAction->setShortcut(QKeySequence("Ctrl+G"));
     if(error_multiple) tempAction->setEnabled(false);
     tempAction = menu->addAction("Ungroup selected", this,SLOT(on_actionUngroup_triggered()));
+    tempAction->setShortcut(QKeySequence("Ctrl+U"));
     if(error_group) tempAction->setEnabled(false);
     menu->addSeparator();
     tempAction = menu->addAction("Set connection", this,SLOT(on_actionConnect_triggered()));
+    tempAction->setShortcut(QKeySequence("Ctrl+C"));
     if(error_single) tempAction->setEnabled(false);
 
     auto sendMenu = new QMenu("Setpoint");

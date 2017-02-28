@@ -99,51 +99,41 @@ QCasuTreeItem::QCasuTreeItem(QCasuZMQ *zmqObject) :
             m_widgetMap[key]->setTextColor(1, m_zmqObject->getLedColor());
             return;
         }
+        auto makeString = [&](dataType key){
+                QString temp;
+                int lastSize;
+                for(auto &item : m_zmqObject->getLastValuesList(key)){
+                    temp = QString::number((int)item.value)+ "\t" + temp;
+                    lastSize = QString::number((int)item.value).size();
+                }
+                temp.chop(1);
+                return std::pair<QString, int>(temp, lastSize);
+            };
         if(key == Freq){
-            QString temp_freq;
-            QString temp_amp;
-            for(auto &item : m_zmqObject->getLastValuesList(Freq))
-                temp_freq = QString::number((int)item.value)+ "\t" + temp_freq;
-            for(auto &item : m_zmqObject->getLastValuesList(Amp))
-                temp_amp = QString::number((int)item.value)+ "\t" + temp_amp;
+            std::vector<std::pair<QString,int>> dataStrings = {makeString(Freq), makeString(Amp)};
 
             // padding last values to left justify last column
-            temp_freq.chop(1);
-            temp_amp.chop(1);
-            int max_size = temp_freq.size() - temp_freq.lastIndexOf('\t');
-            if(temp_amp.size() - temp_amp.lastIndexOf('\t') > max_size) max_size = temp_amp.size() - temp_amp.lastIndexOf('\t');
-            temp_freq = temp_freq.leftJustified(temp_freq.lastIndexOf('\t') + max_size);
-            temp_amp = temp_amp.leftJustified(temp_amp.lastIndexOf('\t') + max_size);
+            int max_size = dataStrings[0].second > dataStrings[1].second ? dataStrings[0].second : dataStrings[1].second;
+            for(auto& item : dataStrings)
+                item.first = item.first.leftJustified(item.first.lastIndexOf('\t') + max_size);
 
-            m_widgetMap[Freq]->setData(1, Qt::DisplayRole, QVariant(temp_freq));
-            m_widgetMap[Amp]->setData(1, Qt::DisplayRole, QVariant(temp_amp));
+            m_widgetMap[Freq]->setData(1, Qt::DisplayRole, QVariant(dataStrings[0].first));
+            m_widgetMap[Amp]->setData(1, Qt::DisplayRole, QVariant(dataStrings[1].first));
             return;
         }
         if(key == VibePatt){
-            QString temp_period;
-            QString temp_freq;
-            QString temp_amp;
-            for(auto &item : m_zmqObject->getLastValuesList(VibePatt_period))
-                temp_period = QString::number((int)item.value)+ "\t" + temp_period;
-            for(auto &item : m_zmqObject->getLastValuesList(VibePatt_freq))
-                temp_freq = QString::number((int)item.value)+ "\t" + temp_freq;
-            for(auto &item : m_zmqObject->getLastValuesList(VibePatt_amp))
-                temp_amp = QString::number((int)item.value)+ "\t" + temp_amp;
+            std::vector<std::pair<QString,int>> dataStrings = {makeString(VibePatt_period), makeString(VibePatt_freq), makeString(VibePatt_amp)};
 
             // padding last values to left justify last column
-            temp_period.chop(1);
-            temp_freq.chop(1);
-            temp_amp.chop(1);
-            int max_size = temp_period.size() - temp_period.lastIndexOf('\t');
-            if(temp_freq.size() - temp_freq.lastIndexOf('\t') > max_size) temp_freq = temp_freq.size() - temp_amp.lastIndexOf('\t');
-            if(temp_amp.size() - temp_amp.lastIndexOf('\t') > max_size) max_size = temp_amp.size() - temp_amp.lastIndexOf('\t');
-            temp_period = temp_period.leftJustified(temp_period.lastIndexOf('\t') + max_size);
-            temp_freq = temp_freq.leftJustified(temp_freq.lastIndexOf('\t') + max_size);
-            temp_amp = temp_amp.leftJustified(temp_amp.lastIndexOf('\t') + max_size);
+            int max_size = dataStrings[0].second > dataStrings[1].second ? dataStrings[0].second : dataStrings[1].second;
+                max_size = dataStrings[2].second > max_size              ? dataStrings[2].second : max_size;
+            for(auto& item : dataStrings)
+                item.first = item.first.leftJustified(item.first.lastIndexOf('\t') + max_size);
 
-            m_widgetMap[VibePatt_period]->setData(1, Qt::DisplayRole, QVariant(temp_period));
-            m_widgetMap[VibePatt_freq]->setData(1, Qt::DisplayRole, QVariant(temp_freq));
-            m_widgetMap[VibePatt_amp]->setData(1, Qt::DisplayRole, QVariant(temp_amp));
+            m_widgetMap[VibePatt_period]->setData(1, Qt::DisplayRole, QVariant(dataStrings[0].first));
+            m_widgetMap[VibePatt_freq]->setData(1, Qt::DisplayRole, QVariant(dataStrings[1].first));
+            m_widgetMap[VibePatt_amp]->setData(1, Qt::DisplayRole, QVariant(dataStrings[2].first));
+
 
             m_widgetMap[VibePatt_period]->setTextColor(1, m_zmqObject->getState(VibePatt_period)? Qt::darkGreen : Qt::red);
             m_widgetMap[VibePatt_freq]->setTextColor(1, m_zmqObject->getState(VibePatt_freq)? Qt::darkGreen : Qt::red);
