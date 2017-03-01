@@ -1,4 +1,4 @@
- #ifndef QCASUZMQ_H
+#ifndef QCASUZMQ_H
 #define QCASUZMQ_H
 
 #define findKey(l, k) (std::find(l.begin(),l.end(), k) != l.end())

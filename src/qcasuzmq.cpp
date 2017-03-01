@@ -326,7 +326,8 @@ void QCasuZMQ::messageReceived(const QList<QByteArray> &message)
             if(g_settings->value("log_on").toBool()){
                 m_logFile[device] << ";" << m_values.value(VibePatt_period).value
                                   << ";" << m_values.value(VibePatt_freq).value
-                                  << ";" << m_values.value(VibePatt_amp).value;
+                                  << ";" << m_values.value(VibePatt_amp).value
+                                  << ";" << m_state[VibePatt];
             }
         }
         emit updated(VibePatt);
