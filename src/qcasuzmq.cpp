@@ -185,7 +185,7 @@ void QCasuZMQ::messageReceived(const QList<QByteArray> &message)
 
     if(g_settings->value("log_on").toBool() && !m_logOpen[device]) openLogFile(device);
     if(!g_settings->value("log_on").toBool() && m_logOpen[device]) closeLogFile(device);
-    m_logFile[device] << (float) QDateTime::currentDateTime().toMSecsSinceEpoch() / 1000 ;
+    m_logFile[device] << QString::number(QDateTime::currentDateTime().toMSecsSinceEpoch() / 1000.0, 'f', 3) ;
 
     if (device == "IR"){
         AssisiMsg::RangeArray ranges;
