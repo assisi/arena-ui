@@ -185,7 +185,7 @@ void QCasuZMQ::messageReceived(const QList<QByteArray> &message)
 
     if(g_settings->value("log_on").toBool() && !m_logOpen[device]) openLogFile(device);
     if(!g_settings->value("log_on").toBool() && m_logOpen[device]) closeLogFile(device);
-    m_logFile[device] << QString::number(QDateTime::currentDateTime().toMSecsSinceEpoch() / 1000.0, 'f', 3) ;
+    m_logFile[device] << QString::number(QDateTime::currentDateTime().toMSecsSinceEpoch() / 1000.0, 'f', 3).toStdString() ;
 
     if (device == "IR"){
         AssisiMsg::RangeArray ranges;
@@ -197,7 +197,7 @@ void QCasuZMQ::messageReceived(const QList<QByteArray> &message)
             this->addToBuffer(m_IR_ARRAY[k], newData);
             emit updated(m_IR_ARRAY[k]);
             if(g_settings->value("log_on").toBool()){
-                m_logFile[device]<< ";" << newData.value;
+                m_logFile[device]<< " ; " << newData.value;
             }
         }
     }
@@ -211,7 +211,7 @@ void QCasuZMQ::messageReceived(const QList<QByteArray> &message)
             this->addToBuffer(m_TEMP_ARRAY[k], newData);
             emit updated(m_TEMP_ARRAY[k]);
             if(g_settings->value("log_on").toBool()){
-                m_logFile[device]<< ";" << newData.value;
+                m_logFile[device]<< " ; " << newData.value;
             }
         }
     }
@@ -230,8 +230,8 @@ void QCasuZMQ::messageReceived(const QList<QByteArray> &message)
             newData.value = vibrations.amplitude(k);
             m_values.insert(Amp, newData);
             if(g_settings->value("log_on").toBool()){
-                m_logFile[device] << ";" << m_values.value(Freq).value
-                                  << ";" << m_values.value(Amp).value;
+                m_logFile[device] << " ; " << m_values.value(Freq).value
+                                  << " ; " << m_values.value(Amp).value;
             }
         }
         for(; k < 2; k++){// Fill rest of values with zero
@@ -239,8 +239,8 @@ void QCasuZMQ::messageReceived(const QList<QByteArray> &message)
             m_values.insert(Freq, newData);
             m_values.insert(Amp, newData);
             if(g_settings->value("log_on").toBool()){
-                m_logFile[device] << ";" << m_values.value(Freq).value
-                                  << ";" << m_values.value(Amp).value;
+                m_logFile[device] << " ; " << m_values.value(Freq).value
+                                  << " ; " << m_values.value(Amp).value;
             }
         }
         emit updated(Freq);
@@ -254,8 +254,8 @@ void QCasuZMQ::messageReceived(const QList<QByteArray> &message)
         m_state[Peltier] = command == "On";
         emit updated(Peltier);
         if(g_settings->value("log_on").toBool()){
-            m_logFile[device] << ";" << m_values.value(Peltier).value
-                              << ";" << m_state[Peltier];
+            m_logFile[device] << " ; " << m_values.value(Peltier).value
+                              << " ; " << m_state[Peltier];
         }
      }
     if (device == "Airflow"){
@@ -267,8 +267,8 @@ void QCasuZMQ::messageReceived(const QList<QByteArray> &message)
         m_state[Airflow] = command == "On";
         emit updated(Airflow);
         if(g_settings->value("log_on").toBool()){
-            m_logFile[device] << ";" << m_values.value(Airflow).value
-                              << ";" << m_state[Airflow];
+            m_logFile[device] << " ; " << m_values.value(Airflow).value
+                              << " ; " << m_state[Airflow];
         }
      }
     if (device == "Speaker"){
@@ -285,9 +285,9 @@ void QCasuZMQ::messageReceived(const QList<QByteArray> &message)
         emit updated(Speaker_freq);
         emit updated(Speaker_amp);
         if(g_settings->value("log_on").toBool()){
-            m_logFile[device] << ";" << m_values.value(Speaker_freq).value
-                              << ";" << m_values.value(Speaker_amp).value
-                              << ";" << m_state[Speaker];
+            m_logFile[device] << " ; " << m_values.value(Speaker_freq).value
+                              << " ; " << m_values.value(Speaker_amp).value
+                              << " ; " << m_state[Speaker];
         }
     }
     if (device == "DiagnosticLed")
@@ -300,8 +300,8 @@ void QCasuZMQ::messageReceived(const QList<QByteArray> &message)
         m_state[LED] = command == "On";
         emit updated(LED);
         if(g_settings->value("log_on").toBool()){
-            m_logFile[device]<< ";" << m_ledColor.name().toStdString()
-                      << ";" << m_state[LED];
+            m_logFile[device]<< " ; " << m_ledColor.name().toStdString()
+                      << " ; " << m_state[LED];
         }
     }
     if (device == "VibrationPattern"){
@@ -324,10 +324,10 @@ void QCasuZMQ::messageReceived(const QList<QByteArray> &message)
             newData.value = vibrationPattern.vibe_amps(k);
             m_values.insert(VibePatt_amp, newData);
             if(g_settings->value("log_on").toBool()){
-                m_logFile[device] << ";" << m_values.value(VibePatt_period).value
-                                  << ";" << m_values.value(VibePatt_freq).value
-                                  << ";" << m_values.value(VibePatt_amp).value
-                                  << ";" << m_state[VibePatt];
+                m_logFile[device] << " ; " << m_values.value(VibePatt_period).value
+                                  << " ; " << m_values.value(VibePatt_freq).value
+                                  << " ; " << m_values.value(VibePatt_amp).value
+                                  << " ; " << m_state[VibePatt];
             }
         }
         emit updated(VibePatt);
