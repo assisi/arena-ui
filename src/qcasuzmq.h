@@ -43,6 +43,7 @@ namespace zmqData {
             zmqBuffer(QString casuName, dataType key);
             void insert(const double &key, const QCPData &value);
             void erase(QMap::iterator it);
+            void emitReplot();
             QString getLegendName() const;
             QString getCasuName() const;
             dataType getDataType() const;

@@ -140,14 +140,19 @@ void QCasuZMQ::closeLogFile(QString device)
 
 void QCasuZMQ::addToBuffer(dataType key, QCPData data)
 {
+    bool t_plot_to_update = false;
     if(m_buffers[key]->empty() || (data.key -  m_buffers[key]->lastKey())*1000 >g_settings->value("trendSampleTime_ms").toDouble()){
         m_buffers[key]->insert(data.key, data);
+        t_plot_to_update = true;
     }
     while(data.key - m_buffers[key]->firstKey() > QTime(0,0,0).secsTo(g_settings->value("trendTimeSpan").toTime())){
         m_buffers[key]->erase(m_buffers[key]->begin()); //Delete data older than $timeSpan
+        t_plot_to_update = true;
     }
 
-    emit updated(key);
+    if (t_plot_to_update){
+        m_buffers[key]->emitReplot();
+    }
 }
 
 void QCasuZMQ::connectZMQ()
@@ -195,7 +200,9 @@ void QCasuZMQ::messageReceived(const QList<QByteArray> &message)
             if( k == m_IR_ARRAY.size()) break;
             newData.value = ranges.raw_value(k);
             this->addToBuffer(m_IR_ARRAY[k], newData);
+            // ---- UPDATE ---- //
             emit updated(m_IR_ARRAY[k]);
+            // ---- LOG ---- //
             if(g_settings->value("log_on").toBool()){
                 m_logFile[device]<< " ; " << newData.value;
             }
@@ -209,7 +216,9 @@ void QCasuZMQ::messageReceived(const QList<QByteArray> &message)
             if( k == m_TEMP_ARRAY.size()) break;
             newData.value = temperatures.temp(k);
             this->addToBuffer(m_TEMP_ARRAY[k], newData);
+            // ---- UPDATE ---- //
             emit updated(m_TEMP_ARRAY[k]);
+            // ---- LOG ---- //
             if(g_settings->value("log_on").toBool()){
                 m_logFile[device]<< " ; " << newData.value;
             }
@@ -229,6 +238,7 @@ void QCasuZMQ::messageReceived(const QList<QByteArray> &message)
             m_values.insert(Freq, newData);
             newData.value = vibrations.amplitude(k);
             m_values.insert(Amp, newData);
+            // ---- LOG pt 1 ---- //
             if(g_settings->value("log_on").toBool()){
                 m_logFile[device] << " ; " << m_values.value(Freq).value
                                   << " ; " << m_values.value(Amp).value;
@@ -238,11 +248,13 @@ void QCasuZMQ::messageReceived(const QList<QByteArray> &message)
             newData.value = 0.0;
             m_values.insert(Freq, newData);
             m_values.insert(Amp, newData);
+            // ---- LOG pt 2 ---- //
             if(g_settings->value("log_on").toBool()){
                 m_logFile[device] << " ; " << m_values.value(Freq).value
                                   << " ; " << m_values.value(Amp).value;
             }
         }
+        // ---- UPDATE ---- //
         emit updated(Freq);
     }
     if (device == "Peltier"){
@@ -252,11 +264,13 @@ void QCasuZMQ::messageReceived(const QList<QByteArray> &message)
         m_lastDataTime[Peltier] = m_values.value(Peltier).key;
         m_values.replace(Peltier, newData);
         m_state[Peltier] = command == "On";
-        emit updated(Peltier);
+        // ---- LOG ---- //
         if(g_settings->value("log_on").toBool()){
             m_logFile[device] << " ; " << m_values.value(Peltier).value
                               << " ; " << m_state[Peltier];
         }
+        // ---- UPDATE ---- //
+        emit updated(Peltier);
      }
     if (device == "Airflow"){
         AssisiMsg::Airflow airflow;
@@ -265,11 +279,13 @@ void QCasuZMQ::messageReceived(const QList<QByteArray> &message)
         m_lastDataTime[Airflow] = m_values.value(Airflow).key;
         m_values.replace(Airflow, newData);
         m_state[Airflow] = command == "On";
-        emit updated(Airflow);
+        // ---- LOG ---- //
         if(g_settings->value("log_on").toBool()){
             m_logFile[device] << " ; " << m_values.value(Airflow).value
                               << " ; " << m_state[Airflow];
         }
+        // ---- UPDATE ---- //
+        emit updated(Airflow);
      }
     if (device == "Speaker"){
         AssisiMsg::VibrationSetpoint airflow;
@@ -282,13 +298,15 @@ void QCasuZMQ::messageReceived(const QList<QByteArray> &message)
         m_state[Speaker] = command == "On";
         m_state[Speaker_freq] = command == "On";
         m_state[Speaker_amp] = command == "On";
-        emit updated(Speaker_freq);
-        emit updated(Speaker_amp);
+        // ---- LOG ---- //
         if(g_settings->value("log_on").toBool()){
             m_logFile[device] << " ; " << m_values.value(Speaker_freq).value
                               << " ; " << m_values.value(Speaker_amp).value
                               << " ; " << m_state[Speaker];
         }
+        // ---- UPDATE ---- //
+        emit updated(Speaker_freq);
+        emit updated(Speaker_amp);
     }
     if (device == "DiagnosticLed")
     {
@@ -298,11 +316,13 @@ void QCasuZMQ::messageReceived(const QList<QByteArray> &message)
                           LEDcolor.color().green(),
                           LEDcolor.color().blue());
         m_state[LED] = command == "On";
-        emit updated(LED);
+        // ---- LOG ---- //
         if(g_settings->value("log_on").toBool()){
             m_logFile[device]<< " ; " << m_ledColor.name().toStdString()
                       << " ; " << m_state[LED];
         }
+        // ---- UPDATE ---- //
+        emit updated(LED);
     }
     if (device == "VibrationPattern"){
         AssisiMsg::VibrationPattern vibrationPattern;
@@ -330,6 +350,7 @@ void QCasuZMQ::messageReceived(const QList<QByteArray> &message)
                                   << " ; " << m_state[VibePatt];
             }
         }
+        // ---- UPDATE ---- //
         emit updated(VibePatt);
     }
 
@@ -366,12 +387,15 @@ zmqBuffer::zmqBuffer(QString casuName, dataType key) :
 void zmqBuffer::insert(const double &key, const QCPData &value)
 {
     this->QMap::insert(key, value);
-    emit updatePlot();
 }
 
 void zmqBuffer::erase(QMap::iterator it)
 {
     this->QMap::erase(it);
+}
+
+void zmqBuffer::emitReplot()
+{
     emit updatePlot();
 }
 
