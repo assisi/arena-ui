@@ -186,7 +186,7 @@ void QCasuZMQ::messageReceived(const QList<QByteArray> &message)
     std::string data(message.at(3).constData(), message.at(3).size());
 
     QCPData newData;
-    newData.key = (double) QTime(0,0,0).msecsTo(QTime::currentTime())/1000;
+    newData.key = QDateTime::currentDateTime().toMSecsSinceEpoch() / 1000.0;
 
     if(g_settings->value("log_on").toBool() && !m_logOpen[device]) openLogFile(device);
     if(!g_settings->value("log_on").toBool() && m_logOpen[device]) closeLogFile(device);
