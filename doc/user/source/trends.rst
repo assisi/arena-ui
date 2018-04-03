@@ -1,4 +1,5 @@
-.. _trends_link:
+
+.. trends:
 
 Displaying data trends
 ======================
@@ -27,7 +28,7 @@ through the **Settings** menu:
 Creating data trends
 --------------------
 
-To start trending some data, select the sensor names you are interested in
+To start showing some data trends, select the sensor names you are interested in
 from the **Casu data Configuration tab**, and bring up the context
 menu by *right-clicking* on one of the selected names. This will bring
 up a context menu with two options:
@@ -44,40 +45,26 @@ Monitoring and manipulating data trends
 
 Once you have created some trends, you can view an manipulate them
 from the **Trend graphs Configuration tab**. The following *mouse
-controls* are available for manipulating data trends:
+controls* are available for manipulating the trend graphs
 
-  Trend window viewport manipulation:
-    **Click + mouse drag**
-      Reposition graphs and stop realtime graph
-      adjusting (so you can study an area of interest)
-    **Ctrl + mouse scroll**
-      y-axis zoom
-    **Shift + mouse scroll**
-      x-axis zoom
-    **mouse scroll**
-      x-axis & y-axis zoom
-    **double click**
-      resume realtime graph adjusting
+* **Click + mouse drag** - reposition graph and stop realtime graph
+  adjusting (so you can study an area of interest)
+* **Ctrl + mouse scroll** - y-axis zoom
+* **Shift + mouse scroll** - x-axis zoom
+* **mouse scroll** - x-axis & y-axis zoom
+* **double click** - resume realtime graph adjusting
 
-  Graph selection:
-    **left mouse click**
-      Select single graph and deselect others
-    **Ctrl + left mouse click**
-      Toggle selection of single graph, while others are uneffected
-    *Graph selection works either by clicking on plotted graph or by clicking its representation in legend display*
+*Right-clicking* on one
+of the trends brings up a context menu with the following options:
 
-  Context menu *(right mouse click)*
-    **(Un)Dock from main window**
-      Depending on the current docking
-      state, the trend can either be docked or undocked.
-    **Hide/Show legend**
-      Allows toggling of legend display.
-    **Remove selected graphs**
-      The graphs that are selected, on current axis, are removed from the axis.
-    **Add graphs (selected in tree)**
-      Data that is currently selected
-      in the **Casu data Configuration tab** is added to the current axis.
-    **Save to pdf**
-      The current view is saved to a pdf document.
-    **Close trend**
-      Closes the trend.
+* **(Un)Dock from main window** - Depending on the current docking
+  state, the trend can either be docked or undocked;
+* **Hide/Show legend** - Allows toggling of legend display;
+* **Remove selected graphs** - The graph that is selected (by
+  *left-click* in the current axis) is removed from the axis;
+* **Add graphs (selected in tree)** - Data that is currently selected
+  in the **Casu data Configuration tab** is added to the current axis;
+* **Save to pdf** - The current view is saved to a pdf document (a
+  File save dialog is shown which enables the user to choose the
+  filename and location);
+* **Close trend** - Closes the trend;

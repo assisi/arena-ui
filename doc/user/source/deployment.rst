@@ -24,7 +24,7 @@ bottom part of the Deployment tab.
 Running controllers
 -------------------
 
-Controller run is performed by pressing on the *Run* button on the
+The controllers are run by pressing on the *Run* button on the
 **Deployment Configuration tab**, according to the contents of the
 loaded poject (`.assisi` file). The output can be monitored in the
 bottom part of the Deployment tab.
