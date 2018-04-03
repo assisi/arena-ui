@@ -11,40 +11,70 @@ QDialogSetpoint::QDialogSetpoint(QWidget *parent, QString command, QList<QGraphi
 {
     ui->setupUi(this);
 
-    bool groupSelected;
+    // Disable "OK" & "Apply" buttons if validation fails
+    connect(ui->value1, &QLineEdit::textEdited, [&](){
+        if (ui->value1->hasAcceptableInput()) {
+            ui->buttonBox->button(QDialogButtonBox::Ok)->setEnabled(true);
+            ui->buttonBox->button(QDialogButtonBox::Apply)->setEnabled(true);
+        } else {
+            ui->buttonBox->button(QDialogButtonBox::Ok)->setDisabled(true);
+            ui->buttonBox->button(QDialogButtonBox::Apply)->setDisabled(true);
+        }
+        // If command is "Vibration", we should also check second input field
+        if (m_command == "Vibration" && !ui->value2->hasAcceptableInput()){
+            ui->buttonBox->button(QDialogButtonBox::Ok)->setDisabled(true);
+            ui->buttonBox->button(QDialogButtonBox::Apply)->setDisabled(true);
+        }
+    });
+    connect(ui->value2, &QLineEdit::textEdited, [&](){
+        if (ui->value1->hasAcceptableInput() && ui->value2->hasAcceptableInput()) {
+            ui->buttonBox->button(QDialogButtonBox::Ok)->setEnabled(true);
+            ui->buttonBox->button(QDialogButtonBox::Apply)->setEnabled(true);
+        } else {
+            ui->buttonBox->button(QDialogButtonBox::Ok)->setDisabled(true);
+            ui->buttonBox->button(QDialogButtonBox::Apply)->setDisabled(true);
+        }
+    });
 
+    // Disable input fields if radio button is "OFF"
+    connect(ui->radioON, &QRadioButton::toggled, [&](bool state){
+        if(m_command != "IR Proximity") ui->value1->setEnabled(state);
+        if(m_command == "Vibration") ui->value2->setEnabled(state);
+    });
+
+    bool groupSelected;
     QCasuSceneItem *tempItem;
 
-    if(m_group.size() > 1){
+    if(m_group.size() > 1){ // if there is more than one child, it is a group
         groupSelected = true;
-    } else if(sCast(m_group.first())->isGroup()){
+    } else if(sCast(m_group.first())->isGroup()){ // if there is single child, ask if he is a group
             groupSelected = true;
         } else {
-        groupSelected = false;
-        tempItem = siCast(m_group.first());
+            groupSelected = false;
+            tempItem = siCast(m_group.first());
         }
 
-    this->setWindowTitle(command + " data to send to CASUs");
+    this->setWindowTitle(m_command + " data to send to CASUs");
 
     auto validator1 = new QDoubleValidator;
     auto validator2 = new QDoubleValidator;
     validator1->setNotation(QDoubleValidator::StandardNotation);
     validator2->setNotation(QDoubleValidator::StandardNotation);
 
-    if(command != "Vibration"){
+    if(m_command != "Vibration"){
         delete ui->text21;
         delete ui->text22;
         delete ui->value2;
-        if(command == "IR Proximity"){
+        if(m_command == "IR Proximity"){
             delete ui->text11;
             delete ui->text12;
             delete ui->value1;
         }
     }
 
-    if(command != "LED") delete ui->colorButton;
+    if(m_command != "LED") delete ui->colorButton;
 
-    if(command == "Temperature"){
+    if(m_command == "Temperature"){
         ui->text11->setText("Temperature setpoint:");
         ui->text12->setText("Allowed temperature range: [26,45]°C");
 
@@ -53,7 +83,7 @@ QDialogSetpoint::QDialogSetpoint(QWidget *parent, QString command, QList<QGraphi
 
         if(groupSelected) ui->value1->setText("26.00");
         else{
-            double temp = tempItem->getZmqObject()->getValue(Peltier);
+            double temp = tempItem->getZmqObject()->getLastValue(Peltier);
             if(temp > 26){
                 ui->value1->setText(QString::number(temp,'f',2));
             } else {
@@ -62,7 +92,7 @@ QDialogSetpoint::QDialogSetpoint(QWidget *parent, QString command, QList<QGraphi
         }
     }
 
-    if(command == "Vibration"){
+    if(m_command == "Vibration"){
         ui->text11->setText("Vibration frequency setpoint:");
         ui->text12->setText("Allowed frequency range: [50,1500]Hz");
         ui->text21->setText("Vibration amplitude setpoint:");
@@ -77,12 +107,12 @@ QDialogSetpoint::QDialogSetpoint(QWidget *parent, QString command, QList<QGraphi
             ui->value1->setText("500.00");
             ui->value2->setText("50.00");
         } else {
-            double temp1 = tempItem->getZmqObject()->getValue(Speaker_freq);
-            double temp2 = tempItem->getZmqObject()->getValue(Speaker_amp);
+            double temp1 = tempItem->getZmqObject()->getLastValue(Speaker_freq);
+            double temp2 = tempItem->getZmqObject()->getLastValue(Speaker_amp);
 
             if(temp1 >= 50){
                 ui->value1->setText(QString::number(temp1,'f',2));
-                ui->value1->setText(QString::number(temp2,'f',2));
+                ui->value2->setText(QString::number(temp2,'f',2));
             } else {
                 ui->value1->setText("500.00");
                 ui->value2->setText("50.00");
@@ -90,7 +120,7 @@ QDialogSetpoint::QDialogSetpoint(QWidget *parent, QString command, QList<QGraphi
         }
     }
 
-    if(command == "LED"){
+    if(m_command == "LED"){
         ui->text11->setText("Color:");
         ui->text12->setText("[hex #rrggbb], [hex #RRGGBB]");
         QRegularExpression re("^#([A-Fa-f0-9]{6})$");
@@ -98,7 +128,7 @@ QDialogSetpoint::QDialogSetpoint(QWidget *parent, QString command, QList<QGraphi
         ui->value1->setText("#7aba71");
     }
 
-    if(command == "Airflow"){
+    if(m_command == "Airflow"){
         ui->text11->setText("Intensity setpoint:");
         ui->text12->setText("Allowed intensity range: 1 (value is discarded)");
 
@@ -108,7 +138,7 @@ QDialogSetpoint::QDialogSetpoint(QWidget *parent, QString command, QList<QGraphi
 
         if(groupSelected) ui->value1->setText("1.00");
         else{
-            double temp = tempItem->getZmqObject()->getValue(Airflow);
+            double temp = tempItem->getZmqObject()->getLastValue(Airflow);
             if(temp > 1)
                 ui->value1->setText(QString::number(temp,'f',2));
             else
@@ -148,13 +178,6 @@ bool QDialogSetpoint::prepareMessage()
 {
     // First, clear the message
     m_message.clear();
-
-    if (m_command != "IR Proximity" && !ui->value1->hasAcceptableInput()){
-        return false;
-    }
-    if (m_command == "Vibration" && !ui->value2->hasAcceptableInput()){
-        return false;
-    }
 
     if(m_command == "Temperature"){
         AssisiMsg::Temperature temp;

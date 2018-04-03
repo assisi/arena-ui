@@ -23,8 +23,8 @@ QCasuTreeItem::QCasuTreeItem(QCasuZMQ *zmqObject) :
         tempWidget->addChild(new QNoSortTreeItem(QStringList("IR - B")));
         tempWidget->addChild(new QNoSortTreeItem(QStringList("IR - BR")));
         tempWidget->addChild(new QNoSortTreeItem(QStringList("IR - FR")));
-        for(int k = 0; k < m_IR_NUM; k++){
-            m_widgetMap.insert(dCast(k), tempWidget->child(k));
+        for(uint k = 0; k < m_IR_ARRAY.size(); k++){
+            m_widgetMap.insert(m_IR_ARRAY[k], tempWidget->child(k));
             tempWidget->child(k)->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled);
         }
         tempWidget->setFlags(Qt::ItemIsEnabled);
@@ -42,8 +42,8 @@ QCasuTreeItem::QCasuTreeItem(QCasuZMQ *zmqObject) :
         tempWidget->addChild(new QNoSortTreeItem(QStringList("Temp - PCB")));
         tempWidget->addChild(new QNoSortTreeItem(QStringList("Temp - RING")));
         tempWidget->addChild(new QNoSortTreeItem(QStringList("Temp - WAX")));
-        for(int k = 0; k < m_TEMP_NUM; k++){
-            m_widgetMap.insert(dCast(k + m_TEMP_START), tempWidget->child(k));
+        for(uint k = 0; k < m_TEMP_ARRAY.size(); k++){
+            m_widgetMap.insert(m_TEMP_ARRAY[k], tempWidget->child(k));
             tempWidget->child(k)->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled);
         }
         tempWidget->setFlags(Qt::ItemIsEnabled);
@@ -54,8 +54,8 @@ QCasuTreeItem::QCasuTreeItem(QCasuZMQ *zmqObject) :
         tempWidget = new QNoSortTreeItem(QStringList("Vibration"));
         tempWidget->addChild(new QNoSortTreeItem(QStringList("Frequency")));
         tempWidget->addChild(new QNoSortTreeItem(QStringList("Amplitude")));
-        for(int k = 0; k < 2; k++){
-            m_widgetMap.insert(dCast(k + m_VIBR_START), tempWidget->child(k));
+        for(uint k = 0; k < m_VIBE_ARRAY.size(); k++){
+            m_widgetMap.insert(m_VIBE_ARRAY[k], tempWidget->child(k));
             tempWidget->setFlags(Qt::ItemIsEnabled);
         }
         tempWidget->setFlags(Qt::ItemIsEnabled);
@@ -69,13 +69,21 @@ QCasuTreeItem::QCasuTreeItem(QCasuZMQ *zmqObject) :
         tempWidget->addChild(new QNoSortTreeItem(QStringList("Speaker")));
         tempWidget->child(2)->addChild(new QNoSortTreeItem(QStringList("Frequency")));
         tempWidget->child(2)->addChild(new QNoSortTreeItem(QStringList("Amplitude")));
-        for(int k = 0; k < 2; k++){
-            m_widgetMap.insert(dCast(k + m_SETPOINT_START), tempWidget->child(k));
+        tempWidget->addChild(new QNoSortTreeItem(QStringList("VibrationPattern")));
+        tempWidget->child(3)->addChild(new QNoSortTreeItem(QStringList("Period")));
+        tempWidget->child(3)->addChild(new QNoSortTreeItem(QStringList("Frequency")));
+        tempWidget->child(3)->addChild(new QNoSortTreeItem(QStringList("Amplitude")));
+        for(uint k = 0; k < m_SETPOINT_ARRAY.size(); k++){
+            m_widgetMap.insert(m_SETPOINT_ARRAY[k], tempWidget->child(k));
             tempWidget->child(k)->setFlags(Qt::ItemIsEnabled);
         }
-        for(int k = 0; k < 2; k++){
-            m_widgetMap.insert(dCast(k + m_SETPOINT_START + 3), tempWidget->child(2)->child(k));
-            tempWidget->child(k)->setFlags(Qt::ItemIsEnabled);
+        for(uint k = 0; k < m_SPEAKER_ARRAY.size(); k++){
+            m_widgetMap.insert(m_SPEAKER_ARRAY[k], tempWidget->child(2)->child(k));
+            tempWidget->child(2)->child(k)->setFlags(Qt::ItemIsEnabled);
+        }
+        for(uint k = 0; k < m_VIBEPATT_ARRAY.size(); k++){
+            m_widgetMap.insert(m_VIBEPATT_ARRAY[k], tempWidget->child(3)->child(k));
+            tempWidget->child(3)->child(k)->setFlags(Qt::ItemIsEnabled);
         }
         tempWidget->setFlags(Qt::ItemIsEnabled);
         addChild(tempWidget);
@@ -91,16 +99,50 @@ QCasuTreeItem::QCasuTreeItem(QCasuZMQ *zmqObject) :
             m_widgetMap[key]->setTextColor(1, m_zmqObject->getLedColor());
             return;
         }
-        if(key == dCast(m_VIBR_START)){
-            QString temp_freq = QString::number(roundF2D(m_zmqObject->getValue(Freq1))) + " " + QString::number(roundF2D(m_zmqObject->getValue(Freq2)));
-            QString temp_amp = QString::number(roundF2D(m_zmqObject->getValue(Amp2))) + " " + QString::number(roundF2D(m_zmqObject->getValue(Amp2)));
-            m_widgetMap[Freq1]->setData(1, Qt::DisplayRole, QVariant(temp_freq));
-            m_widgetMap[Amp1]->setData(1, Qt::DisplayRole, QVariant(temp_amp));
+        auto makeString = [&](dataType key){
+                QString temp;
+                int lastSize;
+                for(auto &item : m_zmqObject->getLastValuesList(key)){
+                    temp = QString::number((int)item.value)+ "\t" + temp;
+                    lastSize = QString::number((int)item.value).size();
+                }
+                temp.chop(1);
+                return std::pair<QString, int>(temp, lastSize);
+            };
+        if(key == Freq){
+            std::vector<std::pair<QString,int>> dataStrings = {makeString(Freq), makeString(Amp)};
+
+            // padding last values to left justify last column
+            int max_size = dataStrings[0].second > dataStrings[1].second ? dataStrings[0].second : dataStrings[1].second;
+            for(auto& item : dataStrings)
+                item.first = item.first.leftJustified(item.first.lastIndexOf('\t') + max_size);
+
+            m_widgetMap[Freq]->setData(1, Qt::DisplayRole, QVariant(dataStrings[0].first));
+            m_widgetMap[Amp]->setData(1, Qt::DisplayRole, QVariant(dataStrings[1].first));
             return;
         }
-        m_widgetMap[key]->setData(1, Qt::DisplayRole, QVariant(m_zmqObject->getValue(key)));
-        if(key >= m_SETPOINT_START){
-            m_widgetMap[key]->setTextColor(1, m_zmqObject->getState(key)? Qt::green : Qt::red);
+        if(key == VibePatt){
+            std::vector<std::pair<QString,int>> dataStrings = {makeString(VibePatt_period), makeString(VibePatt_freq), makeString(VibePatt_amp)};
+
+            // padding last values to left justify last column
+            int max_size = dataStrings[0].second > dataStrings[1].second ? dataStrings[0].second : dataStrings[1].second;
+                max_size = dataStrings[2].second > max_size              ? dataStrings[2].second : max_size;
+            for(auto& item : dataStrings)
+                item.first = item.first.leftJustified(item.first.lastIndexOf('\t') + max_size);
+
+            m_widgetMap[VibePatt_period]->setData(1, Qt::DisplayRole, QVariant(dataStrings[0].first));
+            m_widgetMap[VibePatt_freq]->setData(1, Qt::DisplayRole, QVariant(dataStrings[1].first));
+            m_widgetMap[VibePatt_amp]->setData(1, Qt::DisplayRole, QVariant(dataStrings[2].first));
+
+
+            m_widgetMap[VibePatt_period]->setTextColor(1, m_zmqObject->getState(VibePatt_period)? Qt::darkGreen : Qt::red);
+            m_widgetMap[VibePatt_freq]->setTextColor(1, m_zmqObject->getState(VibePatt_freq)? Qt::darkGreen : Qt::red);
+            m_widgetMap[VibePatt_amp]->setTextColor(1, m_zmqObject->getState(VibePatt_amp)? Qt::darkGreen : Qt::red);
+            return;
+        }
+        m_widgetMap[key]->setData(1, Qt::DisplayRole, QVariant(m_zmqObject->getLastValue(key)));
+        if(findKey(m_DATA_SETPOINT,key)){
+            m_widgetMap[key]->setTextColor(1, m_zmqObject->getState(key)? Qt::darkGreen : Qt::red);
         }
     });
 }

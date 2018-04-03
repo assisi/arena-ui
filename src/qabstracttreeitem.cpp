@@ -19,8 +19,8 @@ void QAbstractTreeItem::setSceneItem(QGraphicsItem *sceneItem)
 bool QAbstractTreeItem::isChildSelected() const
 {
     bool childSelected = false;
-    for(int k = 0; k < m_IR_NUM + m_TEMP_NUM; k++){
-        childSelected |= m_widgetMap[dCast(k)]->isSelected();
+    for(auto &key : m_DATA_BUFFERS){
+        childSelected |= m_widgetMap[key]->isSelected();
     }
     return childSelected;
 }
@@ -28,9 +28,9 @@ bool QAbstractTreeItem::isChildSelected() const
 QList<zmqBuffer *> QAbstractTreeItem::getBuffers() const
 {
     QList<zmqBuffer *> outList;
-    for(int k = 0; k < m_IR_NUM + m_TEMP_NUM; k++){
-        if(m_widgetMap[dCast(k)]->isSelected()){
-            outList.append((sCast(m_sceneItem))->getBuffers(dCast(k)));
+    for(auto &key : m_DATA_BUFFERS){
+        if(m_widgetMap[key]->isSelected()){
+            outList.append((sCast(m_sceneItem))->getBuffers(key));
         }
     }
     return outList;

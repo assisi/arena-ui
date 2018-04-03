@@ -22,18 +22,36 @@ QDialogSetpointVibePattern::QDialogSetpointVibePattern(QWidget *parent, const QL
 
     // TODO: Set input limit info programatically
 
-    // TODO: Initialize lineEdit box values with current setpoints
-    // (requires the resolution of Issue #96)
-    QCasuSceneItem *tempItem = NULL;
+    bool isSingleCASU;
+    QCasuSceneItem *tempItem;
 
-    if (!isGroup(group))
-    {
-        tempItem = siCast(group.first());
+    if(m_group.size() > 1){ // if there is more than one child, it is a group
+        isSingleCASU = false;
+    } else if(sCast(m_group.first())->isGroup()){ // if there is single child, ask if he is a group
+            isSingleCASU = false;
+        } else {
+            isSingleCASU = true;
+            tempItem = siCast(m_group.first());
+        }
+
+    if(isSingleCASU && tempItem->getZmqObject()->getLastValuesList(zmqData::VibePatt_freq).size()){
+        QString temp_period;
+        QString temp_freq;
+        QString temp_amp;
+        for(auto& item : tempItem->getZmqObject()->getLastValuesList(zmqData::VibePatt_period))
+            temp_period = QString::number(item.value) + ", " + temp_period;
+        for(auto& item : tempItem->getZmqObject()->getLastValuesList(zmqData::VibePatt_freq))
+            temp_freq = QString::number(item.value) + ", " + temp_freq;
+        for(auto& item : tempItem->getZmqObject()->getLastValuesList(zmqData::VibePatt_amp))
+            temp_amp = QString::number(item.value) + ", " + temp_amp;
+        temp_period.chop(2);
+        temp_freq.chop(2);
+        temp_amp.chop(2);
+
+        ui->lineEdit_periods->setText(temp_period);
+        ui->lineEdit_frequencies->setText(temp_freq);
+        ui->lineEdit_amplitudes->setText(temp_amp);
     }
-
-    // TODO: Initialize dialog with current setpoints if only one CASU is selected
-    // TODO: Initialize dialog with defaults if group is selected
-
 }
 
 QDialogSetpointVibePattern::~QDialogSetpointVibePattern()
@@ -191,7 +209,7 @@ void QDialogSetpointVibePattern::on_radioButton_off_clicked(void)
 
 void QDialogSetpointVibePattern::on_radioButton_on_clicked(void)
 {
-    this->ui->lineEdit_periods->setDisabled(false);
-    this->ui->lineEdit_frequencies->setDisabled(false);
-    this->ui->lineEdit_amplitudes->setDisabled(false);
+    this->ui->lineEdit_periods->setEnabled(true);
+    this->ui->lineEdit_frequencies->setEnabled(true);
+    this->ui->lineEdit_amplitudes->setEnabled(true);
 }

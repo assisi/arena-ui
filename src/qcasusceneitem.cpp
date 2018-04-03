@@ -73,12 +73,12 @@ void QCasuSceneItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *op
 
     //paint IR sensor readings
     if(g_settings->value("IR_on").toBool()){
-        for(int k = 0; k < m_IR_NUM; k++){
+        for(uint k = 0; k < m_IR_ARRAY.size(); k++){
             brush.setColor(Qt::black);
             painter->setBrush(brush);
             double tempIR;
 
-            if (m_zmqObject->isConnected()) tempIR = m_zmqObject->getValue(dCast(k)) / 65536;
+            if (m_zmqObject->isConnected()) tempIR = m_zmqObject->getLastValue(m_IR_ARRAY[k]) / 65536;
             else tempIR = 0;
             painter->drawPie(QIRTriangle(m_coordinates, m_yaw + k*60, tempIR), (m_yaw + k*60 - 25)*16, 50*16); // 0° is at 3 o'clock, ccw direction
         }
@@ -88,7 +88,7 @@ void QCasuSceneItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *op
     if(g_settings->value("temp_on").toBool()){
         for(int k = 0; k < 4; k++){
             if(m_zmqObject->isConnected()){
-                double tempTemp = m_zmqObject->getValue(dCast(6 + k));
+                double tempTemp = m_zmqObject->getLastValue(m_TEMP_ARRAY[k]);
                 // temperature range is from 22 - 42 C°
                 if (tempTemp > 42) tempTemp = 42;
                 if (tempTemp < 22) tempTemp = 22;
@@ -147,13 +147,13 @@ void QCasuSceneItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *op
 
     //paint airflow marker
     if(g_settings->value("air_on").toBool() && m_zmqObject->isConnected() && m_zmqObject->getState(Airflow)){
-        double value = m_zmqObject->getValue(Airflow);
+        double value = m_zmqObject->getLastValue(Airflow);
 
         pen.setColor(Qt::transparent);
         brush.setColor(QColor(250, 218, 94, 96));
         painter->setPen(pen);
         painter->setBrush(brush);
-        // 30 FPS, max_speed = 6 deg/frame -> w = 0.5 rpm
+        // 30 FPS, max_speed = 6 deg/frame -> w = 0.5 rps
         // CURRENTLY THERE IS ONLY ONE INTENSITY, WHEN INTESITY RANGE WILL BE ENABLED, MAX_SPEED SHOULD BE 12
         m_airflowAngle = fmod(m_airflowAngle + value * 6 * FPSrepaint, 360);
         painter->drawPath(QPetal(m_coordinates, m_airflowAngle));       // petal 1
@@ -163,8 +163,11 @@ void QCasuSceneItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *op
 
     //paint vibration marker
     if(g_settings->value("vibr_on").toBool() && m_zmqObject->isConnected() && m_zmqObject->getState(Speaker)){
-        double freq = m_zmqObject->getValue(Freq1);
-        double amplitude = m_zmqObject->getValue(Amp1);
+        double freq = 0;
+        double amplitude = 1;
+        if(m_zmqObject->getLastValuesList(Freq).size())
+            freq = m_zmqObject->getLastValuesList(Freq).last().value;
+            //amplitude = m_zmqObject->getLastValuesList(Amp).last().value;
 
         pen.setColor(QColor(255,255,255,96));
         pen.setWidth(2);
@@ -172,8 +175,8 @@ void QCasuSceneItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *op
         brush.setColor(Qt::transparent);
         painter->setPen(pen);
         painter->setBrush(brush);
-        // 30 FPS, max_speed = 12 deg/frame -> w = 1 rpm
-        m_vibrAngle = fmod(m_vibrAngle - amplitude/50* 12*FPSrepaint, 360);
+        // 30 FPS, speed = 18 deg/frame -> w = 1.5 rps
+        m_vibrAngle = fmod(m_vibrAngle - amplitude* 18 *FPSrepaint, 360);
         // wawesNum = [6 .. 15]
         int wawesNum = 6+9*freq/1500;
         auto tempItem = std::move(QVibratingCircle(m_coordinates, wawesNum, m_vibrAngle));

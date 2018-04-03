@@ -17,6 +17,7 @@ Contents:
 
    install
    basics
+   treeview
    trends
    deployment
    logging

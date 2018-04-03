@@ -1,7 +1,7 @@
 #ifndef QCASUZMQ_H
 #define QCASUZMQ_H
 
-#define dCast static_cast<zmqData::dataType>
+#define findKey(l, k) (std::find(l.begin(),l.end(), k) != l.end())
 
 #include <QObject>
 #include <QTime>
@@ -17,17 +17,20 @@
 namespace zmqData {
     enum dataType {IR_F, IR_FL, IR_BL, IR_B, IR_BR, IR_FR, // m_IR_num = 6
         Temp_F, Temp_L, Temp_B, Temp_R, Temp_Top, Temp_Pcb, Temp_Ring, Temp_Wax, // m_Temp_num = 8
-        Freq1, Amp1, Freq2, Amp2, // m_vibr_num = 4
-        Peltier, Airflow, Speaker, Speaker_freq, Speaker_amp, LED};
+        Freq, Amp, // m_vibr_num = 2
+        Peltier, Airflow, Speaker, VibePatt, Speaker_freq, Speaker_amp, VibePatt_period, VibePatt_freq, VibePatt_amp,  LED};
 
-    const static int m_TEMP_START = 6;
-    const static int m_VIBR_START = 14;
-    const static int m_SETPOINT_START = 18;
+    const static std::vector<dataType> m_IR_ARRAY = {IR_F, IR_FL, IR_BL, IR_B, IR_BR, IR_FR};
+    const static std::vector<dataType> m_TEMP_ARRAY = {Temp_F, Temp_L, Temp_B, Temp_R, Temp_Top, Temp_Pcb, Temp_Ring, Temp_Wax};
+    const static std::vector<dataType> m_VIBE_ARRAY = {Freq, Amp};
+    const static std::vector<dataType> m_SETPOINT_ARRAY = {Peltier, Airflow, Speaker, VibePatt};
+    const static std::vector<dataType> m_SPEAKER_ARRAY = {Speaker_freq, Speaker_amp};
+    const static std::vector<dataType> m_VIBEPATT_ARRAY = {VibePatt_period, VibePatt_freq, VibePatt_amp};
 
-    const static int m_IR_NUM = 6;
-    const static int m_TEMP_NUM = 8;
-    const static int m_VIBR_NUM = 4;
-    const static int m_DATATYPE_NUM = 24;
+    const static std::vector<dataType> m_DATA_BUFFERS = {IR_F, IR_FL, IR_BL, IR_B, IR_BR, IR_FR,
+                                                         Temp_F, Temp_L, Temp_B, Temp_R, Temp_Top, Temp_Pcb, Temp_Ring, Temp_Wax,};
+    const static std::vector<dataType> m_DATA_SETPOINT = {Peltier, Airflow, Speaker, VibePatt, Speaker_freq,
+                                                         Speaker_amp, VibePatt_period, VibePatt_freq, VibePatt_amp,  LED};
 
     class zmqBuffer : public QObject, public QCPDataMap
         {
@@ -40,6 +43,7 @@ namespace zmqData {
             zmqBuffer(QString casuName, dataType key);
             void insert(const double &key, const QCPData &value);
             void erase(QMap::iterator it);
+            void emitReplot();
             QString getLegendName() const;
             QString getCasuName() const;
             dataType getDataType() const;
@@ -57,7 +61,8 @@ public:
     explicit QCasuZMQ(QObject *parent = 0, QString casuName = QString());
 
     zmqData::zmqBuffer* getBuffer(zmqData::dataType key) const;
-    double getValue(zmqData::dataType key) const;
+    double getLastValue(zmqData::dataType key) const;
+    QList<QCPData> getLastValuesList(zmqData::dataType key) const;
     QColor getLedColor() const;
     bool getState(zmqData::dataType key) const;
     int getAvgSamplingTime() const;
@@ -85,7 +90,7 @@ private:
     QTimer* m_connectionTimer;
 
     QMap<zmqData::dataType, zmqData::zmqBuffer*> m_buffers;
-    QMap<zmqData::dataType, QCPData> m_values;
+    QMultiMap<zmqData::dataType, QCPData> m_values;
     QMap<zmqData::dataType, double> m_lastDataTime;
     QMap<zmqData::dataType, bool> m_state;
     QColor m_ledColor;

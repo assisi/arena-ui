@@ -10,48 +10,73 @@ Global options
 
 Global options affecting logging, such as *Always on on startup* and
 the *Log save folder location* where all logs are saved can be
-configured from the **Settings** dialog. A new subfolder, named after
+configured from the **Settings** dialog.
+
+Log folder topology
+-------------------
+
+A new subfolder, named after
 the `YY-MM-DD` pattern is created inside the Log save folder location when the
-first experiment of the day is run. A log file is created for every
-connected CASU, named after the pattern
-`YY-MM-DD-HH-MM_casuname.log`. The same file is used as long as the
-Arena UI is not restarted.
+first experiment of the day is run. A log folder is created for every
+connected CASU with its name. Inside every CASU folder are separate folders for each device where every new logging session creates individual file whose name indicates timestamp when that session stared `YY-MM-DD_HH-MM.log`.
+
+ |  **Log folder**
+ |    **YY-MM-DD** #1
+ |        **casu-001**
+ |            **Airflow**
+ |                *YY-MM-DD_HH-MM.log* #1
+ |                *YY-MM-DD_HH-MM.log* #2
+ |                ...
+ |            **Fft**
+ |                *YY-MM-DD_HH-MM.log* #1
+ |                *YY-MM-DD_HH-MM.log* #2
+ |            ...
+ |        **casu-002**
+ |            **Airflow**
+ |            ...
+ |        ...
+ |    **YY-MM-DD** #2
+ |        **casu-001**
+ |        ...
+ |    ...
 
 Log file format
 ---------------
 
 The log file is a `.csv` file where each row has the following format:
 
-+----------+-----------+--------+-----+--------+
-| DeviceID | Timestamp | Value1 | ... | ValueN |
-+----------+-----------+--------+-----+--------+
+    =========== ======== ===== ======
+    Timestamp ; Value1 ; ... ; ValueN
+    =========== ======== ===== ======
 
-Proximity sensor readings
-~~~~~~~~~~~~~~~~~~~~~~~~~
+**Proximity sensor readings**
+ |    Subfolder: **IR**
+ |    Values: *IR_F, IR_FL, IR_BL, IR_B, IR_BR, IR_FR*
 
-IR 6x
+**Temperature sensor readings**
+ |    Subfolder: **Temp**
+ |    Values: *Temp_F, Temp_L, Temp_B, Temp_R, Temp_Top, Temp_Pcb, Temp_Ring, Temp_Wax*
 
-Accelerometer readings
-~~~~~~~~~~~~~~~~~~~~~~
+**Vibration readings** (1st & 2nd Fft harmonics)
+ |    Subfolder: **Fft**
+ |    Values(2x): *Freq, Amp*
 
-Acc 1x
+**Peltier setpoint**
+ |    Subfolder: **Peltier**
+ |    Values: *Temp, State*
 
-Temperature sensor readings
-~~~~~~~~~~~~~~~~~~~~~~~~~~~
+**Speaker setpoint** (vibration)
+ |    Subfolder: **Speaker**
+ |    Values: *Freq, Amp, State*
 
-Temp 4x
+**Airflow setpoint**
+ |    Subfolder: **Airflow**
+ |    Values: *Intensity, State*
 
-Peltier setpoint
-~~~~~~~~~~~~~~~~
+**Diagnostic LED setpoint**
+ |    Subfolder: **DiagnosticLed**
+ |    Values: *color* [hex RRGGBB]
 
-Peltier 1x
-
-Speaker setpoint
-~~~~~~~~~~~~~~~~
-
-Speaker 2x (freq, amp?)
-
-Airflow setpoint
-~~~~~~~~~~~~~~~~
-
-Airflow 1x
+**Vibration pattern setpoint** (N segments)
+ |    Subfolder: **VibrationPattern**
+ |    Values(Nx): *Period, Freq, Amp, State*

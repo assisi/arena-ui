@@ -41,6 +41,7 @@ public:
      */
     QNoSortTreeItem(Params&&... params) : QTreeWidgetItem(std::forward<Params>(params)...) {
         setTextAlignment(1, Qt::AlignRight);
+        setFont(1, QFontDatabase::systemFont(QFontDatabase::FixedFont));
     }
     /*!
      * \brief reimplemented operator <
