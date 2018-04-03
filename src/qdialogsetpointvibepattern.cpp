@@ -7,10 +7,14 @@
 #include "qdialogsetpointvibepattern.h"
 #include "ui_qdialogsetpointvibepattern.h"
 
-#include "utils.h"
 #include "qcasusceneitem.h"
 #include "qcasutreeitem.h"
 #include "dev_msgs.pb.h"
+
+template <typename T>
+bool isInBounds(const T& value, const T& low, const T& high){
+    return !(value < low) && !(value > high);
+}
 
 
 QDialogSetpointVibePattern::QDialogSetpointVibePattern(QWidget *parent, const QList<QGraphicsItem *>& group) :
