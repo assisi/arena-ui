@@ -40,8 +40,9 @@ QTrendPlot::QTrendPlot(QTreeWidget* tree1,QTreeWidget* tree2 , QWidget *parent) 
    customPolicy.setHeightForWidth(true);
    setSizePolicy(customPolicy);
 
-   xAxis->setTickLabelType(QCPAxis::ltDateTime);
-   xAxis->setDateTimeFormat(QString("hh:mm:ss"));
+   QSharedPointer<QCPAxisTickerDateTime> dateTimeTicker(new QCPAxisTickerDateTime);
+   dateTimeTicker->setDateTimeFormat("hh:mm:ss");
+   xAxis->setTicker(dateTimeTicker);
 
    setInteractions(QCP::iRangeDrag | QCP::iRangeZoom | QCP::iSelectLegend | QCP::iSelectPlottables | QCP::iMultiSelect);
 
@@ -74,7 +75,8 @@ QTrendPlot::QTrendPlot(QTreeWidget* tree1,QTreeWidget* tree2 , QWidget *parent) 
            auto item = legend->itemWithPlottable(graph(k));
            if (item->selected() || graph(k)->selected()){
              item->setSelected(true);
-             graph(k)->setSelected(true);
+             //graph(k)->setSelected(true);
+             //TODO: qcp
            }
          }
    });
@@ -82,7 +84,7 @@ QTrendPlot::QTrendPlot(QTreeWidget* tree1,QTreeWidget* tree2 , QWidget *parent) 
    connect(this,&QTrendPlot::beforeReplot,this,&QTrendPlot::prettyPlot);
 }
 
-void QTrendPlot::addGraph(zmqBuffer *buffer){
+void QTrendPlot::addGraph(QSharedPointer<zmqBuffer> buffer){
     for(int k=0; k<graphCount(); k++){
         if (!QString::compare(graph(k)->name(), buffer->getLegendName())) return;
     }
@@ -103,18 +105,18 @@ void QTrendPlot::addGraph(zmqBuffer *buffer){
         }
     }
     // NOTE: QCustomPlot::replot() has default value
-    connect(buffer, &zmqBuffer::updatePlot, [&](){ replot(); });
+    connect(buffer.data(), &zmqBuffer::updatePlot, [&](){ replot(); });
     m_connectionMap.insert(graph(), buffer);
 }
 
-void QTrendPlot::addGraphList(QList<zmqBuffer *> &bufferList)
+void QTrendPlot::addGraphList(QList<QSharedPointer<zmqBuffer> > &bufferList)
 {    
     bool new_trend = true;
     if(graphCount()) new_trend = false;
 
     // even though bufferList is QList by reference, these changes are positive on whole QList
     bufferList = bufferList.toSet().toList(); //remove duplicates
-    qSort(bufferList.begin(),bufferList.end(),[](zmqBuffer *b1, zmqBuffer *b2){
+    qSort(bufferList.begin(),bufferList.end(),[](QSharedPointer<zmqBuffer> b1, QSharedPointer<zmqBuffer> b2){
         return QString::compare(b1->getLegendName(), b2->getLegendName()) < 0;
     }); //sort by legend name
 
@@ -126,24 +128,25 @@ void QTrendPlot::addGraphList(QList<zmqBuffer *> &bufferList)
         rescaleAxes();
         if(yAxis->range().size() < 5)yAxis->setRange(yAxis->range().center(), 5, Qt::AlignCenter);
         if(graph()->data()->isEmpty())xAxis->setRange(QTime(0,0,0).msecsTo(QTime::currentTime()) /1000, 60, Qt::AlignRight);
-        else xAxis->setRange(graph()->data()->lastKey(), 60, Qt::AlignRight);
+        //else xAxis->setRange(graph()->data()->lastKey(), 60, Qt::AlignRight);
+        //TODO: qcp
     }
 }
 
 void QTrendPlot::removeGraph(QCPGraph *graph){
     QCustomPlot::removeGraph(graph);
-    disconnect(m_connectionMap[graph],0,this,0);
+    disconnect(m_connectionMap[graph].data(),0,this,0);
     m_connectionMap.remove(graph);
 }
 
-zmqBuffer *QTrendPlot::link(QCPGraph *graph)
+QSharedPointer <zmqData::zmqBuffer> QTrendPlot::link(QCPGraph *graph)
 {
     return m_connectionMap[graph];
 }
 
 void QTrendPlot::addSelectedGraphs(){
 
-    QList<zmqBuffer *> bufferList;
+    QList<QSharedPointer <zmqData::zmqBuffer> > bufferList;
 
     for(int k=0; k < casuTree->topLevelItemCount(); k++)
         bufferList.append(tCast(casuTree->topLevelItem(k))->getBuffers());
@@ -165,14 +168,15 @@ void QTrendPlot::prettyPlot()
         auto yRange = yAxis->range();
         auto xRange = xAxis->range();
 
-        QCPData temp;
+        QCPGraphData temp;
         temp.key = 0;
 
         for(int k = 0; k < graphCount();k++){
-            QCPDataMap* tempMap = graph(k)->data();
+            QSharedPointer<QCPGraphDataContainer> tempMap = graph(k)->data();
             if(tempMap->isEmpty()) continue;
-            double tempKey = tempMap->lastKey();
-            if(k==0 || temp.key < tempKey) temp = tempMap->find(tempKey).value();
+            //double tempKey = tempMap->lastKey();
+            //if(k==0 || temp.key < tempKey) temp = tempMap->find(tempKey).value();
+            //TODO: qcp
         }
         if(!temp.key) return;
 

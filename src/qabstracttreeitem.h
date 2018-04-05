@@ -25,7 +25,7 @@ public:
 
     //Public virtual methods
     virtual bool isChildSelected() const;
-    virtual QList<zmqData::zmqBuffer *> getBuffers() const;
+    virtual QList<QSharedPointer<zmqData::zmqBuffer> > getBuffers() const;
 };
 
 /*!

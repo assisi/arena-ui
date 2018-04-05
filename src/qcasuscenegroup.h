@@ -25,7 +25,7 @@ public:
     explicit QCasuSceneGroup() = default;
 
     bool isGroup() const Q_DECL_OVERRIDE;
-    QList<zmqData::zmqBuffer *> getBuffers(zmqData::dataType key) const Q_DECL_OVERRIDE;
+    QList<QSharedPointer <zmqData::zmqBuffer> > getBuffers(zmqData::dataType key) const Q_DECL_OVERRIDE;
     QVector<QPointF> getCoordinateVector() const Q_DECL_OVERRIDE;
     void sendSetpoint(const QList<QByteArray> &message) const Q_DECL_OVERRIDE;
     void setGroupColor(const QColor &color) Q_DECL_OVERRIDE;

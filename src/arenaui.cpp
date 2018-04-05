@@ -374,7 +374,7 @@ void ArenaUI::on_actionOpenArena_triggered()
         for(int k = 0; k < tempSize; k++){
             loadSession.setArrayIndex(k);
             int graphSize = loadSession.beginReadArray("graph");
-            QList<zmqBuffer *> toAdd;
+            QList<QSharedPointer <zmqData::zmqBuffer> > toAdd;
 
             for(int i = 0; i < graphSize; i++){
                 loadSession.setArrayIndex(i);
@@ -474,7 +474,7 @@ void ArenaUI::on_actionPlot_selected_in_same_trend_triggered()
 
 void ArenaUI::on_actionPlot_selected_in_different_trends_triggered()
 {
-    QList<zmqBuffer *> bufferList;
+    QList<QSharedPointer <zmqData::zmqBuffer> > bufferList;
 
     for(int k=0; k < ui->casuTree->topLevelItemCount(); k++){
         bufferList.append(tCast(ui->casuTree->topLevelItem(k))->getBuffers());
@@ -484,7 +484,7 @@ void ArenaUI::on_actionPlot_selected_in_different_trends_triggered()
     }
 
     for(auto& buffer : bufferList){
-        QList<zmqBuffer*> tempList;
+        QList<QSharedPointer <zmqData::zmqBuffer> > tempList;
         tempList.append(buffer);
 
         auto tempWidget = new QTrendPlot(ui->casuTree, ui->groupTree);

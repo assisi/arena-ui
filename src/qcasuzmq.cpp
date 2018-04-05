@@ -7,7 +7,7 @@ QCasuZMQ::QCasuZMQ(QObject *parent, QString casuName) :
     m_name(casuName)
 {
     for(uint k = 0; k < m_DATA_BUFFERS.size(); k++){
-        m_buffers.insert(m_DATA_BUFFERS[k], new zmqBuffer(m_name, m_DATA_BUFFERS[k]));
+        m_buffers.insert(m_DATA_BUFFERS[k], QSharedPointer<zmqBuffer>::create(m_name, m_DATA_BUFFERS[k]));
     }
     for(uint k = 0; k < m_DATA_SETPOINT.size(); k++){
         m_state.insert(m_DATA_SETPOINT[k], false);
@@ -28,24 +28,24 @@ QCasuZMQ::QCasuZMQ(QObject *parent, QString casuName) :
     });
 }
 
-zmqBuffer *QCasuZMQ::getBuffer(dataType key) const
+QSharedPointer <zmqData::zmqBuffer> QCasuZMQ::getBuffer(dataType key) const
 {
-    if (findKey(m_DATA_BUFFERS, key)) return m_buffers[key];
-    return 0;
+    return m_buffers[key];
 }
 
 double QCasuZMQ::getLastValue(dataType key) const
 {
     if (findKey(m_DATA_BUFFERS, key)){
-        if (m_buffers[key]->isEmpty()) return 0;
-        else return m_buffers[key]->last().value;
+        bool isValid;
+        QCPRange bufferRange = m_buffers[key]->valueRange(isValid);
+        if (isValid) return bufferRange.upper;
+        else return 0;
     }
     return m_values.value(key).value;
 }
 
-QList<QCPData> QCasuZMQ::getLastValuesList(dataType key) const
+QList<QCPGraphData> QCasuZMQ::getLastValuesList(dataType key) const
 {
-    if(findKey(m_DATA_BUFFERS, key)) return QList<QCPData>();
     return m_values.values(key);
 }
 
@@ -138,17 +138,19 @@ void QCasuZMQ::closeLogFile(QString device)
     m_logOpen[device] = false;
 }
 
-void QCasuZMQ::addToBuffer(dataType key, QCPData data)
+void QCasuZMQ::addToBuffer(dataType key, QCPGraphData data)
 {
     bool t_plot_to_update = false;
-    if(m_buffers[key]->empty() || (data.key -  m_buffers[key]->lastKey())*1000 >g_settings->value("trendSampleTime_ms").toDouble()){
-        m_buffers[key]->insert(data.key, data);
+    if(m_buffers[key]->isEmpty() || (data.key -  m_buffers[key]->getLastTime())*1000 >g_settings->value("trendSampleTime_ms").toDouble()){
+        m_buffers[key]->add(data);
         t_plot_to_update = true;
     }
+    m_buffers[key]->removeBefore(QTime(0,0,0).secsTo(g_settings->value("trendTimeSpan").toTime()));/*
     while(data.key - m_buffers[key]->firstKey() > QTime(0,0,0).secsTo(g_settings->value("trendTimeSpan").toTime())){
         m_buffers[key]->erase(m_buffers[key]->begin()); //Delete data older than $timeSpan
+
         t_plot_to_update = true;
-    }
+    }*/
 
     if (t_plot_to_update){
         m_buffers[key]->emitReplot();
@@ -185,7 +187,7 @@ void QCasuZMQ::messageReceived(const QList<QByteArray> &message)
     QString command(message.at(2));
     std::string data(message.at(3).constData(), message.at(3).size());
 
-    QCPData newData;
+    QCPGraphData newData;
     newData.key = QDateTime::currentDateTime().toMSecsSinceEpoch() / 1000.0;
 
     if(g_settings->value("log_on").toBool() && !m_logOpen[device]) openLogFile(device);
@@ -384,16 +386,6 @@ zmqBuffer::zmqBuffer(QString casuName, dataType key) :
     }
 }
 
-void zmqBuffer::insert(const double &key, const QCPData &value)
-{
-    this->QMap::insert(key, value);
-}
-
-void zmqBuffer::erase(QMap::iterator it)
-{
-    this->QMap::erase(it);
-}
-
 void zmqBuffer::emitReplot()
 {
     emit updatePlot();
@@ -416,6 +408,8 @@ dataType zmqBuffer::getDataType() const
 
 double zmqBuffer::getLastTime() const
 {
-    if (this->isEmpty()) return 0;
-    return last().key;
+    if (this->isEmpty())
+        return 0;
+    else
+        return std::prev(this->constEnd())->key;
 }

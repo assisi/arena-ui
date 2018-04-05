@@ -29,7 +29,7 @@ private:
      * This is workaround for the context menu action because group functionality was added late
      */
 
-    QMap<QCPGraph *, zmqData::zmqBuffer *> m_connectionMap;
+    QMap<QCPGraph *, QSharedPointer <zmqData::zmqBuffer> > m_connectionMap;
 
     bool autoPosition;
     bool showLegend;
@@ -43,19 +43,19 @@ public:
      * \brief Add single QCPGraph to this plot and connect it to corresponding QTreeBuffer
      * \param treeItem
      */
-    void addGraph(zmqData::zmqBuffer *treeItem);
+    void addGraph(QSharedPointer <zmqData::zmqBuffer> treeItem);
     /*!
      * \brief Parse multiple QTreeBuffer items
      * \param itemList
      */
-    void addGraphList(QList<zmqData::zmqBuffer *> &itemList);
+    void addGraphList(QList<QSharedPointer <zmqData::zmqBuffer> > &itemList);
     /*!
      * \brief Remove single QCPGraph and disconnect it from its source
      * \param graph
      */
     void removeGraph(QCPGraph* graph);
 
-    zmqData::zmqBuffer *link(QCPGraph *graph);
+    QSharedPointer<zmqData::zmqBuffer> link(QCPGraph *graph);
 protected:
     /*!
      * \brief Overloaded function which is responsible for constat 9:16 size ratio

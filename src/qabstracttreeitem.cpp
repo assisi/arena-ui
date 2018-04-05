@@ -25,9 +25,9 @@ bool QAbstractTreeItem::isChildSelected() const
     return childSelected;
 }
 
-QList<zmqBuffer *> QAbstractTreeItem::getBuffers() const
+QList<QSharedPointer <zmqData::zmqBuffer> > QAbstractTreeItem::getBuffers() const
 {
-    QList<zmqBuffer *> outList;
+    QList<QSharedPointer <zmqData::zmqBuffer> > outList;
     for(auto &key : m_DATA_BUFFERS){
         if(m_widgetMap[key]->isSelected()){
             outList.append((sCast(m_sceneItem))->getBuffers(key));

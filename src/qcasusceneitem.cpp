@@ -10,9 +10,9 @@ bool QCasuSceneItem::isGroup() const
     return false;
 }
 
-QList<zmqBuffer *> QCasuSceneItem::getBuffers(dataType key) const
+QList<QSharedPointer <zmqData::zmqBuffer> > QCasuSceneItem::getBuffers(dataType key) const
 {
-    QList<zmqBuffer *> out;
+    QList<QSharedPointer <zmqData::zmqBuffer> > out;
     out.append(m_zmqObject->getBuffer(key));
     return out;
 }
