@@ -75,8 +75,7 @@ QTrendPlot::QTrendPlot(QTreeWidget* tree1,QTreeWidget* tree2 , QWidget *parent) 
            auto item = legend->itemWithPlottable(graph(k));
            if (item->selected() || graph(k)->selected()){
              item->setSelected(true);
-             //graph(k)->setSelected(true);
-             //TODO: qcp
+             graph(k)->setSelection(QCPDataSelection(QCPDataRange(0,graph(k)->dataCount())));
            }
          }
    });
@@ -92,6 +91,7 @@ void QTrendPlot::addGraph(QSharedPointer<zmqBuffer> buffer){
     graph()->setData(buffer);
     graph()->setName(buffer->getLegendName());
     graph()->setPen(QPen(Qt::black));
+    graph()->setSelectable(QCP::stWhole);
 
     while(1){
         bool color_used = false;
@@ -104,8 +104,7 @@ void QTrendPlot::addGraph(QSharedPointer<zmqBuffer> buffer){
             break;
         }
     }
-    // NOTE: QCustomPlot::replot() has default value
-    connect(buffer.data(), &zmqBuffer::updatePlot, [&](){ replot(); });
+    connect(buffer.data(), &zmqBuffer::updatePlot, [&](){ replot(QCustomPlot::rpQueuedReplot); });
     m_connectionMap.insert(graph(), buffer);
 }
 
@@ -128,8 +127,7 @@ void QTrendPlot::addGraphList(QList<QSharedPointer<zmqBuffer> > &bufferList)
         rescaleAxes();
         if(yAxis->range().size() < 5)yAxis->setRange(yAxis->range().center(), 5, Qt::AlignCenter);
         if(graph()->data()->isEmpty())xAxis->setRange(QTime(0,0,0).msecsTo(QTime::currentTime()) /1000, 60, Qt::AlignRight);
-        //else xAxis->setRange(graph()->data()->lastKey(), 60, Qt::AlignRight);
-        //TODO: qcp
+        else xAxis->setRange(std::prev(graph()->data()->constEnd())->key, 60, Qt::AlignRight);
     }
 }
 
@@ -174,9 +172,8 @@ void QTrendPlot::prettyPlot()
         for(int k = 0; k < graphCount();k++){
             QSharedPointer<QCPGraphDataContainer> tempMap = graph(k)->data();
             if(tempMap->isEmpty()) continue;
-            //double tempKey = tempMap->lastKey();
-            //if(k==0 || temp.key < tempKey) temp = tempMap->find(tempKey).value();
-            //TODO: qcp
+            const QCPGraphData* tempData = std::prev(tempMap->constEnd());
+            if(k==0 || temp.key < tempData->key) temp = *tempData;
         }
         if(!temp.key) return;
 
