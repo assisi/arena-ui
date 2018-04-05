@@ -153,7 +153,7 @@ void QTrendPlot::addSelectedGraphs(){
 
     addGraphList(bufferList);
 
-    replot();
+    replot(QCustomPlot::rpQueuedReplot);
 }
 
 void QTrendPlot::prettyPlot()
@@ -204,7 +204,7 @@ void QTrendPlot::showContextMenu(QPoint position){
     connect(tempAction, &QAction::triggered, [&](){
         showLegend = !showLegend;
         legend->setVisible(showLegend);
-        replot();
+        replot(QCustomPlot::rpQueuedReplot);
     });
 
     tempAction = menu->addAction("Remove selected graphs");

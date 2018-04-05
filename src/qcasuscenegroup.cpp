@@ -136,7 +136,6 @@ QVector<QLineF> QCasuSceneGroup::Prim(const QVector<QPointF> &list)
     QVector<QLineF> mst;
     QVector<QPointF> visited;
 
-    // NOTE: experimental nested range-for
     for (int k = 0; k < list.size(); k++){
         for (int i = k+1; i < list.size(); i++){
             allLines.append(QLineF(list[k],list[i]));

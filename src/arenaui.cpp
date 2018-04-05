@@ -131,7 +131,6 @@ ArenaUI::ArenaUI(QWidget *parent) :
     // - 30fps update
     m_sceneUpdate = new QTimer(this);
     m_sceneUpdate->start(33);
-    // NOTE: QGraphicsScene::update() has default value
     connect(m_sceneUpdate, &QTimer::timeout, [&](){ m_arenaScene->update(); });
 }
 
