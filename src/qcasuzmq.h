@@ -45,7 +45,6 @@ namespace zmqData {
             QString getLegendName() const;
             QString getCasuName() const;
             dataType getDataType() const;
-            const QCPGraphData *getLastData() const;
             double getLastTime() const;
     signals:
             void updatePlot();

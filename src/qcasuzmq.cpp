@@ -406,11 +406,6 @@ dataType zmqBuffer::getDataType() const
     return m_key;
 }
 
-const QCPGraphData* zmqBuffer::getLastData() const
-{
-    return std::prev(this->constEnd());
-}
-
 double zmqBuffer::getLastTime() const
 {
     if (this->isEmpty())
