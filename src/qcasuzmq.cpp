@@ -145,12 +145,8 @@ void QCasuZMQ::addToBuffer(dataType key, QCPGraphData data)
         m_buffers[key]->add(data);
         t_plot_to_update = true;
     }
-    m_buffers[key]->removeBefore(QTime(0,0,0).secsTo(g_settings->value("trendTimeSpan").toTime()));/*
-    while(data.key - m_buffers[key]->firstKey() > QTime(0,0,0).secsTo(g_settings->value("trendTimeSpan").toTime())){
-        m_buffers[key]->erase(m_buffers[key]->begin()); //Delete data older than $timeSpan
 
-        t_plot_to_update = true;
-    }*/
+    m_buffers[key]->removeBefore(QDateTime::currentDateTime().toMSecsSinceEpoch() / 1000.0 - QTime(0,0,0).secsTo(g_settings->value("trendTimeSpan").toTime()));
 
     if (t_plot_to_update){
         m_buffers[key]->emitReplot();
