@@ -32,7 +32,7 @@ namespace zmqData {
     const static std::vector<dataType> m_DATA_SETPOINT = {Peltier, Airflow, Speaker, VibePatt, Speaker_freq,
                                                          Speaker_amp, VibePatt_period, VibePatt_freq, VibePatt_amp,  LED};
 
-    class zmqBuffer : public QObject, public QCPDataMap
+    class zmqBuffer : public QObject, public QCPGraphDataContainer
         {
             Q_OBJECT
         private:
@@ -41,14 +41,12 @@ namespace zmqData {
             dataType m_key;
         public:
             zmqBuffer(QString casuName, dataType key);
-            void insert(const double &key, const QCPData &value);
-            void erase(QMap::iterator it);
             void emitReplot();
             QString getLegendName() const;
             QString getCasuName() const;
             dataType getDataType() const;
             double getLastTime() const;
-        signals:
+    signals:
             void updatePlot();
         };
 }
@@ -60,9 +58,9 @@ class QCasuZMQ : public QObject
 public:
     explicit QCasuZMQ(QObject *parent = 0, QString casuName = QString());
 
-    zmqData::zmqBuffer* getBuffer(zmqData::dataType key) const;
+    QSharedPointer<zmqData::zmqBuffer> getBuffer(zmqData::dataType key) const;
     double getLastValue(zmqData::dataType key) const;
-    QList<QCPData> getLastValuesList(zmqData::dataType key) const;
+    QList<QCPGraphData> getLastValuesList(zmqData::dataType key) const;
     QColor getLedColor() const;
     bool getState(zmqData::dataType key) const;
     int getAvgSamplingTime() const;
@@ -89,8 +87,8 @@ private:
 
     QTimer* m_connectionTimer;
 
-    QMap<zmqData::dataType, zmqData::zmqBuffer*> m_buffers;
-    QMultiMap<zmqData::dataType, QCPData> m_values;
+    QMap<zmqData::dataType, QSharedPointer<zmqData::zmqBuffer> > m_buffers;
+    QMultiMap<zmqData::dataType, QCPGraphData> m_values;
     QMap<zmqData::dataType, double> m_lastDataTime;
     QMap<zmqData::dataType, bool> m_state;
     QColor m_ledColor;
@@ -104,7 +102,7 @@ private:
     void openLogFile(QString);
     void closeLogFile(QString);
 
-    void addToBuffer(zmqData::dataType key, QCPData data);
+    void addToBuffer(zmqData::dataType key, QCPGraphData data);
     void connectZMQ();
 
 signals:

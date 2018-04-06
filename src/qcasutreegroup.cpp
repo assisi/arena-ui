@@ -51,9 +51,9 @@ QSelectionTreeItem::QSelectionTreeItem(QGraphicsScene *scene) :
 {
 }
 
-QList<zmqBuffer *> QSelectionTreeItem::getBuffers() const
+QList<QSharedPointer<zmqBuffer> > QSelectionTreeItem::getBuffers() const
 {
-    QList<zmqBuffer *> outList;
+    QList<QSharedPointer<zmqBuffer> > outList;
     for(auto &key : m_DATA_BUFFERS){
         if(m_widgetMap[key]->isSelected()){
             for(auto& item : m_scene->selectedItems()){
