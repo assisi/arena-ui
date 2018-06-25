@@ -56,7 +56,7 @@ QCasuTreeItem::QCasuTreeItem(QCasuZMQ *zmqObject) :
         tempWidget->addChild(new QNoSortTreeItem(QStringList("Amplitude")));
         for(uint k = 0; k < m_VIBE_ARRAY.size(); k++){
             m_widgetMap.insert(m_VIBE_ARRAY[k], tempWidget->child(k));
-            tempWidget->setFlags(Qt::ItemIsEnabled);
+            tempWidget->child(k)->setFlags(Qt::ItemIsEnabled);
         }
         tempWidget->setFlags(Qt::ItemIsEnabled);
         addChild(tempWidget);
@@ -75,7 +75,10 @@ QCasuTreeItem::QCasuTreeItem(QCasuZMQ *zmqObject) :
         tempWidget->child(3)->addChild(new QNoSortTreeItem(QStringList("Amplitude")));
         for(uint k = 0; k < m_SETPOINT_ARRAY.size(); k++){
             m_widgetMap.insert(m_SETPOINT_ARRAY[k], tempWidget->child(k));
-            tempWidget->child(k)->setFlags(Qt::ItemIsEnabled);
+            if (k == 0) // CHECK IF CHILD IS PELTIER TO MAKE IT SELECTABLE
+                tempWidget->child(0)->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled);
+            else
+                tempWidget->child(k)->setFlags(Qt::ItemIsEnabled);
         }
         for(uint k = 0; k < m_SPEAKER_ARRAY.size(); k++){
             m_widgetMap.insert(m_SPEAKER_ARRAY[k], tempWidget->child(2)->child(k));

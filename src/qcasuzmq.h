@@ -28,8 +28,8 @@ namespace zmqData {
     const static std::vector<dataType> m_VIBEPATT_ARRAY = {VibePatt_period, VibePatt_freq, VibePatt_amp};
 
     const static std::vector<dataType> m_DATA_BUFFERS = {IR_F, IR_FL, IR_BL, IR_B, IR_BR, IR_FR,
-                                                         Temp_F, Temp_L, Temp_B, Temp_R, Temp_Top, Temp_Pcb, Temp_Ring, Temp_Wax,};
-    const static std::vector<dataType> m_DATA_SETPOINT = {Peltier, Airflow, Speaker, VibePatt, Speaker_freq,
+                                                         Temp_F, Temp_L, Temp_B, Temp_R, Temp_Top, Temp_Pcb, Temp_Ring, Temp_Wax, Peltier};
+    const static std::vector<dataType> m_DATA_SETPOINT = {Airflow, Speaker, VibePatt, Speaker_freq,
                                                          Speaker_amp, VibePatt_period, VibePatt_freq, VibePatt_amp,  LED};
 
     class zmqBuffer : public QObject, public QCPGraphDataContainer

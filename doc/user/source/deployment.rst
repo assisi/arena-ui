@@ -1,3 +1,5 @@
+.. _deploy_link:
+
 Deploying CASU controller code
 ==============================
 

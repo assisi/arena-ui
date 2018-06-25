@@ -42,6 +42,12 @@ QCasuTreeGroup::QCasuTreeGroup(QString name) :
         tempWidget->setFlags(Qt::ItemIsEnabled);
         this->addChild(tempWidget);
     }
+    /* Peltier */{
+        tempWidget = new QNoSortTreeItem(QStringList("Peltier"));
+        m_widgetMap.insert(Peltier, tempWidget);
+        tempWidget->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled);
+        this->addChild(tempWidget);
+    }
 }
 
 

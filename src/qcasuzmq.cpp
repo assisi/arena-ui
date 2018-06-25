@@ -265,7 +265,7 @@ void QCasuZMQ::messageReceived(const QList<QByteArray> &message)
         peltier.ParseFromString(data);
         newData.value = peltier.temp();
         m_lastDataTime[Peltier] = m_values.value(Peltier).key;
-        m_values.replace(Peltier, newData);
+        this->addToBuffer(Peltier, newData);
         m_state[Peltier] = command == "On";
         // ---- LOG ---- //
         if(g_settings->value("log_on").toBool()){
