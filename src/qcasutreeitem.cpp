@@ -56,7 +56,7 @@ QCasuTreeItem::QCasuTreeItem(QCasuZMQ *zmqObject) :
         tempWidget->addChild(new QNoSortTreeItem(QStringList("Amplitude")));
         for(uint k = 0; k < m_VIBE_ARRAY.size(); k++){
             m_widgetMap.insert(m_VIBE_ARRAY[k], tempWidget->child(k));
-            tempWidget->setFlags(Qt::ItemIsEnabled);
+            tempWidget->child(k)->setFlags(Qt::ItemIsEnabled);
         }
         tempWidget->setFlags(Qt::ItemIsEnabled);
         addChild(tempWidget);
