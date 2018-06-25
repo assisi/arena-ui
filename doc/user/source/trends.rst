@@ -1,5 +1,4 @@
-
-.. trends:
+.. _trends_link:
 
 Displaying data trends
 ======================

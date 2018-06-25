@@ -12,4 +12,4 @@ Tab is populated with two treeviews whose relative size to each other can be
 
     Several devices can be selected simultaneously by clicking and dragging on their name
     in the treeviews. User can select multiple devices by holding **Ctrl** modifier. Mixed selection between both treeviews is possible. A context menu, accessed by right-clicking on a device name, enables the plotting of sensor value trends in time, as
-    described in more detail in `Displaying data trends`_ .
+    described in more detail in :ref:`trends_link`.

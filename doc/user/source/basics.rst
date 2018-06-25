@@ -6,15 +6,20 @@ This section describes basic operation of the Arena UI. The program can be start
 User interface layout
 ---------------------
 
-The basic layout of the user interface is shown in Figure :ref:`fig_uielem`.
+The basic layout of the user interface is shown in next figure:
 
-
-.. _fig_uielem:
 
 .. figure:: figures/arena_ui_elements.png
     :align: center
 
     Basic elements of the Arena UI
+    
+Basic layout is divided into 5 different areas:
+    1. Menu pane
+    2. Arena state visualization
+    3. Configuration tabs
+    4. CASU state treeview
+    5. Group selection treeview
 
 Most of elements of the Arena UI can be resized with sliders betweem them. If slider is moved close to the edge of some element, that element will be hidden. It can be brought back with moving the slider from edge, revealing the hidden element.
 
@@ -59,18 +64,71 @@ actuator setpoints can be provided.
   **Physical position**
     CASUs are visualized at their respective positions (as specified in the .assisi file); Orientation is indicated by a short dash.
   **Selections status**
-    Selected CASUs are indicated by a dashed outline, whereas unselected CASUs have a solid outline. A treeview with actuator setpoints and sensor
+    Selected CASUs are indicated by a dashed outline, whereas unselected CASUs have a solid outline. If two or more CASUs are grouped together, visualization will shown them in unique color and connect them with dashed line when selected.
+
+    A treeview with actuator setpoints and sensor
     values appears in the *Casu data* configuration tab for each selected CASU.
   **Connection status**
     Unconnected CASUs have a red outline, connected CASUs have a green outline.
+
+.. figure:: figures/casu_selection.png
+  :align: center
+  :scale: 50%
+
+  Example of connected/unconnected CASUs, selected/unselected CASUs and grouped CASUs
+..
   **Temperature readings**
     Temperature readings are displayed as circular segments at 2cm distance from the CASU body; They are color-coded, with a colorbar displayed in the top-left corner of the visualization area.
+
+.. figure:: figures/casu_temp.png
+  :align: center
+  :scale: 50%
+  Temperature sensor visualization
+..
+
   **Proximity sensor readings**
     Proximity sensor readings are visualized as six triangles radiating out of the CASU body. Size of triangle depends on read proximity value.
+
+.. figure:: figures/casu_prox.png
+  :align: center
+  :scale: 50%
+  
+  Proximity sensor visualization
+..
+
   **Diagnostic LED actuator**
     Diagnostic LED state is indicated by the color of the CASU body.
+
+.. figure:: figures/casu_led.png
+  :align: center
+  :scale: 50%
+  
+  Led color visualization
+  
+..
+
   **Airflow actuator**
-    When the airflow actuator is turned on, a shaded circular area is displayed around the CASU body
+    When the airflow actuator is turned on, an animation of a fan is displayed over the CASU body.
+
+.. figure:: figures/casu_air.png
+  :align: center
+  :scale: 50%
+  
+  Airflow status visualization
+  
+..
+
+  **Vibration actuator**
+    When the vibration actuator is turned on, an animation of a vibrating dotted band is displayed around the CASU body.
+
+.. figure:: figures/casu_vibr.png
+  :align: center
+  :scale: 50%
+  
+  Vibration status visualization
+  
+..
+
   **Context menu** *(right mouse click in the arena visualization area)*
     * Toggle marker visability
 
@@ -105,35 +163,7 @@ actuator setpoints can be provided.
       - VibrationPattern *(F6)*
 
 Configuration tabs
-=======
-* **Physical position** - CASUs are visualized at their respective
-  positions (as specified in the .assisi file); Orientation is
-  indicated by a short dash at the front;
-* **Selections status** - CASUs are selected by left mouse click;
-  selected CASUs are indicated by a solid outline, whereas unselected
-  CASUs have a dashed outline; a treeview with actuator setpoints and
-  sensor values appears in the *Casu data* configuration tab for each
-  selected CASU; *Ctrl-Click* on an CASU toggles its selection state;
-* **Connection status** - Unconnected CASUs have a red outline,
-  connected CASUs have a green outline;
-* **Temperature readings** - Temperature readings are displayed as circular
-  segments at 2cm distance from the CASU body; They are color-coded,
-  with a colorbar displayed in the bottom-left corner of the
-  visualization area;
-* **Proximity sensor readings** - Proximity sensor readings are
-  visualized as six triangles radiating out of the CASU body;
-* **Diagnostic LED actuator** - Diagnostic LED state is indicated by
-  the color of the CASU body;
-* **Airflow actuator** - When the airflow actuator is turned on, light
-  yellow indicators are circling around the CASU body;
-* **Vibration actuator** - When the vibration actuator is turned on, a
-  light grey waveform is shown circling around the CASU body; Frequency is
-  visualized by the number of minima/maxima of the waveform, and
-  amplitude is visualized by the speed of motion of the waveform;
-* **Context menu** - Activated by right-click in the arena
-  visualization area; Enables on/off toggling of sensor
-  visualizations, CASU grouping/ungrouping, customizing connection
-  settings and providing **actuator setpoints**
+==================
 
 CASU state treeview
 ~~~~~~~~~~~~~~~~~~~
@@ -149,7 +179,7 @@ values for all actuator setpoints and sensor values. Several devices
 can be selected simultaneously by clicking and dragging on their name
 in the treeview. A context menu, accessed by right-clicking on a
 device name, enables the plotting of sensor value trends in time, as
-described in more detail in :ref:`trends`.
+described in more detail in :ref:`trends_link`.
 
 
     See :ref:`treeview_link`.
@@ -160,4 +190,7 @@ described in more detail in :ref:`trends`.
     See :ref:`trends_link`.
 
   **Deployment**
+    Currently loaded project files are shown on top, and bellow are buttons for operating the pre-written program sequences and simulator accompanied with textual output box where user can catch shell messages.
+    
+    See :ref:`deploy_link`.
     
