@@ -7,6 +7,7 @@ QCasuTreeGroup::QCasuTreeGroup(QString name) :
     m_name(name)
 {
     this->setData(0,Qt::DisplayRole,QStringList(m_name));
+    this->setFlags(Qt::ItemIsEnabled);
     QTreeWidgetItem* tempWidget;
 
     /* IR branch children */{
