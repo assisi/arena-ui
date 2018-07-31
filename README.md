@@ -1,5 +1,7 @@
 # assisi-arena-ui #
 
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.1323953.svg)](https://doi.org/10.5281/zenodo.1323953)
+
 Bee arena user interface for the ASSISI|bf project.
 
 ## Instructions for users ##
@@ -32,6 +34,15 @@ libboost-dev
 ### Building the code ###
 
 From Qt Creator ...
+
+### Building the docs
+
+User documentation can be compiled in the doc/user directory:
+
+```
+make html
+make latexpdf
+```
 
 ## Debian packaging ##
 
